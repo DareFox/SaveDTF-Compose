@@ -1,1 +1,0 @@
-data class Entry(val name: String, val url: String, var isLoaded: Boolean)
