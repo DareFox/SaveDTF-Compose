@@ -37,15 +37,15 @@ fun MenuPreview() {
 @Composable
 fun Menu() {
     Surface(Modifier.fillMaxWidth()) {
-        var entries by remember { mutableStateOf(mutableStateListOf<Entry>()) }
         Column() {
+            var entries by remember { mutableStateOf(mutableStateListOf<Entry>()) }
             var pageURL by remember { mutableStateOf("") }
             TextField(
                 value = pageURL,
                 textStyle = MaterialTheme.typography.subtitle1,
                 shape = RectangleShape,
                 onValueChange = {
-                    pageURL = it
+                    pageURL = it  // IT WILL RECOMPOSE entries; TODO: fix unnecessary recomposition
                 },
                 singleLine = true,
                 placeholder = {
@@ -58,8 +58,8 @@ fun Menu() {
                 keyboardActions = KeyboardActions(onDone = { FocusRequester.Default.requestFocus() }),
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
                 modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.background).onKeyEvent {
-                    if (it.key == Key.Enter && it.type == KeyEventType.KeyUp) {
-                        entries.add(0,Entry("Entry", pageURL, true))
+                    if (it.key == Key.Enter && pageURL.isNotEmpty() && it.type == KeyEventType.KeyUp) {
+                        entries.add(0, Entry("Page Name", pageURL, true))
                         pageURL = ""
                     }
                     true
@@ -68,7 +68,7 @@ fun Menu() {
             Button(
                 onClick = {
                     if (pageURL.isNotEmpty()) {
-                        entries.add(0,Entry("Entry", pageURL, true))
+                        entries.add(0, Entry("Page Name", pageURL, true))
                     }
                     pageURL = ""
                 },
@@ -82,6 +82,7 @@ fun Menu() {
             if (entries.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(20.dp))
             }
+
             EntryList(entries)
         }
     }

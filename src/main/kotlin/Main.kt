@@ -23,9 +23,7 @@ fun main() = application {
         title = "SaveDTF!",
         icon = painterResource("img/hehe.webp"),
     ) {
-//        test()
-//        AnimatedVisibilityLazyColumnDemo()
-        SaveDtfTheme(false) {
+        SaveDtfTheme(true) {
             Surface(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
                 Column {
                     InfoBanner()
