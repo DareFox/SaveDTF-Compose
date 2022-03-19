@@ -29,7 +29,7 @@ import ui.SaveDtfTheme
 fun EntryListPreview() {
     SaveDtfTheme(true) {
         EntryList(
-            listOf(
+            mutableListOf(
                 Entry("tes", "ets", true)
             )
         )
@@ -38,7 +38,7 @@ fun EntryListPreview() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun EntryList(entries: List<Entry>) {
+fun EntryList(entries: MutableList<Entry>) {
     Surface(color = Color.Black.copy(0.0f)) {
         Crossfade(entries) {
             if (entries.isEmpty()) {
@@ -58,8 +58,6 @@ fun EntryList(entries: List<Entry>) {
             } else {
                 val scope = rememberCoroutineScope()
                 val lazyListState = rememberLazyListState()
-
-                println("column init")
 
                 LazyColumn(state = lazyListState) {
                     items(entries, key = { it.id }) { entry ->
@@ -81,7 +79,7 @@ fun EntryList(entries: List<Entry>) {
                     }
                 }
 
-                scope.launch {
+                scope.launch { // scroll on top, when adding new elements
                     lazyListState.animateScrollToItem(0)
                     lazyListState.animateScrollToItem(0) // scroll works only on second call, idk why ¯\_(ツ)_/¯
                 }
