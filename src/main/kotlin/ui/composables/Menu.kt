@@ -40,43 +40,22 @@ fun Menu() {
         Column() {
             var entries by remember { mutableStateOf(mutableStateListOf<Entry>()) }
             var pageURL by remember { mutableStateOf("") }
-            TextField(
-                value = pageURL,
-                textStyle = MaterialTheme.typography.subtitle1,
-                shape = RectangleShape,
-                onValueChange = {
-                    pageURL = it  // IT WILL RECOMPOSE entries; TODO: fix unnecessary recomposition
+            var input by remember { mutableStateOf("") }
+
+            InputField(
+                onInputChange = {
+                    println("oninputchange " + it)
+                    pageURL = it
+                    input = it
                 },
-                singleLine = true,
-                placeholder = {
-                    Text(
-                        text = "Ссылка на профиль или пост на DTF",
-                        style = MaterialTheme.typography.subtitle1
-                    )
+                onConfirm = {
+                    println("onConfirm " + it)
+                    pageURL = it;
+                    input = ""
                 },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { FocusRequester.Default.requestFocus() }),
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
-                modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.background).onKeyEvent {
-                    if (it.key == Key.Enter && pageURL.isNotEmpty() && it.type == KeyEventType.KeyUp) {
-                        entries.add(0, Entry("Page Name", pageURL, true))
-                        pageURL = ""
-                    }
-                    true
-                },
-            )
-            Button(
-                onClick = {
-                    if (pageURL.isNotEmpty()) {
-                        entries.add(0, Entry("Page Name", pageURL, true))
-                    }
-                    pageURL = ""
-                },
-                content = {
-                    Text("Добавить в очередь", style = MaterialTheme.typography.subtitle1, fontWeight = FontWeight.Bold)
-                },
-                modifier = Modifier.fillMaxWidth().defaultMinSize(Dp.Unspecified, 50.dp),
-                shape = RoundedCornerShape(0, 0, 40, 40)
+                input = input,
+                placeholderInput = "input placeholder",
+                placeholderButton = "button placeholder"
             )
 
             if (entries.isNotEmpty()) {
