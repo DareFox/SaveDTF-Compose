@@ -6,7 +6,7 @@ class FileCache(val subdirName: String? = null): BinaryCache {
     private val tempFolder
         get() = getTempCacheFolder(subdirName)
 
-    override fun addValue(key: String, value: ByteArray) {
+    override fun setValue(key: String, value: ByteArray) {
         tempFolder.resolve(key).writeBytes(value)
     }
 

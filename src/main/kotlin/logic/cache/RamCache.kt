@@ -7,9 +7,9 @@ class RamCache(val id: String? = null) : BinaryCache {
     private val cache: MutableMap<String, SoftReference<ByteArray>> = ConcurrentHashMap()
     private val fileCache = FileCache(id)
 
-    override fun addValue(key: String, value: ByteArray) {
+    override fun setValue(key: String, value: ByteArray) {
         cache[key] = SoftReference(value)
-        fileCache.addValue(key, value)
+        fileCache.setValue(key, value)
     }
 
     override fun getValueOrNull(key: String): ByteArray? {
