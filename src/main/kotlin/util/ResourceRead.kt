@@ -4,7 +4,10 @@ import java.net.URL
 
 private val dummy = object {}
 
-fun readResource(path: String): URL {
+/**
+ * Read resource at path
+ */
+private fun readResourceOrNull(path: String, fixedPathCallback: (String) -> Unit): URL? {
     // If string starts with ./ or .\
     // e.g ./foo/bar or .\foo\bar
     val dotSlashRegex = """^.(/ | \\)""".toRegex()
@@ -23,11 +26,28 @@ fun readResource(path: String): URL {
         "/" + it.value
     }
 
+    // Notify fixed path
+    fixedPathCallback(fixedPath)
+
     // Can read ONLY if path is '/foo/bar'
     // Neither './foo/bar' nor 'foo/bar'
-    val res = dummy.javaClass.getResource(fixedPath)
+    return dummy.javaClass.getResource(fixedPath)
+}
+
+/**
+ * Read resource at path
+ *
+ * Throws [IllegalArgumentException] if failed to load resource
+ */
+fun readResource(path: String): URL {
+    var fixedPath = path
+
+    val res = readResourceOrNull(path) {
+        fixedPath = it
+    }
+
     requireNotNull(res) {
-        "Failed to read resource $fixedPath"
+        "Failed to read resource $path. [Fixed path is $fixedPath]"
     }
 
     return res
