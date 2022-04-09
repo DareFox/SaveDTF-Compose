@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.20"
     id("org.jetbrains.compose") version "1.1.1"
 }
 
@@ -22,6 +23,8 @@ val ktor_version = "1.6.8"
 dependencies {
     implementation(compose.desktop.currentOs)
     implementation("br.com.devsrsouza.compose.icons.jetbrains:feather:1.0.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
