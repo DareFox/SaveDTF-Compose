@@ -3,6 +3,9 @@ package logic.cache
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * Represents cache in RAM. Internally uses [FileCache] for saving cache between sessions and for saving up space in RAM
+ */
 class RamCache(val id: String? = null) : BinaryCache {
     private val cache: MutableMap<String, SoftReference<ByteArray>> = ConcurrentHashMap()
     private val fileCache = FileCache(id)
@@ -12,6 +15,12 @@ class RamCache(val id: String? = null) : BinaryCache {
         fileCache.setValue(key, value)
     }
 
+    /**
+     * If value exists in disk, but not in RAM, this method will:
+     *  - read value from disk
+     *  - save it to RAM cache
+     *  - return value
+     */
     override fun getValueOrNull(key: String): ByteArray? {
         if (isExistInMemory(key)) {
             val value = cache[key]!!.get()
