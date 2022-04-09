@@ -1,11 +1,13 @@
+package util
+
 fun String.repeatOrEmpty(num: Int = 1): String {
-    if (num <= 0) {
-        return ""
+    return if (num <= 0) {
+        ""
     } else {
         var result = this
         for (number in 0..num) {
             result += this
         }
-        return result
+        result
     }
 }
