@@ -22,19 +22,30 @@ val ktor_version = "1.6.8"
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    // ICONS
     implementation("br.com.devsrsouza.compose.icons.jetbrains:feather:1.0.0")
 
+    // Kotlin Serialization. For caching
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
+    // Http-client Ktor. For downloading media from servers
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
 
+    // API for cmtt websites
     implementation("com.github.DareFox:kmttAPI:0.2.0")
 
+    // HTML Parser
     implementation("org.jsoup:jsoup:1.14.3")
 
+    // Function rate limiter
     implementation("io.github.resilience4j:resilience4j-ratelimiter:1.7.1")
     implementation("io.github.resilience4j:resilience4j-kotlin:1.7.1")
+
+    // Logger
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.20")
+    implementation("org.slf4j:slf4j-simple:1.7.29")
+
 }
 
 tasks.withType<KotlinCompile> {
