@@ -26,7 +26,9 @@ suspend fun Document.saveImages(): Document {
     }
 
     downloadElements(imageContainers, "data-image-src") {
-        Element("img").attr("src", it.toBase64HTML())
+        Element("img")
+            .attr("src", it.toBase64HTML())
+            .attr("style", "height: 100%; width: 100%; object-fit: contain")
     }
 
     return this
