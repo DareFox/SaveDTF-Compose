@@ -6,7 +6,7 @@ package util
  * @sample getIdOrNullSample
  */
 fun String.getMediaIdOrNull(): String? {
-    val regex = Regex("""(?<=leonardo\.osnova\.io\/)\S+((?=\/)|${'$'}|\s*)""")
+    val regex = Regex("""(?<=leonardo\.osnova\.io\/)\S+?[^\/](?=\/|${'$'}|\s+)""")
     val search = regex.find(this)
     return search?.value
 }
