@@ -9,7 +9,6 @@ import logic.cache.buildCache
 import logic.ktor.Client
 import logic.ktor.rateRequest
 import mu.KotlinLogging
-import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import util.getMediaId
 import util.getValueWithMetadata
@@ -18,57 +17,7 @@ import util.setValueWithMetadata
 private val logger = KotlinLogging.logger { }
 private val cache = buildCache()
 
-// TODO check on coroutine cancellability
-
-suspend fun Document.saveImages(): Document {
-    val imageContainers = getElementsByClass("andropov_image").filter {
-        it.attr("data-image-src").isNotEmpty()
-    }
-
-    downloadElements(imageContainers, "data-image-src") {
-        Element("img")
-            .attr("src", it.toBase64HTML())
-            .attr("style", "height: 100%; width: 100%; object-fit: contain")
-    }
-
-    return this
-}
-
-suspend fun Document.saveVideos(): Document {
-    val videoContainers = getElementsByClass("andropov_video").filter {
-        it.attr("data-video-mp4").isNotEmpty()
-    }
-
-    downloadElements(videoContainers, "data-video-mp4") {
-        val base = Element("video").attr("controls", "")
-        val sourceElement = Element("source").attr("src", it.toBase64HTML())
-
-        base.prependChild(sourceElement)
-    }
-
-    return this
-}
-
-private suspend fun downloadElements(
-    elements: List<Element>,
-    urlAttriubte: String,
-    transform: (BinaryMedia) -> Element,
-) {
-    val responses = getMediaFromElements(elements, urlAttriubte)
-
-    responses.forEach { (element, binaryMedia) ->
-        // Delete all children from Element node
-        // I think it could be done faster, if instead of remove children,
-        // we will just remove parent node and recreate it with new children
-        element.children().forEach {
-            it.remove()
-        }
-
-        element.prependChild(transform(binaryMedia))
-    }
-}
-
-private suspend fun getMediaFromElements(
+internal suspend fun downloadMedia(
     elements: List<Element>,
     attributeMediaURL: String,
 ): MutableMap<Element, BinaryMedia> {
@@ -97,7 +46,7 @@ private suspend fun getMediaFromElements(
                     logger.info { "Downloaded $downloadUrl" }
                     val byteArray = response.content.toByteArray()
                     val type = response.contentType()!!
-                    val metadata = MediaMetadata(type.contentType, type.contentSubtype)
+                    val metadata = MediaMetadata(type.contentType, type.contentSubtype, mediaID)
 
                     cache.setValueWithMetadata(mediaID, byteArray, metadata)
                     logger.info { "Saved to cache" }
@@ -118,4 +67,3 @@ private suspend fun getMediaFromElements(
     logger.info { "All download jobs finished. Returning map of results" }
     return downloadMap
 }
-
