@@ -5,7 +5,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.*
-import logic.cache.RamCache
+import logic.cache.buildCache
 import logic.ktor.Client
 import logic.ktor.rateRequest
 import mu.KotlinLogging
@@ -16,7 +16,9 @@ import util.getValueWithMetadata
 import util.setValueWithMetadata
 
 private val logger = KotlinLogging.logger { }
-private val cache = RamCache()
+private val cache = buildCache()
+
+// TODO check on coroutine cancellability
 
 suspend fun Document.saveImages(): Document {
     val imageContainers = getElementsByClass("andropov_image").filter {
@@ -45,7 +47,11 @@ suspend fun Document.saveVideos(): Document {
     return this
 }
 
-private suspend fun downloadElements(elements: List<Element>, urlAttriubte: String, transform: (BinaryMedia) -> Element) {
+private suspend fun downloadElements(
+    elements: List<Element>,
+    urlAttriubte: String,
+    transform: (BinaryMedia) -> Element,
+) {
     val responses = getMediaFromElements(elements, urlAttriubte)
 
     responses.forEach { (element, binaryMedia) ->
@@ -60,7 +66,10 @@ private suspend fun downloadElements(elements: List<Element>, urlAttriubte: Stri
     }
 }
 
-private suspend fun getMediaFromElements(elements: List<Element>, attributeMediaURL: String): MutableMap<Element, BinaryMedia> {
+private suspend fun getMediaFromElements(
+    elements: List<Element>,
+    attributeMediaURL: String,
+): MutableMap<Element, BinaryMedia> {
     val downloaderScope = CoroutineScope(Dispatchers.IO)
     val downloadJobs = mutableListOf<Job>()
     val downloadMap = mutableMapOf<Element, BinaryMedia>()
@@ -88,17 +97,18 @@ private suspend fun getMediaFromElements(elements: List<Element>, attributeMedia
                     val type = response.contentType()!!
                     val metadata = MediaMetadata(type.contentType, type.contentSubtype)
 
-                    val media = BinaryMedia(metadata, byteArray)
-                    downloadMap[it] = media
-
                     cache.setValueWithMetadata(mediaID, byteArray, metadata)
                     logger.info { "Saved to cache" }
 
-                    media // return is here
+                    BinaryMedia(metadata, byteArray) // return is here
+
+
                 } else {
                     throw IllegalArgumentException("Server responded with ${response.status} status")
                 }
             }
+
+            downloadMap[it] = media //  add result
         }
     }
 
