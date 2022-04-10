@@ -8,7 +8,7 @@ import kotlin.math.log
 /**
  * Represents cache in RAM. Internally uses [FileCache] for saving cache between sessions and for saving up space in RAM
  */
-class RamCache(val id: String? = null) : BinaryCache {
+internal class RamCache(val id: String? = null) : BinaryCache {
     private val logger = KotlinLogging.logger {  }
     private val cache: MutableMap<String, SoftReference<ByteArray>> = ConcurrentHashMap()
     private val fileCache = FileCache(id)
@@ -39,7 +39,7 @@ class RamCache(val id: String? = null) : BinaryCache {
                 return value
         }
 
-        // If no cached value memory, load it from file.
+        // If no cached value in memory, load it from file.
         // If file doesn't exist, then return null
         return if (fileCache.isExist(key)) {
             logger.info { "$key doesn't exists in memory, but exists on hard drive" }
