@@ -21,7 +21,3 @@ data class BinaryMedia(val metadata: MediaMetadata, val binary: ByteArray) {
         return result
     }
 }
-
-fun BinaryMedia.toBase64HTML(): String {
-    return "data:${metadata.type}/${metadata.subtype};base64,${Base64.getEncoder().encodeToString(binary)}"
-}
