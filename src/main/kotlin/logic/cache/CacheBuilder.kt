@@ -9,7 +9,6 @@ enum class CacheType {
 
 private val cachedCaches: MutableMap<Pair<String?, CacheType>, BinaryCache> = ConcurrentHashMap() // nice naming
 
-@Synchronized
 fun buildCache(
     id: String? = null,
     cacheType: CacheType = CacheType.RAM,
@@ -17,18 +16,23 @@ fun buildCache(
 ): BinaryCache {
     val cache: BinaryCache
 
-    if (preventCacheDuplication && cachedCaches.containsKey(id to cacheType)) {
-        cache = cachedCaches[id to cacheType]!!
+    if (preventCacheDuplication) {
+        // Use double-check lock to prevent duplicate (https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java)
+        cache = cachedCaches[id to cacheType] ?: synchronized(cachedCaches) {
+           cachedCaches[id to cacheType] ?: createCache(cacheType, id).also {
+                cachedCaches[id to cacheType] = it
+           }
+        }
     } else {
-        cache = when (cacheType) {
-            CacheType.RAM -> RamCache(id)
-            CacheType.HARD_DRIVE -> FileCache(id)
-        }
-
-        if (preventCacheDuplication) {
-            cachedCaches[id to cacheType] = cache
-        }
+        cache = createCache(cacheType, id)
     }
 
     return cache
+}
+
+private fun createCache(type: CacheType, id: String?): BinaryCache {
+    return when (type) {
+        CacheType.RAM -> RamCache(id)
+        CacheType.HARD_DRIVE -> FileCache(id)
+    }
 }
