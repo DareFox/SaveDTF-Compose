@@ -1,4 +1,4 @@
-package logic.document
+package logic.document.processors
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
