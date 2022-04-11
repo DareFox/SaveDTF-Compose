@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.yield
+import logic.document.processors.changeTitle
 import logic.document.processors.downloadDocument
 import logic.document.processors.reformat
 import logic.document.processors.removeStyles
@@ -50,6 +51,12 @@ private class EntryDownloader(override val entry: Entry) : IEntryDownloader {
                 progress("Insert inside template")
                 document = document.reformat()
                 yield()
+
+                entry.title?.also {
+                    progress("Change title")
+                    document = document.changeTitle(it)
+                    yield()
+                }
 
                 progress("Download all media")
                 files = document.downloadDocument(progress)
