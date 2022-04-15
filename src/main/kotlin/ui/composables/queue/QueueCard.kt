@@ -89,7 +89,9 @@ fun GenericCard(
     }
 
     LaunchedEffect(Unit) {
-        viewmodel.initialize()
+        if (viewmodel.status.value == QueueElementStatus.WAITING_INIT) {
+            viewmodel.initialize()
+        }
     }
 
     Column(
