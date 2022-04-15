@@ -1,10 +1,7 @@
 package ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -25,7 +22,8 @@ private val LightColorPalette = lightColors(
     secondary = Color(0xFFe88abf),
     secondaryVariant = Color(0xFFffbbf2),
     onSecondary = Color(0xFF000000),
-    onError = Color(0xFFda1313)
+    onError = Color(0xFFda1313),
+
 )
 
 private val DarkColorPalette = darkColors(
@@ -36,7 +34,8 @@ private val DarkColorPalette = darkColors(
     secondary = Color(0xFFe88abf),
     secondaryVariant = Color(0xFFffbbf2),
     onSecondary = Color(0xFF000000),
-    onError = Color(0xFFEF4E4E)
+    onError = Color(0xFFEF4E4E),
+
 )
 
 val Lato = FontFamily(
@@ -48,14 +47,35 @@ val Lato = FontFamily(
 val typography = Typography(
     subtitle1 = TextStyle(
         fontFamily = Lato,
-        fontSize = 1.2.em,
+        fontSize = 1.7.em,
         fontWeight = FontWeight.ExtraLight,
     ),
-    h2 = TextStyle(
-        fontSize = 2.3.em,
+    subtitle2 = TextStyle(
+        fontFamily = Lato,
+        fontSize = 1.3.em,
+        fontWeight = FontWeight.ExtraLight,
+    ),
+    h1 = TextStyle(
+        fontSize = 3.0.em,
         fontFamily = Lato,
         fontWeight = FontWeight.Bold,
-    )
+    ),
+    h2 = TextStyle(
+        fontSize = 2.5.em,
+        fontFamily = Lato,
+        fontWeight = FontWeight.Bold,
+    ),
+    h3 = TextStyle(
+        fontSize = 2.0.em,
+        fontFamily = Lato,
+        fontWeight = FontWeight.Bold
+    ),
+    h4 = TextStyle(
+        fontSize = 1.7.em,
+        fontFamily = Lato,
+        fontWeight = FontWeight.Bold
+    ),
+
 )
 
 @Composable
