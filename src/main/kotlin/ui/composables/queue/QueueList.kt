@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
@@ -21,8 +20,6 @@ import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
 import ui.composables.queue.ActionBarElement
 import ui.composables.queue.QueueCard
-import ui.viewmodel.queue.EntryQueueElementViewModel
-import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.*
 import ui.viewmodel.queue.QueueViewModel
 
@@ -43,11 +40,24 @@ fun QueueList() {
 
                 LazyColumn(state = lazyListState) {
                     items(entries, key = { it }) { entry ->
-                        val state by rememberSaveable {
-                            mutableStateOf(MutableTransitionState(false).apply {
+                        // Hoisting transition state to view model
+                        val creationStateMap by QueueViewModel.creationStateMap.collectAsState()
+                        val viewModelTransitionState = creationStateMap.getOrDefault(entry, null)
+                        val mutableState: MutableState<MutableTransitionState<Boolean>>
+
+                        // If there's no transition state, create it
+                        // Else, use already existing one
+                        if (viewModelTransitionState != null) {
+                            mutableState = mutableStateOf(viewModelTransitionState)
+                        } else {
+                            val transitionState = MutableTransitionState(false).apply {
                                 targetState = true
-                            })
+                            }
+                            mutableState = mutableStateOf(transitionState)
+                            QueueViewModel.setCreationState(transitionState, entry)
                         }
+
+                        val state by remember { mutableState }
 
                         if (!state.targetState && !state.currentState) { // on animation EXIT end
                             QueueViewModel.remove(entry)
