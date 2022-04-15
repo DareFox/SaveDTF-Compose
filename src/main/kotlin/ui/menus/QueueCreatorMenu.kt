@@ -32,7 +32,7 @@ fun QueueCreatorMenu() {
             var enable by rememberSaveable { mutableStateOf(false) }
 
 
-            val supported = UrlUtil.isBookmarkLink(input) || UrlUtil.isUserProfile(input) || UrlUtil.isEntry(input)
+            val supported = viewmodel.canCreateQueueElement(input)
             val errorMessage = if(input.isNotEmpty() && !supported) "Неверный URL" else null
 
             enable = input.isNotEmpty() && supported

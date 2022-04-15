@@ -27,6 +27,9 @@ object QueueViewModel {
         }
     }
 
+    fun canCreateQueueElement(url: String): Boolean {
+        return UrlUtil.isEntry(url) || UrlUtil.isBookmarkLink(url) || UrlUtil.isUserProfile(url)
+    }
 
     fun createAndAddQueueElement(url: String): IQueueElementViewModel? {
         val element = when {
