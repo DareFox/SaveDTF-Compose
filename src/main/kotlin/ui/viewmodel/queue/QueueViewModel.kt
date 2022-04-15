@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.update
 import util.UrlUtil
 
 object QueueViewModel {
-    private val _queue = MutableStateFlow(listOf<IQueueElementViewModel>())
-    val queue: StateFlow<List<IQueueElementViewModel>> = _queue
+    private val _queue = MutableStateFlow(setOf<IQueueElementViewModel>())
+    val queue: StateFlow<Set<IQueueElementViewModel>> = _queue
 
     private val _creationStateMap = MutableStateFlow(mapOf<IQueueElementViewModel, MutableTransitionState<Boolean>>())
     val creationStateMap: StateFlow<Map<IQueueElementViewModel, MutableTransitionState<Boolean>>> = _creationStateMap
@@ -32,7 +32,7 @@ object QueueViewModel {
 
     fun clear() {
         _queue.update {
-            listOf()
+            setOf()
         }
     }
 

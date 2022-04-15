@@ -39,7 +39,7 @@ fun QueueList() {
                 Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
 
                 LazyColumn(state = lazyListState) {
-                    items(entries, key = { it }) { entry ->
+                    items(entries.toList(), key = { it }) { entry ->
                         // Hoisting transition state to view model
                         val creationStateMap by QueueViewModel.creationStateMap.collectAsState()
                         val viewModelTransitionState = creationStateMap.getOrDefault(entry, null)
