@@ -14,7 +14,11 @@ object SettingsViewModel {
     private fun getPrefFolder() = preferences.get("save_folder", File("./saved").canonicalPath)
     val folderToSave: StateFlow<String?> = _folderToSave
 
-    private fun getToken(website: Website) = preferences.node("tkn").get(website.name, null)
+    private fun getToken(website: Website): String? {
+        val token = preferences.node("tkn").get(website.name, null)
+
+        return token
+    }
     private val _tokens = MutableStateFlow(mapOf<Website, String?>(
         Website.DTF to getToken(Website.DTF),
         Website.VC to getToken(Website.VC),
@@ -22,8 +26,12 @@ object SettingsViewModel {
     ))
     val tokens: StateFlow<Map<Website, String?>> = _tokens
 
-    fun setToken(token: String, website: Website) {
-        preferences.node("tkn").put(website.name, token)
+    fun setToken(token: String?, website: Website) {
+        if (token == null || token.isEmpty() || token.isBlank()) {
+            preferences.node("tkn").remove(website.name)
+        } else {
+            preferences.node("tkn").put(website.name, token)
+        }
 
         _tokens.update {
             val map = it.toMutableMap()
