@@ -18,17 +18,12 @@ fun AppUI() {
     Surface(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
         var navbarElement by remember { mutableStateOf(NavBar.DOWNLOAD_MENU) }
         var navbarIndex by remember { mutableStateOf(0) }
-        val entries by remember { mutableStateOf(mutableStateListOf<String>()) }
 
         Column {
             InfoBanner()
             Box(modifier = Modifier.weight(1f)) {
                 when (navbarElement) {
-                    NavBar.DOWNLOAD_MENU -> QueueCreatorMenu(
-                        entries = entries,
-                        addEntry = { if (!entries.contains(it)) entries.add(it) },
-                        entryRemove = { entries.remove(it) }
-                    )
+                    NavBar.DOWNLOAD_MENU -> QueueCreatorMenu()
                     NavBar.SETTINGS_MENU -> NavBarPreview()
                 }
             }

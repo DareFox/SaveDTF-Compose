@@ -10,26 +10,31 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import ui.composables.QueueList
 import ui.composables.InputField
+import ui.viewmodel.queue.QueueViewModel
 import util.SharedRegex
+import util.UrlUtil
 
 @Composable
 @Preview
 fun QueueCreatorMenuPreview() {
     SaveDtfTheme(true) {
-        QueueCreatorMenu(listOf(), {}, {})
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun QueueCreatorMenu(entries: List<String>, addEntry: (String) -> Unit, entryRemove: (String) -> Unit) {
+fun QueueCreatorMenu() {
     Surface(Modifier.fillMaxWidth()) {
         Column() {
+            val viewmodel = QueueViewModel
+
             var input by rememberSaveable { mutableStateOf("") }
             var enable by rememberSaveable { mutableStateOf(false) }
 
-            val supported = SharedRegex.entryUrlRegex.find(input) != null
+
+            val supported = UrlUtil.isBookmarkLink(input) || UrlUtil.isUserProfile(input) || UrlUtil.isEntry(input)
             val errorMessage = if(input.isNotEmpty() && !supported) "Неверный URL" else null
+
             enable = input.isNotEmpty() && supported
 
             InputField(
@@ -37,7 +42,7 @@ fun QueueCreatorMenu(entries: List<String>, addEntry: (String) -> Unit, entryRem
                     input = it
                 },
                 onConfirm = {
-                    addEntry(it)
+                    viewmodel.createAndAddQueueElement(it)
                 },
                 input = input,
                 placeholderInput = "Вставь ссылку сюда",
@@ -47,7 +52,7 @@ fun QueueCreatorMenu(entries: List<String>, addEntry: (String) -> Unit, entryRem
                 errorMessage = errorMessage
              )
 
-            QueueList(entries, entryRemove)
+            QueueList()
         }
     }
 }

@@ -24,11 +24,14 @@ import ui.composables.queue.QueueCard
 import ui.viewmodel.queue.EntryQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.*
+import ui.viewmodel.queue.QueueViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun QueueList(entries: List<String>, entryRemove: (String) -> Unit) {
+fun QueueList() {
     Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxHeight()) {
+        val entries by QueueViewModel.queue.collectAsState()
+
         if (entries.isEmpty()) {
             EmptyQueueList()
         } else {
@@ -47,7 +50,7 @@ fun QueueList(entries: List<String>, entryRemove: (String) -> Unit) {
                         }
 
                         if (!state.targetState && !state.currentState) { // on animation EXIT end
-                            entryRemove(entry)
+                            QueueViewModel.remove(entry)
                         }
 
                         AnimatedVisibility(
@@ -56,8 +59,7 @@ fun QueueList(entries: List<String>, entryRemove: (String) -> Unit) {
                             exit = shrinkVertically(),
                         ) {
                             Box(modifier = Modifier.padding(bottom = 30.dp)) {
-                                val viewmodel by remember { mutableStateOf(EntryQueueElementViewModel(entry)) }
-                                val status by viewmodel.status.collectAsState()
+                                val status by entry.status.collectAsState()
 
                                 val buttons = mutableListOf(
                                     ActionBarElement(FeatherIcons.Trash2, "delete") {
@@ -73,7 +75,7 @@ fun QueueList(entries: List<String>, entryRemove: (String) -> Unit) {
                                     }
                                 }
 
-                                QueueCard(viewmodel, buttons)
+                                QueueCard(entry, buttons)
                             }
                         }
                     }
