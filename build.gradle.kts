@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.20"
     id("org.jetbrains.compose") version "1.1.1"
+    id("org.openjfx.javafxplugin") version "0.0.10"
 }
 
 group = "me.darefox"
@@ -46,6 +47,11 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.20")
     implementation("org.slf4j:slf4j-simple:1.7.29")
 
+}
+
+javafx {
+    version = "17.0.1"
+    modules = listOf("javafx.swing")
 }
 
 tasks.withType<KotlinCompile> {
