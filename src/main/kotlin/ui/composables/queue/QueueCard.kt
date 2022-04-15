@@ -40,23 +40,23 @@ data class ActionBarElement(
 fun PreviewCard() {
     SaveDtfTheme(false) {
         QueueCard(
-            viewmodel = EntryQueueElementViewModel("a"),
+            viewModel = EntryQueueElementViewModel("a"),
             actionBar = listOf(ActionBarElement(FeatherIcons.Trash2, "delete") {})
         )
     }
 }
 
 @Composable
-fun QueueCard(viewmodel: IQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
-    when (viewmodel) {
-        is IEntryQueueElementViewModel -> EntryCard(viewmodel, actionBar)
+fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
+    when (viewModel) {
+        is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
     }
 }
 
 @Composable
-fun EntryCard(viewmodel: IEntryQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
-    val entry by viewmodel.entry.collectAsState()
-    val status by viewmodel.status.collectAsState()
+fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
+    val entry by viewModel.entry.collectAsState()
+    val status by viewModel.status.collectAsState()
 
     val title = if (entry == null) "Статья" else {
         val entryTitle = entry?.title
@@ -67,14 +67,14 @@ fun EntryCard(viewmodel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
             entryTitle
         }
     }
-    val author = entry?.author?.name ?: viewmodel.url
+    val author = entry?.author?.name ?: viewModel.url
 
-    GenericCard(viewmodel, actionBar, title, author, status)
+    GenericCard(viewModel, actionBar, title, author, status)
 }
 
 @Composable
 fun GenericCard(
-    viewmodel: IQueueElementViewModel,
+    viewModel: IQueueElementViewModel,
     actionBar: List<ActionBarElement> = listOf(),
     title: String,
     author: String,
@@ -89,8 +89,8 @@ fun GenericCard(
     }
 
     LaunchedEffect(Unit) {
-        if (viewmodel.status.value == QueueElementStatus.WAITING_INIT) {
-            viewmodel.initialize()
+        if (viewModel.status.value == QueueElementStatus.WAITING_INIT) {
+            viewModel.initialize()
         }
     }
 
@@ -116,7 +116,7 @@ fun GenericCard(
                 Spacer(modifier = Modifier.height(1.dp))
                 Text(
                     text = author,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.subtitle2,
                     maxLines = 1,
                     color = MaterialTheme.colors.onPrimary,
                     fontStyle = FontStyle.Italic,
@@ -124,7 +124,7 @@ fun GenericCard(
                 if (error != null) {
                     Text(
                         text = error ?: "null",
-                        style = MaterialTheme.typography.subtitle1,
+                        style = MaterialTheme.typography.subtitle2,
                         color = MaterialTheme.colors.onPrimary,
                         fontStyle = FontStyle.Italic,
                     )
@@ -167,7 +167,7 @@ fun GenericCard(
             ) {
                 actionBar.forEach {
                     Icon(it.icon, it.description, modifier = Modifier.clickable {
-                        it.onClickCallback(viewmodel)
+                        it.onClickCallback(viewModel)
                     })
                     Spacer(modifier = Modifier.fillMaxHeight().width(20.dp))
                 }

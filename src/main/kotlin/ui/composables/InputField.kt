@@ -32,7 +32,7 @@ fun InputField(
     println(input)
     OutlinedTextField(
         value = input,
-        textStyle = MaterialTheme.typography.subtitle1,
+        textStyle = MaterialTheme.typography.subtitle2,
         shape = RoundedCornerShape(25),
         onValueChange = {
             onInputChange(it)
@@ -41,7 +41,7 @@ fun InputField(
         placeholder = {
             Text(
                 text = placeholderInput,
-                style = MaterialTheme.typography.subtitle1
+                style = MaterialTheme.typography.subtitle2
             )
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -60,7 +60,7 @@ fun InputField(
         Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
         Text(
             text = errorMessage,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.onError,
             modifier = Modifier.padding(20.dp, 0.dp)
         )
@@ -73,7 +73,7 @@ fun InputField(
             onConfirm(input)
         },
         content = {
-            Text(placeholderButton, style = MaterialTheme.typography.subtitle1, fontWeight = FontWeight.Bold)
+            Text(placeholderButton, style = MaterialTheme.typography.subtitle2, fontWeight = FontWeight.Bold)
         },
         modifier = Modifier.fillMaxWidth().defaultMinSize(Dp.Unspecified, 50.dp).clip(shape = RoundedCornerShape(25)),
     )

@@ -22,7 +22,7 @@ fun EmptyQueueList() {
         Text(
             text = "\"Пусто... Должно быть это ветер\"",
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.subtitle2,
             modifier = Modifier.fillMaxWidth(),
             fontStyle = FontStyle.Italic
         )

@@ -104,7 +104,7 @@ fun IconTextNavBar(elements: List<IconTextBarElement>, selectedIndex: Int) {
             }
             Text(
                 text = it.name,
-                style = MaterialTheme.typography.subtitle1
+                style = MaterialTheme.typography.subtitle2
             )
         }
     }
@@ -121,14 +121,14 @@ fun TextNavBar(elements: List<TextBarElement>, selectedIndex: Int) {
             Box {
                 Text(
                     text = it.name,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.subtitle2,
                     color = MaterialTheme.colors.onBackground
                 )
                 Column {
                     AnimatedVisibility(state, enter = fadeIn(), exit = fadeOut()) {
                         Text(
                             text = it.name,
-                            style = MaterialTheme.typography.subtitle1,
+                            style = MaterialTheme.typography.subtitle2,
                             color = MaterialTheme.colors.primary
                         )
                     }

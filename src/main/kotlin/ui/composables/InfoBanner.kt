@@ -67,7 +67,7 @@ fun InfoBanner() {
                 )
                 Text(
                     text = infoText,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.subtitle2,
                     color = MaterialTheme.colors.onBackground,
                 )
             }
