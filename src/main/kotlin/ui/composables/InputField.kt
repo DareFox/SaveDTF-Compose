@@ -1,10 +1,7 @@
 package ui.composables
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,7 +11,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -29,7 +25,9 @@ fun InputField(
     input: String,
     placeholderInput: String,
     placeholderButton: String,
-    enabled: Boolean
+    enabled: Boolean,
+    isError: Boolean,
+    errorMessage: String?
 ) {
     println(input)
     OutlinedTextField(
@@ -54,8 +52,20 @@ fun InputField(
                 onConfirm(input)
             }
             true
-        }
+        },
+        isError = isError,
     )
+
+    if (isError && errorMessage != null) {
+        Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
+        Text(
+            text = errorMessage,
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colors.onError,
+            modifier = Modifier.padding(20.dp, 0.dp)
+        )
+    }
+
     Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
     Button(
         enabled = enabled,
