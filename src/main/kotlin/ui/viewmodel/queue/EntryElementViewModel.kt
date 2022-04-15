@@ -13,6 +13,7 @@ import mu.KotlinLogging
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.*
 import util.SharedRegex
+import util.UrlUtil
 import java.io.File
 
 interface IEntryQueueElementViewModel : IQueueElementViewModel {
@@ -43,18 +44,15 @@ data class EntryQueueElementViewModel(override val url: String): IEntryQueueElem
         entryDownloader = null
 
         logger.info { "Parsing website" }
-        val website = when (val regex = SharedRegex.websiteRegex.find(url)?.value?.lowercase()) {
-            "dtf" -> Website.DTF
-            "tjournal" -> Website.TJ
-            "vc" -> Website.VC
-            else -> {
-                _lastErrorMessage.value = "Website $regex is not supported"
-                _status.value = QueueElementStatus.ERROR
-                return
-            }
+        val website = UrlUtil.getWebsiteType(url)
+
+        if (website == null) {
+            _lastErrorMessage.value = "Website $url is not supported"
+            _status.value = QueueElementStatus.ERROR
+            return
         }
 
-        val token = SettingsViewModel.token.value
+        val token = SettingsViewModel.tokens.value.get(website)
         val api = if (token != null) {
             authKmtt(website, token)
         } else {
