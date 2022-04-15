@@ -3,6 +3,7 @@ package ui.viewmodel.queue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import util.UrlUtil
 
 object QueueViewModel {
     private val _queue = MutableStateFlow(listOf<IQueueElementViewModel>())
@@ -24,5 +25,18 @@ object QueueViewModel {
         _queue.update {
             listOf()
         }
+    }
+
+
+    fun createAndAddQueueElement(url: String): IQueueElementViewModel? {
+        val element = when {
+            UrlUtil.isUserProfile(url) -> TODO("todo UserProfileDownloader")
+            UrlUtil.isEntry(url) -> EntryQueueElementViewModel(url)
+            UrlUtil.isBookmarkLink(url) -> TODO("todo BookmarkDownloader")
+            else -> null
+        }
+
+        element.also { if (it != null) this.add(it) }
+        return element
     }
 }
