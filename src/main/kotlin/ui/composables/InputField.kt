@@ -50,7 +50,7 @@ fun InputField(
         keyboardActions = KeyboardActions(onDone = { FocusRequester.Default.requestFocus() }),
         colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
         modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.background).onKeyEvent {
-            if (it.key == Key.Enter && it.type == KeyEventType.KeyUp) {
+            if (it.key == Key.Enter && it.type == KeyEventType.KeyUp && enabled) {
                 onConfirm(input)
             }
             true
