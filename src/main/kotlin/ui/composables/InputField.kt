@@ -1,8 +1,10 @@
 package ui.composables
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.*
@@ -25,16 +28,16 @@ fun InputField(
     onConfirm: (String) -> Unit,
     input: String,
     placeholderInput: String,
-    placeholderButton: String
+    placeholderButton: String,
+    enabled: Boolean
 ) {
     println(input)
-    TextField(
+    OutlinedTextField(
         value = input,
         textStyle = MaterialTheme.typography.subtitle1,
-        shape = RectangleShape,
+        shape = RoundedCornerShape(25),
         onValueChange = {
             onInputChange(it)
-            // ???????? // IT WILL RECOMPOSE entries; TODO: fix unnecessary recomposition
         },
         singleLine = true,
         placeholder = {
@@ -51,15 +54,17 @@ fun InputField(
                 onConfirm(input)
             }
             true
-        },
+        }
     )
+    Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
     Button(
+        enabled = enabled,
         onClick = {
             onConfirm(input)
         },
         content = {
             Text(placeholderButton, style = MaterialTheme.typography.subtitle1, fontWeight = FontWeight.Bold)
         },
-        modifier = Modifier.fillMaxWidth().defaultMinSize(Dp.Unspecified, 50.dp),
+        modifier = Modifier.fillMaxWidth().defaultMinSize(Dp.Unspecified, 50.dp).clip(shape = RoundedCornerShape(25)),
     )
 }
