@@ -4,6 +4,7 @@ import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import logic.cache.buildCache
 import java.io.File
 import java.util.prefs.Preferences
 
@@ -43,5 +44,9 @@ object SettingsViewModel {
     fun setFolderToSave(folder: String) {
         preferences.put("save_folder", folder)
         _folderToSave.value = getPrefFolder()
+    }
+
+    fun clearCache(): Boolean {
+        return buildCache().clearAll()
     }
 }
