@@ -5,13 +5,16 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
@@ -19,6 +22,7 @@ import compose.icons.feathericons.RefreshCcw
 import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
 import ui.composables.queue.ActionBarElement
+import ui.composables.queue.EmptyQueueList
 import ui.composables.queue.QueueCard
 import ui.viewmodel.queue.IQueueElementViewModel.*
 import ui.viewmodel.queue.QueueViewModel
@@ -90,6 +94,13 @@ fun QueueList() {
                         }
                     }
                 }
+            }
+
+            Box(modifier = Modifier.fillMaxWidth()) {
+                VerticalScrollbar(
+                    modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
+                    adapter = rememberScrollbarAdapter(lazyListState)
+                )
             }
 
             scope.launch { // scroll on top, when adding new elements
