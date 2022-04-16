@@ -84,8 +84,8 @@ fun GenericCard(
     val color = when (status) {
         QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
         QueueElementStatus.WAITING_INIT -> Color.Gray.copy(0.8f)
-        QueueElementStatus.READY_TO_USE -> Color.Gray.copy(0.00001f)
-        QueueElementStatus.SAVED -> Color.Green.copy(0.8f)
+        QueueElementStatus.READY_TO_USE -> Color.Gray.copy(0.00001f) // Composite over transparent color
+        QueueElementStatus.SAVED -> Color.Green.copy(0.5f)
     }
 
     LaunchedEffect(Unit) {
@@ -96,7 +96,7 @@ fun GenericCard(
 
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(topStartPercent = 10, bottomStartPercent = 10))
+            .clip(RoundedCornerShape(10))
             .shadow(8.dp)
             .fillMaxWidth()
     ) {

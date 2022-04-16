@@ -25,7 +25,7 @@ fun QueueCreatorMenuPreview() {
 @Composable
 fun QueueCreatorMenu() {
     Surface(Modifier.fillMaxWidth()) {
-        Column() {
+        Column(modifier = Modifier.padding(10.dp, 0.dp)) {
             val viewmodel = QueueViewModel
 
             var input by rememberSaveable { mutableStateOf("") }
