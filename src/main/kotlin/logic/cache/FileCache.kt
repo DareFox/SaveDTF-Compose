@@ -1,5 +1,6 @@
 package logic.cache
 
+import mu.KotlinLogging
 import util.getTempCacheFolder
 
 /**
@@ -7,6 +8,7 @@ import util.getTempCacheFolder
  * Works not fast as [RamCache], but it can handle large amounts of data and can save it between sessions
  */
 internal class FileCache(val subdirName: String? = null): BinaryCache {
+    private val logger = KotlinLogging.logger {  }
     private val tempFolder
         get() = getTempCacheFolder(subdirName)
 
@@ -33,6 +35,7 @@ internal class FileCache(val subdirName: String? = null): BinaryCache {
     }
 
     override fun clearAll(): Boolean {
+        logger.info { "Clearing all file cache" }
         return tempFolder.deleteRecursively()
     }
 }

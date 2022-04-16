@@ -65,7 +65,9 @@ internal class RamCache(val id: String? = null) : BinaryCache {
     }
 
     override fun clearAll(): Boolean {
+        logger.info { "Clearing all RAM cache" }
         cache.clear()
+        logger.info { "Calling clearAll() on FileCache" }
         return fileCache.clearAll()
     }
 
