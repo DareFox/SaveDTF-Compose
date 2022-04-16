@@ -31,4 +31,8 @@ internal class FileCache(val subdirName: String? = null): BinaryCache {
         val file = tempFolder.resolve(key)
         return file.exists() && file.isFile
     }
+
+    override fun clearAll(): Boolean {
+        return tempFolder.deleteRecursively()
+    }
 }

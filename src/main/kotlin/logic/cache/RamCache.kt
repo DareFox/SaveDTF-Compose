@@ -64,6 +64,11 @@ internal class RamCache(val id: String? = null) : BinaryCache {
         return isExistInMemory(key) || fileCache.isExist(key)
     }
 
+    override fun clearAll(): Boolean {
+        cache.clear()
+        return fileCache.clearAll()
+    }
+
     fun isExistInMemory(key: String): Boolean {
         // Check if GC collected value
         return cache.contains(key) && cache[key]!!.get() != null

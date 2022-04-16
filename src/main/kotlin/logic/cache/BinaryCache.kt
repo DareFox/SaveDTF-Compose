@@ -12,4 +12,7 @@ interface BinaryCache {
 
     /** Return `true` if value exists in cache, else `false` **/
     fun isExist(key: String): Boolean
+
+    /** Clear all cache **/
+    fun clearAll(): Boolean
 }
