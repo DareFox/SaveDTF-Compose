@@ -70,7 +70,7 @@ data class EntryQueueElementViewModel(override val url: String): IEntryQueueElem
         }
 
         _entry.value = entry
-        entryDownloader = entryDownloader(entry)
+        entryDownloader = entryDownloader(entry, SettingsViewModel.retryAmount.value, SettingsViewModel.replaceErrorMedia.value)
         _status.value = QueueElementStatus.READY_TO_USE
     }
 

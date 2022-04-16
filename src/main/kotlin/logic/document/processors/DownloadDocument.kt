@@ -3,6 +3,7 @@ package logic.document.processors
 import kotlinx.coroutines.yield
 import logic.cache.buildCache
 import logic.document.BinaryMedia
+import logic.document.Resources
 import mu.KotlinLogging
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -20,6 +21,8 @@ enum class MediaType {
 
 suspend fun Document.downloadDocument(
     progress: (String) -> Unit = {},
+    retryAmount: Int,
+    replaceError: Boolean,
     vararg mediaType: MediaType = listOf(MediaType.VIDEO, MediaType.IMAGE).toTypedArray(),
 ): MutableMap<String, ByteArray> {
     val allMap = mutableMapOf<String, ByteArray>()
@@ -27,15 +30,15 @@ suspend fun Document.downloadDocument(
     mediaType.toSet().forEach {
         yield()
         allMap += when (it) {
-            MediaType.VIDEO -> this.saveVideos(progress)
-            MediaType.IMAGE -> this.saveImages(progress)
+            MediaType.VIDEO -> this.saveVideos(progress, retryAmount, replaceError)
+            MediaType.IMAGE -> this.saveImages(progress, retryAmount, replaceError)
         }
     }
 
     return allMap
 }
 
-private suspend fun Document.saveImages(progress: (String) -> Unit): Map<String, ByteArray> {
+private suspend fun Document.saveImages(progress: (String) -> Unit, retryAmount: Int, replaceError: Boolean): Map<String, ByteArray> {
     progress("Parsing image elements")
 
     val imageContainers = getElementsByClass("andropov_image").filter {
@@ -46,7 +49,9 @@ private suspend fun Document.saveImages(progress: (String) -> Unit): Map<String,
         folder = "img",
         elements = imageContainers,
         attributeURL = "data-image-src",
-        progress = { progress("Image: $it") }
+        progress = { progress("Image: $it") },
+        retryAmount = retryAmount,
+        errorReplace = if (replaceError) Resources.imageLoadFail else null
     ) { _, relativePath ->
         Element("img")
             .attr("src", relativePath)
@@ -54,7 +59,7 @@ private suspend fun Document.saveImages(progress: (String) -> Unit): Map<String,
     }
 }
 
-private suspend fun Document.saveVideos(progress: (String) -> Unit): Map<String, ByteArray> {
+private suspend fun Document.saveVideos(progress: (String) -> Unit, retryAmount: Int, replaceError: Boolean): Map<String, ByteArray> {
     progress("Parsing video elements")
     val videoContainers = getElementsByClass("andropov_video").filter {
         it.attr("data-video-mp4").isNotEmpty()
@@ -64,7 +69,9 @@ private suspend fun Document.saveVideos(progress: (String) -> Unit): Map<String,
         folder = "video",
         elements = videoContainers,
         attributeURL = "data-video-mp4",
-        progress = { progress("Video: $it") }
+        progress = { progress("Video: $it") },
+        retryAmount = retryAmount,
+        errorReplace = if (replaceError) Resources.videoLoadFail else null
     ) { _, relativePath ->
         val base = Element("video")
             .attr("controls", "")
@@ -80,11 +87,13 @@ private suspend fun saveAndReplaceElement(
     elements: List<Element>,
     attributeURL: String,
     progress: (String) -> Unit = {},
+    retryAmount: Int,
+    errorReplace: BinaryMedia? = null,
     transform: (BinaryMedia, String) -> Element,
 ): MutableMap<String, ByteArray> {
     val elementPaths = mutableMapOf<String, ByteArray>()
     val resolvedFolder = File("").resolve(folder)
-    val responses = downloadMedia(elements, attributeURL, progress)
+    val responses = downloadMedia(elements, attributeURL, progress, retryAmount, errorReplace)
 
     responses.forEach { (element, binaryMedia) ->
         // Delete all children from Element node

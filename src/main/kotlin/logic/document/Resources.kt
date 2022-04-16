@@ -8,7 +8,7 @@ object Resources {
         binary = readResource("img/download/imageLoadFail.png").readBytes()
     )
 
-    val imageVideoFail = BinaryMedia(
+    val videoLoadFail = BinaryMedia(
         MediaMetadata("image", "png", "videoLoadFail.png"),
         binary = readResource("img/download/videoLoadFail.png").readBytes()
     )

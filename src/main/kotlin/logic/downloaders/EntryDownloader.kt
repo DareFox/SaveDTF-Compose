@@ -22,7 +22,7 @@ import kotlin.math.log
 
 private val logger = KotlinLogging.logger { }
 
-private class EntryDownloader(override val entry: Entry) : IEntryDownloader {
+private class EntryDownloader(override val entry: Entry, val retryAmount: Int, val replaceErrorMedia: Boolean) : IEntryDownloader {
     private var document: Document
     private var files: Map<String, ByteArray>? = null
 
@@ -59,7 +59,7 @@ private class EntryDownloader(override val entry: Entry) : IEntryDownloader {
                 }
 
                 progress("Download all media")
-                files = document.downloadDocument(progress)
+                files = document.downloadDocument(progress, retryAmount, replaceErrorMedia)
                 yield()
 
                 progress("Entry was successfully downloaded")
@@ -116,12 +116,16 @@ private class EntryDownloader(override val entry: Entry) : IEntryDownloader {
     }
 }
 
-private val loaders = ConcurrentHashMap<Entry, IEntryDownloader>()
+private val loaders = ConcurrentHashMap<EntryDownloaderParams, IEntryDownloader>()
 
-fun entryDownloader(entry: Entry): IEntryDownloader {
-    return loaders[entry] ?: synchronized(entry) {
-        loaders[entry] ?: EntryDownloader(entry).also {
-            loaders[entry] = it
+fun entryDownloader(entry: Entry, retryAmount: Int = 5, replaceErrorMedia: Boolean = true): IEntryDownloader {
+    val params = EntryDownloaderParams(entry, retryAmount, replaceErrorMedia)
+
+    return loaders[params] ?: synchronized(entry) {
+        loaders[params] ?: EntryDownloader(entry, retryAmount, replaceErrorMedia).also {
+            loaders[params] = it
         }
     }
 }
+
+private data class EntryDownloaderParams(val entry: Entry, val retryAmount: Int, val replaceErrorMedia: Boolean)

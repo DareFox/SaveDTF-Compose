@@ -11,21 +11,32 @@ import java.util.prefs.Preferences
 object SettingsViewModel {
     private val preferences = Preferences.userRoot().node("savedtf-prefs")
 
+    private const val ERROR_MEDIA_KEY = "replace_error_media"
+    private const val RETRY_AMOUNT_KEY = "retry_amount"
+    private const val SAVE_FOLDER_KEY = "save_folder"
+
+    private val _replaceErrorMedia = MutableStateFlow(getPrefReplaceErrorMedia())
+    private val _tokens = MutableStateFlow(mapOf<Website, String?>(
+        Website.DTF to getPrefToken(Website.DTF),
+        Website.VC to getPrefToken(Website.VC),
+        Website.TJ to getPrefToken(Website.TJ)
+    ))
+    private val _retryAmount = MutableStateFlow(getPrefRetryAmount())
     private val _folderToSave = MutableStateFlow<String>(getPrefFolder())
-    private fun getPrefFolder() = preferences.get("save_folder", File("./saved").canonicalPath)
+
+    val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
+    val tokens: StateFlow<Map<Website, String?>> = _tokens
+    val retryAmount: StateFlow<Int> = _retryAmount;
     val folderToSave: StateFlow<String?> = _folderToSave
 
-    private fun getToken(website: Website): String? {
+    private fun getPrefReplaceErrorMedia() = preferences.getBoolean(ERROR_MEDIA_KEY, true)
+    private fun getPrefFolder() = preferences.get(SAVE_FOLDER_KEY, File("./saved").canonicalPath)
+    private fun getPrefRetryAmount() = preferences.getInt(RETRY_AMOUNT_KEY, 5)
+    private fun getPrefToken(website: Website): String? {
         val token = preferences.node("tkn").get(website.name, null)
 
         return token
     }
-    private val _tokens = MutableStateFlow(mapOf<Website, String?>(
-        Website.DTF to getToken(Website.DTF),
-        Website.VC to getToken(Website.VC),
-        Website.TJ to getToken(Website.TJ)
-    ))
-    val tokens: StateFlow<Map<Website, String?>> = _tokens
 
     fun setToken(token: String?, website: Website) {
         if (token == null || token.isEmpty() || token.isBlank()) {
@@ -36,17 +47,24 @@ object SettingsViewModel {
 
         _tokens.update {
             val map = it.toMutableMap()
-            map[website] = getToken(website)
+            map[website] = getPrefToken(website)
             map
         }
     }
-
     fun setFolderToSave(folder: String) {
-        preferences.put("save_folder", folder)
+        preferences.put(SAVE_FOLDER_KEY, folder)
         _folderToSave.value = getPrefFolder()
+    }
+    fun setReplaceErrorMedia(enable: Boolean) {
+        preferences.putBoolean(ERROR_MEDIA_KEY, enable)
+        _replaceErrorMedia.value = getPrefReplaceErrorMedia()
+    }
+    fun setRetryAmount(value: Int) {
+        preferences.putInt(RETRY_AMOUNT_KEY, 5)
     }
 
     fun clearCache(): Boolean {
         return buildCache().clearAll()
     }
+
 }
