@@ -9,12 +9,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.key.*
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -29,7 +26,6 @@ fun InputField(
     isError: Boolean,
     errorMessage: String?
 ) {
-    println(input)
     OutlinedTextField(
         value = input,
         textStyle = MaterialTheme.typography.subtitle2,
@@ -67,14 +63,6 @@ fun InputField(
     }
 
     Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
-    Button(
-        enabled = enabled,
-        onClick = {
-            onConfirm(input)
-        },
-        content = {
-            Text(placeholderButton, style = MaterialTheme.typography.subtitle2, fontWeight = FontWeight.Bold)
-        },
-        modifier = Modifier.fillMaxWidth().defaultMinSize(Dp.Unspecified, 50.dp).clip(shape = RoundedCornerShape(25)),
-    )
+    FancyButton(enabled, { onConfirm(input) }, placeholderButton)
 }
+
