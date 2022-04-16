@@ -3,7 +3,6 @@ package logic.downloaders
 import io.ktor.client.features.*
 import kmtt.models.entry.Entry
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.yield
@@ -18,7 +17,6 @@ import org.jsoup.nodes.Document
 import util.getTempCacheFolder
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.log
 
 private val logger = KotlinLogging.logger { }
 

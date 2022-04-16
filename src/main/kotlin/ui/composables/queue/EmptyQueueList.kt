@@ -1,4 +1,4 @@
-package ui.composables
+package ui.composables.queue
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

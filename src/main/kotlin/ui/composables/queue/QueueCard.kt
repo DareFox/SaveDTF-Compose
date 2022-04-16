@@ -9,7 +9,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +30,7 @@ import ui.SaveDtfTheme
 import ui.viewmodel.queue.EntryQueueElementViewModel
 import ui.viewmodel.queue.IEntryQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel
-import ui.viewmodel.queue.IQueueElementViewModel.*
+import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 
 data class ActionBarElement(
     val icon: ImageVector,

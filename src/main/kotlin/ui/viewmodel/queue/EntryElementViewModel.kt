@@ -3,7 +3,6 @@ package ui.viewmodel.queue
 import kmtt.impl.authKmtt
 import kmtt.impl.publicKmtt
 import kmtt.models.entry.Entry
-import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import logic.downloaders.IEntryDownloader
@@ -11,8 +10,7 @@ import logic.downloaders.entryDownloader
 import logic.downloaders.exceptions.NoContentDownloadedException
 import mu.KotlinLogging
 import ui.viewmodel.SettingsViewModel
-import ui.viewmodel.queue.IQueueElementViewModel.*
-import util.SharedRegex
+import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import util.UrlUtil
 import java.io.File
 

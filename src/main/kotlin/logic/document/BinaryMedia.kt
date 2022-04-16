@@ -1,7 +1,5 @@
 package logic.document
 
-import java.util.*
-
 data class BinaryMedia(val metadata: MediaMetadata, val binary: ByteArray) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

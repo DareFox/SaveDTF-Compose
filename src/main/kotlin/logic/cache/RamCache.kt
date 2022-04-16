@@ -3,7 +3,6 @@ package logic.cache
 import mu.KotlinLogging
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.log
 
 /**
  * Represents cache in RAM. Internally uses [FileCache] for saving cache between sessions and for saving up space in RAM

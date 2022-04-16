@@ -1,4 +1,4 @@
-package ui.composables
+package ui.composables.queue
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -18,14 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
+import compose.icons.feathericons.Download
 import compose.icons.feathericons.RefreshCcw
 import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
-import ui.composables.queue.ActionBarElement
-import ui.composables.queue.EmptyQueueList
-import ui.composables.queue.QueueCard
-import ui.viewmodel.queue.IQueueElementViewModel.*
+import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import ui.viewmodel.queue.QueueViewModel
+import java.io.File
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -39,7 +38,7 @@ fun QueueList() {
             val scope = rememberCoroutineScope()
             val lazyListState = rememberLazyListState()
 
-            Column {
+            Column() {
                 Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
 
                 LazyColumn(state = lazyListState) {
