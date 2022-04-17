@@ -3,8 +3,11 @@ package ui.viewmodel.queue
 import kmtt.impl.authKmtt
 import kmtt.impl.publicKmtt
 import kmtt.models.entry.Entry
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import logic.downloaders.IEntryDownloader
 import logic.downloaders.entryDownloader
 import logic.downloaders.exceptions.NoContentDownloadedException
@@ -22,7 +25,9 @@ interface IEntryQueueElementViewModel : IQueueElementViewModel {
 private val logger = KotlinLogging.logger { }
 
 data class EntryQueueElementViewModel(override val url: String): IEntryQueueElementViewModel {
-    private var entryDownloader: IEntryDownloader? = null
+    private val scope = CoroutineScope(Dispatchers.Default)
+
+    private var entryDownloader = MutableStateFlow<IEntryDownloader?>(null)
 
     private val _entry = MutableStateFlow<Entry?>(null)
     override val entry: StateFlow<Entry?> = _entry
@@ -36,10 +41,27 @@ data class EntryQueueElementViewModel(override val url: String): IEntryQueueElem
     private val _isDownloaded = MutableStateFlow(false)
     override val isDownloaded: StateFlow<Boolean> = _isDownloaded
 
+    private val _progress = MutableStateFlow<String?>(null)
+    override val progress: StateFlow<String?> = _progress
+
+    init {
+        entryDownloader.onEach { // on entry downloader change
+            if (it == null) { // if no downloader -> no progress
+                logger.info { "No downloader, no progress" }
+                _progress.value = null
+            } else {
+                logger.info { "Downloader exists, listening to progress" }
+                it.progress.onEach { progress -> // on progress of downloader change
+                    _progress.value = progress
+                }.launchIn(scope = scope)
+            }
+        }.launchIn(scope = scope)
+    }
+
     override suspend fun initialize() {
         _status.value = QueueElementStatus.WAITING_INIT
         _entry.value = null
-        entryDownloader = null
+        entryDownloader.value = null
 
         logger.info { "Parsing website" }
         val website = UrlUtil.getWebsiteType(url)
@@ -68,12 +90,12 @@ data class EntryQueueElementViewModel(override val url: String): IEntryQueueElem
         }
 
         _entry.value = entry
-        entryDownloader = entryDownloader(entry, SettingsViewModel.retryAmount.value, SettingsViewModel.replaceErrorMedia.value)
+        entryDownloader.value = entryDownloader(entry, SettingsViewModel.retryAmount.value, SettingsViewModel.replaceErrorMedia.value)
         _status.value = QueueElementStatus.READY_TO_USE
     }
 
     override suspend fun save(folder: File): Boolean {
-        val downloader = entryDownloader
+        val downloader = entryDownloader.value
 
         requireNotNull(downloader) {
             "Initialize element before saving"
@@ -91,15 +113,15 @@ data class EntryQueueElementViewModel(override val url: String): IEntryQueueElem
         }
     }
 
-    override suspend fun download(progress: (String) -> Unit): Boolean {
+    override suspend fun download(): Boolean {
         _status.value = QueueElementStatus.READY_TO_USE
-        val downloader = entryDownloader
+        val downloader = entryDownloader.value
 
         requireNotNull(downloader) {
             "Initialize element before saving"
         }
 
-        val result = downloader.download(progress)
+        val result = downloader.download()
 
         return if (result) {
             _status.value = QueueElementStatus.READY_TO_USE

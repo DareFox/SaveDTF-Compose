@@ -5,8 +5,9 @@ import java.io.File
 
 interface IDownloader {
     val isDownloaded: StateFlow<Boolean>
+    val progress: StateFlow<String?>
 
-    suspend fun download(progress: (String) -> Unit): Boolean
+    suspend fun download(): Boolean
 
     suspend fun save(file: File)
 }

@@ -3,6 +3,8 @@ package logic.downloaders
 import io.ktor.client.features.*
 import kmtt.models.entry.Entry
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.yield
@@ -18,12 +20,18 @@ import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger { }
 
-private class EntryDownloader(override val entry: Entry, val retryAmount: Int, val replaceErrorMedia: Boolean) : IEntryDownloader {
+private class EntryDownloader(override val entry: Entry, val retryAmount: Int, val replaceErrorMedia: Boolean) :
+    IEntryDownloader {
+    private val downloaderScope = CoroutineScope(Dispatchers.IO)
+
     private var document: Document
     private var files: Map<String, ByteArray>? = null
 
     private val _isDownloaded = MutableStateFlow(false)
     override val isDownloaded: StateFlow<Boolean> = _isDownloaded
+
+    private val _progress = MutableStateFlow<String?>(null)
+    override val progress: StateFlow<String?> = _progress
 
     init {
         val html = entry.entryContent?.html
@@ -35,26 +43,27 @@ private class EntryDownloader(override val entry: Entry, val retryAmount: Int, v
         document = Jsoup.parse(html)
     }
 
-    override suspend fun download(progress: (String) -> Unit): Boolean {
+    override suspend fun download(): Boolean {
         try {
+
             _isDownloaded.value = try {
                 val file = getTempCacheFolder()
 
-                progress("Removing old css")
+                _progress.value = "Removing old css"
                 document = document.removeStyles()
                 yield()
 
-                progress("Insert inside template")
+                _progress.value = "Insert inside template"
                 document = document.reformat()
                 yield()
 
                 entry.title?.also {
-                    progress("Change title")
+                    _progress.value = "Change title"
                     document = document.changeTitle(it)
                     yield()
                 }
 
-                progress("Download all media")
+                _progress.value = "Download all media"
                 val downloadMode = mutableListOf<MediaType>()
 
                 if (SettingsViewModel.downloadImage.value) {
@@ -65,22 +74,28 @@ private class EntryDownloader(override val entry: Entry, val retryAmount: Int, v
                     downloadMode += MediaType.VIDEO
                 }
 
-                files = document.downloadDocument(progress, retryAmount, replaceErrorMedia)
+                files = document.downloadDocument(
+                    { _progress.value = it },
+                    retryAmount,
+                    replaceErrorMedia,
+                    mediaType = downloadMode.toTypedArray()
+                )
                 yield()
 
-                progress("Entry was successfully downloaded")
+                _progress.value ="Entry was successfully downloaded"
                 true
             } catch (ex: HttpRequestTimeoutException) {
-                progress("Timeout Request Error")
+                _progress.value ="Timeout Request Error"
                 false
             }
 
             return _isDownloaded.value
         } catch (cancel: CancellationException) {
             logger.info { "Download of entry (id: ${entry.id}) was cancelled" }
-             files = null
+            files = null
             _isDownloaded.value = false
-            document = Jsoup.parse(entry.entryContent!!.html!!) // Force unwrap because class and variable are immutable (we check null in init already)
+            document =
+                Jsoup.parse(entry.entryContent!!.html!!) // Force unwrap because class and variable are immutable (we check null in init already)
             throw cancel
         }
     }
