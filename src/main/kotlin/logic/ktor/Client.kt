@@ -5,6 +5,7 @@ import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import java.time.Duration
 import java.util.*
@@ -19,7 +20,9 @@ object Client {
         .build())
 
     val rateLimiter: RateLimiter = rateLimiterRegistry.rateLimiter(rateLimitID)
-    val httpClient: HttpClient = HttpClient()
+    val httpClient: HttpClient = HttpClient() {
+        install(HttpTimeout)
+    }
 }
 
 /**
