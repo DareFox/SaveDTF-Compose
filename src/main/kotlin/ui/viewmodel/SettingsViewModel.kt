@@ -33,9 +33,7 @@ object SettingsViewModel {
     private fun getPrefFolder() = preferences.get(SAVE_FOLDER_KEY, File("./saved").canonicalPath)
     private fun getPrefRetryAmount() = preferences.getInt(RETRY_AMOUNT_KEY, 5)
     private fun getPrefToken(website: Website): String? {
-        val token = preferences.node("tkn").get(website.name, null)
-
-        return token
+        return preferences.node("tkn").get(website.name, null)
     }
 
     fun setToken(token: String?, website: Website) {
@@ -60,7 +58,8 @@ object SettingsViewModel {
         _replaceErrorMedia.value = getPrefReplaceErrorMedia()
     }
     fun setRetryAmount(value: Int) {
-        preferences.putInt(RETRY_AMOUNT_KEY, 5)
+        preferences.putInt(RETRY_AMOUNT_KEY, value)
+        _retryAmount.value = getPrefRetryAmount()
     }
 
     fun clearCache(): Boolean {
