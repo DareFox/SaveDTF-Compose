@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -72,7 +74,7 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
     }
     val author = entry?.author?.name ?: viewModel.url
 
-    GenericCard(viewModel, actionBar, title, author, status)
+    GenericCard(viewModel, actionBar, title, author, status, painter = painter)
 }
 
 @Composable
@@ -82,7 +84,8 @@ fun GenericCard(
     title: String,
     author: String,
     status: QueueElementStatus,
-    error: String? = null
+    error: String? = null,
+    painter: Painter? = null
 ) {
     val color = when (status) {
         QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
@@ -134,30 +137,33 @@ fun GenericCard(
                 }
             }
 
-            Image(
-                painter = painterResource("img/hehe.webp"),
-                contentDescription = null,
-                contentScale = ContentScale.FillHeight,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentSize(
-                        align = Alignment.TopEnd,
-                        unbounded = true
-                    ) // Make box to not constrain oversize
-                    .size(150.dp) // Oversize card
-                    .graphicsLayer { alpha = 0.9999f } // Workaround to enable alpha compositing
-                    .drawWithContent {
-                        val colors = listOf(
-                            Color.Transparent,
-                            Color.Black
-                        )
-                        drawContent()
-                        drawRect(
-                            brush = Brush.horizontalGradient(colors),
-                            blendMode = BlendMode.DstIn
-                        )
-                    }
-            )
+            // Add image, when painter is not null
+            painter?.also {
+                Image(
+                    painter = it,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentSize(
+                            align = Alignment.TopEnd,
+                            unbounded = true
+                        ) // Make box to not constrain oversize
+                        .size(150.dp) // Oversize card
+                        .graphicsLayer { alpha = 0.9999f } // Workaround to enable alpha compositing
+                        .drawWithContent {
+                            val colors = listOf(
+                                Color.Transparent,
+                                Color.Black
+                            )
+                            drawContent()
+                            drawRect(
+                                brush = Brush.horizontalGradient(colors),
+                                blendMode = BlendMode.DstIn
+                            )
+                        }
+                )
+            }
         }
         Surface(
             modifier = Modifier.height(45.dp).fillMaxWidth(),
