@@ -69,10 +69,10 @@ internal suspend fun downloadElementMedia(
 }
 
 suspend fun downloadMediaAsync(
-    downloaderScope: CoroutineScope,
     mediaID: String,
     downloadUrl: String,
     retryAmount: Int,
+    downloaderScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
     replaceError: BinaryMedia? = null
 ) = downloaderScope.async {
     val cached = cache.getValueWithMetadata<MediaMetadata>(mediaID)
