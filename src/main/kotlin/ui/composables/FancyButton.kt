@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,12 +15,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FancyButton(
     enabled: Boolean,
-    onConfirm: () -> Unit,
+    onClick: () -> Unit,
     placeholderButton: String,
-) {
+    buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
+    ) {
     FancyButton(
         enabled = enabled,
-        onClick = onConfirm,
+        onClick = onClick,
+        buttonColors = buttonColors,
         placeholderButton = { Text(placeholderButton, style = MaterialTheme.typography.subtitle2, fontWeight = FontWeight.Bold) }
     )
 }
@@ -31,12 +31,14 @@ fun FancyButton(
 fun FancyButton(
     enabled: Boolean,
     onClick: () -> Unit,
-    placeholderButton: @Composable RowScope.() -> Unit
+    buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
+    placeholderButton: @Composable RowScope.() -> Unit,
 ) {
     Button(
         enabled = enabled,
         onClick = onClick,
         content = placeholderButton,
         modifier = Modifier.fillMaxWidth().defaultMinSize(Dp.Unspecified, 50.dp).clip(shape = RoundedCornerShape(25)),
+        colors = buttonColors
     )
 }
