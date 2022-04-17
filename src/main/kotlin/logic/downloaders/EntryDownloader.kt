@@ -6,14 +6,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.yield
-import logic.document.processors.changeTitle
-import logic.document.processors.downloadDocument
-import logic.document.processors.reformat
-import logic.document.processors.removeStyles
+import logic.document.processors.*
 import logic.downloaders.exceptions.NoContentDownloadedException
 import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import ui.viewmodel.SettingsViewModel
 import util.getTempCacheFolder
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -57,6 +55,16 @@ private class EntryDownloader(override val entry: Entry, val retryAmount: Int, v
                 }
 
                 progress("Download all media")
+                val downloadMode = mutableListOf<MediaType>()
+
+                if (SettingsViewModel.downloadImage.value) {
+                    downloadMode += MediaType.IMAGE
+                }
+
+                if (SettingsViewModel.downloadVideo.value) {
+                    downloadMode += MediaType.VIDEO
+                }
+
                 files = document.downloadDocument(progress, retryAmount, replaceErrorMedia)
                 yield()
 
