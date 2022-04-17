@@ -93,7 +93,7 @@ private suspend fun saveAndReplaceElement(
 ): MutableMap<String, ByteArray> {
     val elementPaths = mutableMapOf<String, ByteArray>()
     val resolvedFolder = File("").resolve(folder)
-    val responses = downloadMedia(elements, attributeURL, progress, retryAmount, errorReplace)
+    val responses = downloadElementMedia(elements, attributeURL, progress, retryAmount, errorReplace)
 
     responses.forEach { (element, binaryMedia) ->
         // Delete all children from Element node

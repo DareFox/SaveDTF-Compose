@@ -23,7 +23,7 @@ import util.setValueWithMetadata
 private val logger = KotlinLogging.logger { }
 private val cache = buildCache()
 
-internal suspend fun downloadMedia(
+internal suspend fun downloadElementMedia(
     elements: List<Element>,
     attributeMediaURL: String,
     progress: (String) -> Unit,
@@ -41,14 +41,17 @@ internal suspend fun downloadMedia(
             val mediaID = downloadUrl.getMediaId()
 
             // Download media concurrently
-            downloadJobs += downloaderJob(downloaderScope = downloaderScope,
-                mediaID = mediaID,
-                downloadUrl = downloadUrl,
-                retryAmount = retryAmount,
-                replaceError = replaceError,
-                downloadMap = downloadMap,
-                element = it,
-                finishedJobs = finishedJobs)
+            downloadJobs += downloaderScope.launch {
+                val media = downloadMediaAsync(downloaderScope = downloaderScope,
+                    mediaID = mediaID,
+                    downloadUrl = downloadUrl,
+                    retryAmount = retryAmount,
+                    replaceError = replaceError
+                ).await()
+
+                downloadMap[it] = media
+                finishedJobs.update { counter -> counter + 1 }
+            }
         }
 
         val progressJob: Job = downloaderScope.launch {
@@ -65,16 +68,13 @@ internal suspend fun downloadMedia(
     return downloadMap
 }
 
-private fun downloaderJob(
+suspend fun downloadMediaAsync(
     downloaderScope: CoroutineScope,
     mediaID: String,
     downloadUrl: String,
     retryAmount: Int,
-    replaceError: BinaryMedia?,
-    downloadMap: MutableMap<Element, BinaryMedia>,
-    element: Element,
-    finishedJobs: MutableStateFlow<Int>,
-) = downloaderScope.launch {
+    replaceError: BinaryMedia? = null
+) = downloaderScope.async {
     val cached = cache.getValueWithMetadata<MediaMetadata>(mediaID)
 
     val media = if (cached?.second != null) {
@@ -87,7 +87,7 @@ private fun downloaderJob(
 
         do {
             val response: HttpResponse? = runBlocking {
-                kotlin.runCatching {
+                kotlin.runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
                     Client.rateRequest<HttpResponse> {
                         method = HttpMethod.Get
                         url(downloadUrl)
@@ -113,11 +113,14 @@ private fun downloaderJob(
                 binaryMedia = BinaryMedia(metadata, byteArray) // return is here
                 break;
             } else if (retryAmount != 0 && counter >= retryAmount) {
+                // If retryAmount is bigger than 0, try until retryAmount
+                // On retryAmount = 0 repeat infinitely until success
                 if (replaceError != null) {
                     logger.info("Replacing error media...")
                     binaryMedia = replaceError
                     break;
                 }
+                // If Retry amount is < 0, throw error
                 if (response == null) {
                     throw RuntimeException("No response from server or can't connect to server")
                 } else {
@@ -128,6 +131,5 @@ private fun downloaderJob(
         binaryMedia
     }
 
-    downloadMap[element] = media //  add result
-    finishedJobs.update { finishedJobsCounter -> finishedJobsCounter + 1 }
+    media // Return media
 }
