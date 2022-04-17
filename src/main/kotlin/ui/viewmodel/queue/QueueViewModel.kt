@@ -37,18 +37,18 @@ object QueueViewModel {
     }
 
     fun canCreateQueueElement(url: String): Boolean {
-        return UrlUtil.isEntry(url) || UrlUtil.isBookmarkLink(url) || UrlUtil.isUserProfile(url)
+        return UrlUtil.isEntry(url)
     }
 
     fun createAndAddQueueElement(url: String): IQueueElementViewModel? {
         val element = when {
-            UrlUtil.isUserProfile(url) -> TODO("todo UserProfileDownloader")
+//            UrlUtil.isUserProfile(url) -> TODO("todo UserProfileDownloader")
             UrlUtil.isEntry(url) -> EntryQueueElementViewModel(url)
-            UrlUtil.isBookmarkLink(url) -> TODO("todo BookmarkDownloader")
+//            UrlUtil.isBookmarkLink(url) -> TODO("todo BookmarkDownloader")
             else -> null
         }
 
-        element.also { if (it != null) this.add(it) }
+        element.also { if (it != null) add(it) }
         return element
     }
 
