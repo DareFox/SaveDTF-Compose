@@ -1,18 +1,13 @@
 package ui.composables.queue
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,11 +23,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Trash2
+import logic.document.processors.downloadMediaAsync
 import ui.SaveDtfTheme
 import ui.viewmodel.queue.EntryQueueElementViewModel
 import ui.viewmodel.queue.IEntryQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
+import util.getMediaId
+import util.getMediaIdOrNull
 
 data class ActionBarElement(
     val icon: ImageVector,
@@ -60,6 +58,8 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
 
 @Composable
 fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
+    val entryCardScope = rememberCoroutineScope()
+
     val entry by viewModel.entry.collectAsState()
     val status by viewModel.status.collectAsState()
 
@@ -74,7 +74,7 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
     }
     val author = entry?.author?.name ?: viewModel.url
 
-    GenericCard(viewModel, actionBar, title, author, status, painter = painter)
+    GenericCard(viewModel, actionBar, title, author, status)
 }
 
 @Composable
@@ -87,12 +87,17 @@ fun GenericCard(
     error: String? = null,
     painter: Painter? = null
 ) {
-    val color = when (status) {
+    val color by animateColorAsState(when (status) {
         QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
         QueueElementStatus.WAITING_INIT -> Color.Gray.copy(0.8f)
         QueueElementStatus.READY_TO_USE -> Color.Gray.copy(0.00001f) // Composite over transparent color
         QueueElementStatus.SAVED -> Color.Green.copy(0.5f)
-    }
+    })
+
+    val onColor by animateColorAsState(when(status) {
+        QueueElementStatus.WAITING_INIT -> Color.White
+        else -> Color.Black
+    })
 
     LaunchedEffect(Unit) {
         if (viewModel.status.value == QueueElementStatus.WAITING_INIT) {
@@ -106,34 +111,42 @@ fun GenericCard(
             .shadow(8.dp)
             .fillMaxWidth()
     ) {
-        Surface(
+        Surface( // Main body
             modifier = Modifier
-                .requiredHeightIn(max = if (error == null) 85.dp else 150.dp)
                 .fillMaxWidth(),
             color = color.compositeOver(MaterialTheme.colors.primary)
         ) {
-            Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp)) {
+            val progress by viewModel.progress.collectAsState()
+
+            Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp, bottom = 12.dp)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.h2,
-                    color = MaterialTheme.colors.onPrimary,
-                    maxLines = 1
+                    maxLines = 1,
+                    color = onColor
                 )
-                Spacer(modifier = Modifier.height(1.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = author,
                     style = MaterialTheme.typography.subtitle2,
                     maxLines = 1,
-                    color = MaterialTheme.colors.onPrimary,
                     fontStyle = FontStyle.Italic,
+                    color = onColor
                 )
-                if (error != null) {
+
+                error?.let {
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = error ?: "null",
                         style = MaterialTheme.typography.subtitle2,
-                        color = MaterialTheme.colors.onPrimary,
                         fontStyle = FontStyle.Italic,
+                        color = onColor
                     )
+                }
+
+                progress?.let {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(progress ?: "", style = MaterialTheme.typography.subtitle2, color = onColor)
                 }
             }
 
@@ -165,21 +178,40 @@ fun GenericCard(
                 )
             }
         }
-        Surface(
+        Surface( // Footer
             modifier = Modifier.height(45.dp).fillMaxWidth(),
             color = color.compositeOver(MaterialTheme.colors.primaryVariant),
         ) {
             Row(
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.padding(horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                actionBar.forEach {
-                    Icon(it.icon, it.description, modifier = Modifier.clickable {
-                        it.onClickCallback(viewModel)
-                    })
-                    Spacer(modifier = Modifier.fillMaxHeight().width(20.dp))
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    actionBar.forEach {
+                        Icon(it.icon, it.description, modifier = Modifier.clickable {
+                            it.onClickCallback(viewModel)
+                        }, tint = onColor)
+                        Spacer(modifier = Modifier.fillMaxHeight().width(20.dp))
+                    }
                 }
+
+                val selected by viewModel.selected.collectAsState()
+
+                Checkbox(
+                    checked = selected,
+                    onCheckedChange = {
+                        if (it) {
+                            viewModel.select()
+                        } else {
+                            viewModel.unselect()
+                        }
+                    },
+                    colors = CheckboxDefaults.colors(uncheckedColor = onColor)
+                )
             }
         }
     }
