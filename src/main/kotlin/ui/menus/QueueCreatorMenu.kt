@@ -1,20 +1,20 @@
 package ui.menus
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.Download
 import ui.SaveDtfTheme
-import ui.composables.InputField
+import ui.composables.FancyButton
+import ui.composables.FancyInputField
 import ui.composables.queue.QueueList
 import ui.viewmodel.queue.QueueViewModel
 
@@ -41,7 +41,7 @@ fun QueueCreatorMenu() {
 
             enable = input.isNotEmpty() && supported
 
-            InputField(
+            FancyInputField(
                 onInputChange = {
                     input = it
                 },
@@ -55,6 +55,10 @@ fun QueueCreatorMenu() {
                 isError = input.isNotEmpty() && !supported,
                 errorMessage = errorMessage
              )
+            Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
+            FancyButton(true, onClick = {
+                viewmodel.createAndAddQueueElement(input)
+            }, "Добавить в очередь")
 
             QueueList()
         }

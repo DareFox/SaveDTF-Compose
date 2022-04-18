@@ -1,17 +1,11 @@
 package ui.composables
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -22,12 +16,11 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun InputField(
+fun FancyInputField(
     onInputChange: (String) -> Unit,
     onConfirm: (String) -> Unit,
     input: String,
     placeholderInput: String,
-    placeholderButton: String,
     enabled: Boolean,
     isError: Boolean,
     errorMessage: String?
@@ -67,8 +60,5 @@ fun InputField(
             modifier = Modifier.padding(20.dp, 0.dp)
         )
     }
-
-    Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
-    FancyButton(enabled, { onConfirm(input) }, placeholderButton)
 }
 
