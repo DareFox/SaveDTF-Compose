@@ -6,6 +6,8 @@ import io.github.resilience4j.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry
 import io.ktor.client.*
 import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import java.time.Duration
 import java.util.*
@@ -22,6 +24,11 @@ object Client {
     val rateLimiter: RateLimiter = rateLimiterRegistry.rateLimiter(rateLimitID)
     val httpClient: HttpClient = HttpClient() {
         install(HttpTimeout)
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                ignoreUnknownKeys = true
+            })
+        }
     }
 }
 
