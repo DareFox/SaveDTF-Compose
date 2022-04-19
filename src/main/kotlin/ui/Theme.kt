@@ -50,7 +50,7 @@ val Lato = FontFamily(
 val typography = Typography(
     subtitle1 = TextStyle(
         fontFamily = Lato,
-        fontSize = 1.7.em,
+        fontSize = 1.6.em,
         fontWeight = FontWeight.ExtraLight,
     ),
     subtitle2 = TextStyle(
