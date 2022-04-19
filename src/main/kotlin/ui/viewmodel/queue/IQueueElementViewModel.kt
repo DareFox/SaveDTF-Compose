@@ -14,10 +14,10 @@ sealed interface IQueueElementViewModel: ISelectable {
 
     val status: StateFlow<QueueElementStatus>
     val lastErrorMessage: StateFlow<String?>
-    val isDownloaded: StateFlow<Boolean>
     val progress: StateFlow<String?>
+    val pathToSave: String
 
     suspend fun initialize()
-    suspend fun save(folder: File): Boolean
-    suspend fun download(): Boolean
+    suspend fun save(): Boolean
+    fun setPathToSave(folder: String)
 }
