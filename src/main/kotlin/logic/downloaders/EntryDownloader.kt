@@ -82,10 +82,10 @@ private class EntryDownloader(override val entry: Entry, val retryAmount: Int, v
                 )
                 yield()
 
-                _progress.value ="Entry was successfully downloaded"
+                _progress.value = "Entry was successfully downloaded"
                 true
             } catch (ex: HttpRequestTimeoutException) {
-                _progress.value ="Timeout Request Error"
+                _progress.value = "Timeout Request Error"
                 false
             }
 
@@ -102,37 +102,41 @@ private class EntryDownloader(override val entry: Entry, val retryAmount: Int, v
 
     override suspend fun save(file: File) {
         if (files == null) {
-            throw NoContentDownloadedException("No files were downloaded. Please call download() before save()")
-        } else {
-            // TODO add synchronized version of save method (???)
-            val binaryFiles = files!!.toMutableMap()
-            val writtenFiles = mutableListOf<File>()
+            download()
+        }
 
-            try {
+        // TODO add synchronized version of save method (???)
+        val binaryFiles = files?.toMutableMap()
+        val writtenFiles = mutableListOf<File>()
+
+        if (binaryFiles == null) {
+            throw NoContentDownloadedException("No files were downloaded.")
+        }
+
+        try {
+            yield()
+            binaryFiles["index.html"] = document.toString().toByteArray() // Include binary HTML too
+
+            binaryFiles.forEach { (path, binary) ->
                 yield()
-                binaryFiles["index.html"] = document.toString().toByteArray() // Include binary HTML too
 
-                binaryFiles.forEach { (path, binary) ->
-                    yield()
+                val toWrite = file.resolve(path)
+                toWrite.parentFile.mkdirs() // Create dirs to file, but don't make binary file as new dir too
 
-                    val toWrite = file.resolve(path)
-                    toWrite.parentFile.mkdirs() // Create dirs to file, but don't make binary file as new dir too
-
-                    logger.info { "Writing ${binary.size}B to ${toWrite.absolutePath}" }
-                    toWrite.writeBytes(binary)
-                    writtenFiles += toWrite
-                }
-
-            } catch (cancel: CancellationException) {
-                logger.info { "Save operation of entry (id: ${entry.id}) was cancelled. Deleting all created files" }
-                // Delete written files on cancellation
-                writtenFiles.forEach {
-                    logger.info { "Deleting ${it.absolutePath}..." }
-                    it.delete()
-                }
-                logger.info { "All ${writtenFiles.size} files were deleted" }
-                throw cancel
+                logger.info { "Writing ${binary.size}B to ${toWrite.absolutePath}" }
+                toWrite.writeBytes(binary)
+                writtenFiles += toWrite
             }
+            files = null // Free memory
+        } catch (cancel: CancellationException) {
+            logger.info { "Save operation of entry (id: ${entry.id}) was cancelled. Deleting all created files" }
+            // Delete written files on cancellation
+            writtenFiles.forEach {
+                logger.info { "Deleting ${it.absolutePath}..." }
+                it.delete()
+            }
+            logger.info { "All ${writtenFiles.size} files were deleted" }
+            throw cancel
         }
     }
 }
