@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "me.darefox"
-version = "1.0"
+version = "1.0.0"
 
 repositories {
     google()
@@ -63,8 +63,10 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "saveDTF-compose"
-            packageVersion = "1.0.0"
+            packageName = "SaveDTF"
+            packageVersion = version.toString()
+            description = "Забекапь все свои (и не только свои) статьи при помощи одной кнопки!"
+            vendor = "DareFox"
         }
     }
 }
