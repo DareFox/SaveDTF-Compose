@@ -21,8 +21,12 @@ proguard/
 .navigation/
 # Android Studio captures folder
 captures/
+
 # IntelliJ Files
 .idea/
 *.iml
 *.iws
 *.ipr
+
+# Allow workspace files
+!.idea/runConfigurations/
