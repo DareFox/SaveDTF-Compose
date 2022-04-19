@@ -37,4 +37,11 @@ object SharedRegex {
      * Returns `(dtf/vc/tjournal).ru/bookmarks` or `null`
      */
     val bookmarksRegex = """(dtf|vc|tjournal)\.ru\/bookmarks""".toRegex(RegexOption.IGNORE_CASE)
+
+    /**
+     * https://stackoverflow.com/a/45615798/13494106
+     *
+     * God bless his soul
+     */
+    val filenameValidationRegex = """\A(?!(?:COM[0-9]|CON|LPT[0-9]|NUL|PRN|AUX|com[0-9]|con|lpt[0-9]|nul|prn|aux)|[\s\.])[^\\\/:*"?<>|]{1,254}\z""".toRegex()
 }
