@@ -23,15 +23,19 @@ val ktor_version = "1.6.8"
 
 dependencies {
     implementation(compose.desktop.currentOs)
+
     // ICONS
     implementation("br.com.devsrsouza.compose.icons.jetbrains:feather:1.0.0")
 
     // Kotlin Serialization. For caching
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
+
     // Http-client Ktor. For downloading media from servers
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-client-serialization:$ktor_version")
+
 
     // API for cmtt websites
     implementation("com.github.DareFox:kmttAPI:7a96f33161")
