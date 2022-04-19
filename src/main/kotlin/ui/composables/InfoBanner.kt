@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ui.SaveDtfTheme
+import ui.viewmodel.AppViewModel
 import util.repeatOrEmpty
 
 @Composable
@@ -61,7 +62,7 @@ fun InfoBanner() {
             Spacer(Modifier.width(20.dp))
             Column {
                 Text(
-                    text = "SaveDTF",
+                    text = "SaveDTF ${AppViewModel.currentVersionObject}",
                     style = MaterialTheme.typography.h2,
                     color = MaterialTheme.colors.onBackground,
                 )
