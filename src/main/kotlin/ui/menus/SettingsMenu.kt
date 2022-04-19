@@ -107,7 +107,7 @@ fun SettingsMenu() {
                 SettingsTextField(
                     name = "Кол-во попыток",
                     input = input,
-                    textPlaceholder = "",
+                    textPlaceholder = "0 — бесконечность, значение меньше нуля ",
                     hideContent = false
                 ) {
                     it.toIntOrNull()?.also { retry ->
