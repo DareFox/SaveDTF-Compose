@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
+import compose.icons.feathericons.Folder
 import compose.icons.feathericons.Trash2
 import logic.document.processors.downloadMediaAsync
 import ui.SaveDtfTheme
@@ -31,6 +32,8 @@ import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import util.getMediaId
 import util.getMediaIdOrNull
+import java.awt.Desktop
+import java.io.File
 
 data class ActionBarElement(
     val icon: ImageVector,
@@ -58,8 +61,6 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
 
 @Composable
 fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
-    val entryCardScope = rememberCoroutineScope()
-
     val entry by viewModel.entry.collectAsState()
     val status by viewModel.status.collectAsState()
 
@@ -137,7 +138,7 @@ fun GenericCard(
                 error?.let {
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = error ?: "null",
+                        text = error,
                         style = MaterialTheme.typography.subtitle2,
                         fontStyle = FontStyle.Italic,
                         color = onColor
@@ -191,7 +192,16 @@ fun GenericCard(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    actionBar.forEach {
+                    val status by viewModel.status.collectAsState()
+                    val buttons = actionBar.toMutableList()
+
+                    if (status == QueueElementStatus.SAVED) {
+                        buttons.add(ActionBarElement(FeatherIcons.Folder, "Open folder") {
+                            Desktop.getDesktop().open(File(viewModel.pathToSave))
+                        })
+                    }
+
+                    buttons.forEach {
                         Icon(it.icon, it.description, modifier = Modifier.clickable {
                             it.onClickCallback(viewModel)
                         }, tint = onColor)
@@ -199,19 +209,19 @@ fun GenericCard(
                     }
                 }
 
-                val selected by viewModel.selected.collectAsState()
-
-                Checkbox(
-                    checked = selected,
-                    onCheckedChange = {
-                        if (it) {
-                            viewModel.select()
-                        } else {
-                            viewModel.unselect()
-                        }
-                    },
-                    colors = CheckboxDefaults.colors(uncheckedColor = onColor)
-                )
+//                val selected by viewModel.selected.collectAsState()
+//
+//                Checkbox(
+//                    checked = selected,
+//                    onCheckedChange = {
+//                        if (it) {
+//                            viewModel.select()
+//                        } else {
+//                            viewModel.unselect()
+//                        }
+//                    },
+//                    colors = CheckboxDefaults.colors(uncheckedColor = onColor)
+//                )
             }
         }
     }
