@@ -34,7 +34,7 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ktor_version")
 
     // API for cmtt websites
-    implementation("com.github.DareFox:kmttAPI:0.2.0")
+    implementation("com.github.DareFox:kmttAPI:7a96f33161")
 
     // HTML Parser
     implementation("org.jsoup:jsoup:1.14.3")
