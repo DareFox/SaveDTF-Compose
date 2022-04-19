@@ -2,13 +2,13 @@ package ui.viewmodel.queue
 
 import kotlinx.coroutines.flow.StateFlow
 import ui.ISelectable
-import java.io.File
 
 sealed interface IQueueElementViewModel: ISelectable {
     enum class QueueElementStatus {
-        WAITING_INIT,
+        INITIALIZING,
         ERROR,
         READY_TO_USE,
+        IN_USE,
         SAVED
     }
 

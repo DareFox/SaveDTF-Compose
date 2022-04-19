@@ -3,7 +3,6 @@ package ui.composables.queue
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,20 +17,19 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
+import compose.icons.feathericons.Download
 import compose.icons.feathericons.Folder
+import compose.icons.feathericons.RefreshCcw
 import compose.icons.feathericons.Trash2
-import logic.document.processors.downloadMediaAsync
+import kotlinx.coroutines.launch
 import ui.SaveDtfTheme
 import ui.viewmodel.queue.EntryQueueElementViewModel
 import ui.viewmodel.queue.IEntryQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
-import util.getMediaId
-import util.getMediaIdOrNull
 import java.awt.Desktop
 import java.io.File
 
@@ -90,18 +88,19 @@ fun GenericCard(
 ) {
     val color by animateColorAsState(when (status) {
         QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
-        QueueElementStatus.WAITING_INIT -> Color.Gray.copy(0.8f)
+        QueueElementStatus.INITIALIZING -> Color.Gray.copy(0.8f)
         QueueElementStatus.READY_TO_USE -> Color.Gray.copy(0.00001f) // Composite over transparent color
         QueueElementStatus.SAVED -> Color.Green.copy(0.5f)
+        QueueElementStatus.IN_USE -> Color.Yellow.copy(0.2f)
     })
 
     val onColor by animateColorAsState(when(status) {
-        QueueElementStatus.WAITING_INIT -> Color.White
+        QueueElementStatus.INITIALIZING -> Color.White
         else -> Color.Black
     })
 
     LaunchedEffect(Unit) {
-        if (viewModel.status.value == QueueElementStatus.WAITING_INIT) {
+        if (viewModel.status.value == QueueElementStatus.INITIALIZING) {
             viewModel.initialize()
         }
     }
@@ -192,13 +191,31 @@ fun GenericCard(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    val status by viewModel.status.collectAsState()
+                    val scope = rememberCoroutineScope()
                     val buttons = actionBar.toMutableList()
 
                     if (status == QueueElementStatus.SAVED) {
-                        buttons.add(ActionBarElement(FeatherIcons.Folder, "Open folder") {
+                        buttons.add(ActionBarElement(FeatherIcons.Folder, "Открыть папку") {
                             Desktop.getDesktop().open(File(viewModel.pathToSave))
                         })
+                    }
+
+                    if (status in listOf(QueueElementStatus.READY_TO_USE, QueueElementStatus.SAVED)) {
+                        buttons += ActionBarElement(FeatherIcons.Download, "Сохранить") {
+                            scope.launch {
+                                if (status != QueueElementStatus.IN_USE) { // Double check
+                                    it.save()
+                                }
+                            }
+                        }
+                    }
+
+                    if (status != QueueElementStatus.INITIALIZING) {
+                        buttons += ActionBarElement(FeatherIcons.RefreshCcw, "Обновить информацию") {
+                            scope.launch {
+                                it.initialize()
+                            }
+                        }
                     }
 
                     buttons.forEach {

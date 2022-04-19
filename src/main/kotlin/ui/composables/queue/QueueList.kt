@@ -24,7 +24,6 @@ import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import ui.viewmodel.queue.QueueViewModel
-import java.io.File
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -79,14 +78,6 @@ fun QueueList() {
                                         state.targetState = false
                                     },
                                 )
-
-                                if (status != QueueElementStatus.WAITING_INIT) {
-                                    buttons += ActionBarElement(FeatherIcons.RefreshCcw, "Обновить информацию") {
-                                        scope.launch {
-                                            it.initialize()
-                                        }
-                                    }
-                                }
 
                                 QueueCard(entry, buttons)
                             }

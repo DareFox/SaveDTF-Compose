@@ -18,6 +18,7 @@ import ui.SaveDtfTheme
 import ui.composables.FancyButton
 import ui.composables.FancyInputField
 import ui.composables.queue.QueueList
+import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import ui.viewmodel.queue.QueueViewModel
 
 @Composable
@@ -69,7 +70,9 @@ fun QueueCreatorMenu() {
                     FancyButton(isQueueNotEmpty, onClick = {
                         queue.forEach {
                             scope.launch {
-                                it.save()
+                                if (it.status.value != QueueElementStatus.IN_USE) {
+                                    it.save()
+                                }
                             }
                         }
                     }) {
@@ -89,14 +92,16 @@ fun QueueCreatorMenu() {
                     FancyButton(isQueueNotEmpty, onClick = {
                         viewmodel.queue.value.forEach {
                             scope.launch {
-                                it.initialize()
+                                if (it.status.value != QueueElementStatus.IN_USE) {
+                                    it.initialize()
+                                }
                             }
                         }
                     }) {
                         Icon(FeatherIcons.RefreshCcw, null)
                     }
                 }
-                )
+            )
 
             Row {
                 Surface(modifier = Modifier.weight(1f)) {

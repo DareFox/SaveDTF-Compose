@@ -3,6 +3,7 @@ package ui.viewmodel.queue
 import kmtt.impl.authKmtt
 import kmtt.impl.publicKmtt
 import kmtt.models.entry.Entry
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +37,7 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
     private val _entry = MutableStateFlow<Entry?>(null)
     override val entry: StateFlow<Entry?> = _entry
 
-    private val _status = MutableStateFlow(QueueElementStatus.WAITING_INIT)
+    private val _status = MutableStateFlow(QueueElementStatus.INITIALIZING)
     override val status: StateFlow<QueueElementStatus> = _status
 
     private val _lastErrorMessage = MutableStateFlow<String?>(null)
@@ -84,7 +85,7 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
 
     override suspend fun initialize() {
         mutex.withLock {
-            _status.value = QueueElementStatus.WAITING_INIT
+            _status.value = QueueElementStatus.INITIALIZING
             _entry.value = null
             entryDownloader.value = null
 
@@ -121,12 +122,11 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
         }
     }
 
-    override fun setPathToSave(folder: String) {
-        userPath = folder
-    }
-
     override suspend fun save(): Boolean {
-        mutex.withLock {
+        mutex.lock()
+
+        try {
+            _status.value = QueueElementStatus.IN_USE
             val downloader = entryDownloader.value
 
             requireNotNull(downloader) {
@@ -148,7 +148,6 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
             val folder = File(convertToValidName(pathToSave))
 
             val value = try {
-                _status.value = QueueElementStatus.READY_TO_USE
                 downloader.save(folder)
                 _status.value = QueueElementStatus.SAVED
                 true
@@ -162,6 +161,12 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
             }
 
             return value
+        } catch (_: CancellationException) {
+            _lastErrorMessage.value = "Operation cancelled"
+            _status.value = QueueElementStatus.ERROR
+            return false
+        } finally {
+            mutex.unlock()
         }
     }
 
@@ -174,5 +179,9 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
 
     override fun unselect() {
         _selected.value = false
+    }
+
+    override fun setPathToSave(folder: String) {
+        userPath = folder
     }
 }
