@@ -48,7 +48,7 @@ object SettingsViewModel {
         if (token == null || token.isEmpty() || token.isBlank()) {
             preferences.node("tkn").remove(website.name)
         } else {
-            preferences.node("tkn").put(website.name, token)
+            preferences.node("tkn").put(website.name, token.trim())
         }
 
         _tokens.update {
