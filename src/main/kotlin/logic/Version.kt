@@ -17,7 +17,11 @@ data class Version(val major: Int, val minor: Int, val fix: Int) {
      *
      * [More here](https://semver.org/#spec-item-11)
      */
-    operator fun compareTo(version: Version): Int {
+    operator fun compareTo(version: Version?): Int {
+        if (version == null) {
+            return 1 // Always bigger than nothin
+        }
+
         if (major > version.major) {
             return 1
         } else if (major < version.major) {
