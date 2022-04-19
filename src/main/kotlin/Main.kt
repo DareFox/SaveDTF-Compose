@@ -16,7 +16,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "SaveDTF!",
         state = rememberWindowState(size = DpSize(820.dp, 740.dp)),
-        icon = painterResource("img/hehe.webp"),
+        icon = painterResource("img/DTF_logo.png"),
     ) {
         SaveDtfTheme(true) {
             AppUI()
