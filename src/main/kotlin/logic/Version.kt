@@ -42,4 +42,6 @@ data class Version(val major: Int, val minor: Int, val fix: Int) {
 
         return 0 // Both are equal
     }
+
+    override fun toString(): String = "$major.$minor.$fix"
 }

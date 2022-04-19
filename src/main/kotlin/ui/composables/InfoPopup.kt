@@ -17,7 +17,12 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Info
 
 @Composable
-fun InfoPopup(title: String, text: String, onClose: () -> Unit) {
+fun InfoPopup(
+    title: String,
+    text: String,
+    onClose: () -> Unit,
+    buttons: @Composable () -> Unit = { FancyButton(true, onClose, "OK") },
+) {
     Window(
         onCloseRequest = onClose,
         state = rememberWindowState(width = 550.dp, height = Dp.Unspecified),
@@ -25,7 +30,6 @@ fun InfoPopup(title: String, text: String, onClose: () -> Unit) {
         title = title,
         resizable = false,
         icon = painterResource("img/DTF_logo.png")
-
     ) {
         Surface(color = MaterialTheme.colors.background) {
             Column(modifier = Modifier.padding(25.dp, 10.dp).defaultMinSize(150.dp)) {
@@ -38,8 +42,7 @@ fun InfoPopup(title: String, text: String, onClose: () -> Unit) {
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-
-                FancyButton(true, onClose, "OK")
+                buttons()
             }
         }
     }

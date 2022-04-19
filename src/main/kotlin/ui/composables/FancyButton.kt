@@ -17,7 +17,7 @@ fun FancyButton(
     enabled: Boolean,
     onClick: () -> Unit,
     placeholderButton: String,
-    buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
+    buttonColors: ButtonColors = ButtonDefaults.buttonColors()
     ) {
     FancyButton(
         enabled = enabled,
@@ -32,7 +32,7 @@ fun FancyButton(
     enabled: Boolean,
     onClick: () -> Unit,
     buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
-    placeholderButton: @Composable RowScope.() -> Unit,
+    placeholderButton: @Composable RowScope.() -> Unit
 ) {
     Button(
         enabled = enabled,

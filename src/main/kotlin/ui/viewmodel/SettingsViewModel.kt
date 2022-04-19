@@ -17,6 +17,25 @@ object SettingsViewModel {
     private const val DOWNLOAD_VIDEO_BOOL_KEY = "download_video"
     private const val DOWNLOAD_IMAGE_BOOL_KEY = "download_image"
 
+    /**
+         ———————————No Updates?———————————
+        ⠀⣞⢽⢪⢣⢣⢣⢫⡺⡵⣝⡮⣗⢷⢽⢽⢽⣮⡷⡽⣜⣜⢮⢺⣜⢷⢽⢝⡽⣝
+        ⠸⡸⠜⠕⠕⠁⢁⢇⢏⢽⢺⣪⡳⡝⣎⣏⢯⢞⡿⣟⣷⣳⢯⡷⣽⢽⢯⣳⣫⠇
+        ⠀⠀⢀⢀⢄⢬⢪⡪⡎⣆⡈⠚⠜⠕⠇⠗⠝⢕⢯⢫⣞⣯⣿⣻⡽⣏⢗⣗⠏⠀
+        ⠀⠪⡪⡪⣪⢪⢺⢸⢢⢓⢆⢤⢀⠀⠀⠀⠀⠈⢊⢞⡾⣿⡯⣏⢮⠷⠁⠀⠀
+        ⠀⠀⠀⠈⠊⠆⡃⠕⢕⢇⢇⢇⢇⢇⢏⢎⢎⢆⢄⠀⢑⣽⣿⢝⠲⠉⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⡿⠂⠠⠀⡇⢇⠕⢈⣀⠀⠁⠡⠣⡣⡫⣂⣿⠯⢪⠰⠂⠀⠀⠀⠀
+        ⠀⠀⠀⠀⡦⡙⡂⢀⢤⢣⠣⡈⣾⡃⠠⠄⠀⡄⢱⣌⣶⢏⢊⠂⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⢝⡲⣜⡮⡏⢎⢌⢂⠙⠢⠐⢀⢘⢵⣽⣿⡿⠁⠁⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠨⣺⡺⡕⡕⡱⡑⡆⡕⡅⡕⡜⡼⢽⡻⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⣼⣳⣫⣾⣵⣗⡵⡱⡡⢣⢑⢕⢜⢕⡝⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⣴⣿⣾⣿⣿⣿⡿⡽⡑⢌⠪⡢⡣⣣⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⡟⡾⣿⢿⢿⢵⣽⣾⣼⣘⢸⢸⣞⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠁⠇⠡⠩⡫⢿⣝⡻⡮⣒⢽⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ——————————————————————————————————
+     */
+    private const val MUTE_UPDATES_NOTIFICATION_KEY = "no_updates_${AppViewModel.VERSION}"
+
     private val _replaceErrorMedia = MutableStateFlow(getPrefReplaceErrorMedia())
     private val _tokens = MutableStateFlow(mapOf<Website, String?>(
         Website.DTF to getPrefToken(Website.DTF),
@@ -27,6 +46,7 @@ object SettingsViewModel {
     private val _folderToSave = MutableStateFlow<String>(getPrefFolder())
     private val _downloadVideo = MutableStateFlow(getPrefDownloadVideo())
     private val _downloadImage = MutableStateFlow(getPrefDownloadImage())
+    private val _ignoreUpdate = MutableStateFlow(getPrefIgnoreUpdates())
 
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
     val tokens: StateFlow<Map<Website, String?>> = _tokens
@@ -34,6 +54,7 @@ object SettingsViewModel {
     val folderToSave: StateFlow<String> = _folderToSave
     val downloadVideo: StateFlow<Boolean> = _downloadVideo
     val downloadImage: StateFlow<Boolean> = _downloadImage
+    val ignoreUpdate: StateFlow<Boolean> = _ignoreUpdate
 
     private fun getPrefReplaceErrorMedia() = preferences.getBoolean(ERROR_MEDIA_BOOL_KEY, true)
     private fun getPrefFolder() = preferences.get(SAVE_FOLDER_STR_KEY, File("./saved").canonicalPath)
@@ -43,6 +64,7 @@ object SettingsViewModel {
     }
     private fun getPrefDownloadVideo() = preferences.getBoolean(DOWNLOAD_VIDEO_BOOL_KEY, true)
     private fun getPrefDownloadImage() = preferences.getBoolean(DOWNLOAD_IMAGE_BOOL_KEY, true)
+    private fun getPrefIgnoreUpdates() = preferences.getBoolean(MUTE_UPDATES_NOTIFICATION_KEY, false)
 
     fun setToken(token: String?, website: Website) {
         if (token == null || token.isEmpty() || token.isBlank()) {
@@ -76,6 +98,10 @@ object SettingsViewModel {
     fun setDownloadImageMode(downloadIt: Boolean) {
         preferences.putBoolean(DOWNLOAD_IMAGE_BOOL_KEY, downloadIt)
         _downloadImage.value = getPrefDownloadImage()
+    }
+    fun setIgnoreUpdate(ignore: Boolean) {
+        preferences.putBoolean(MUTE_UPDATES_NOTIFICATION_KEY, ignore)
+        _ignoreUpdate.value = getPrefIgnoreUpdates()
     }
 
     fun clearCache(): Boolean {

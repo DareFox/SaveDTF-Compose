@@ -7,8 +7,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import logic.Version
 import ui.AppUI
 import ui.SaveDtfTheme
+import ui.composables.CheckVersion
 import ui.composables.InfoPopup
 
 fun main() = application {
@@ -20,6 +22,7 @@ fun main() = application {
     ) {
         SaveDtfTheme(true) {
             AppUI()
+            CheckVersion()
         }
     }
 }

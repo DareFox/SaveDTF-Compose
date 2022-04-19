@@ -21,9 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Eye
 import compose.icons.feathericons.EyeOff
+import ui.composables.CheckVersion
 import ui.composables.FancyButton
 import ui.composables.directoryDialog
 import ui.viewmodel.SettingsViewModel
@@ -31,6 +33,39 @@ import ui.viewmodel.SettingsViewModel
 @Composable
 fun SettingsMenu() {
     val categories = mutableListOf<@Composable () -> Unit>()
+
+    categories += {
+        SettingsCategory("Приложение") {
+            val fields = mutableListOf<@Composable () -> Unit>()
+
+            fields += {
+                val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()
+
+                SettingsBoolField("Игнорировать обновления?", ignoreUpdates) {
+                    SettingsViewModel.setIgnoreUpdate(it)
+                }
+            }
+
+            fields += {
+                var showWindow by remember { mutableStateOf(false) }
+
+                FancyButton(
+                    enabled = true,
+                    onClick = {
+                        showWindow = !showWindow
+                    },
+                    buttonColors = ButtonDefaults.buttonColors(),
+                    placeholderButton = "Проверить обновления"
+                )
+
+                if (showWindow) {
+                    CheckVersion(true)
+                }
+            }
+
+            SettingsFields(fields)
+        }
+    }
 
     categories += {
         SettingsCategory("Токены") {
@@ -226,7 +261,7 @@ fun SettingsTextField(
         ) {
             Text(name, style = MaterialTheme.typography.subtitle1)
         }
-        Box() {
+        Box(modifier = Modifier.height(55.dp)) {
             var passwordVisible by remember { mutableStateOf(false) }
 
             val visualTransformation = if (hideContent && !passwordVisible) {
@@ -239,9 +274,9 @@ fun SettingsTextField(
                 enabled = onFieldClick == null,
                 value = input,
                 onValueChange = onInputChange,
-                textStyle = MaterialTheme.typography.subtitle2,
+                textStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 1.2.em),
                 placeholder = {
-                    Text(textPlaceholder, style = MaterialTheme.typography.subtitle2)
+                    Text(textPlaceholder, style = MaterialTheme.typography.subtitle1.copy(fontSize = 1.3.em))
                 },
                 modifier = Modifier.fillMaxWidth().clickable(onFieldClick != null) { onFieldClick?.invoke() },
                 colors = TextFieldDefaults.outlinedTextFieldColors(disabledTextColor = MaterialTheme.colors.onBackground),
