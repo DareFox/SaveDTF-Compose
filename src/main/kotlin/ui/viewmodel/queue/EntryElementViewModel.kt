@@ -136,7 +136,7 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
             val downloaded: Boolean = if (!downloader.isDownloaded.value) {
                 downloader.download()
             } else {
-                false
+                true
             }
 
             if (!downloaded) {
