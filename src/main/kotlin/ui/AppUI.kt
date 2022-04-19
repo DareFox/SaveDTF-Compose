@@ -8,10 +8,10 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import ui.composables.InfoBanner
-import ui.composables.NavBarPreview
 import ui.composables.TextBarElement
 import ui.composables.TextNavBar
 import ui.menus.QueueCreatorMenu
+import ui.menus.SettingsMenu
 
 @Composable
 fun AppUI() {
@@ -24,7 +24,7 @@ fun AppUI() {
             Box(modifier = Modifier.weight(1f)) {
                 when (navbarElement) {
                     NavBar.DOWNLOAD_MENU -> QueueCreatorMenu()
-                    NavBar.SETTINGS_MENU -> NavBarPreview()
+                    NavBar.SETTINGS_MENU -> SettingsMenu()
                 }
             }
             Box {
