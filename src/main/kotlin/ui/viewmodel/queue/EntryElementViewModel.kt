@@ -5,17 +5,21 @@ import kmtt.impl.publicKmtt
 import kmtt.models.entry.Entry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logic.downloaders.IEntryDownloader
 import logic.downloaders.entryDownloader
-import logic.downloaders.exceptions.NoContentDownloadedException
 import mu.KotlinLogging
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import util.UrlUtil
+import util.convertToValidName
 import java.io.File
+import java.util.*
 
 interface IEntryQueueElementViewModel : IQueueElementViewModel {
     val url: String
@@ -24,7 +28,7 @@ interface IEntryQueueElementViewModel : IQueueElementViewModel {
 
 private val logger = KotlinLogging.logger { }
 
-data class EntryQueueElementViewModel(override val url: String): IEntryQueueElementViewModel {
+data class EntryQueueElementViewModel(override val url: String) : IEntryQueueElementViewModel {
     private val scope = CoroutineScope(Dispatchers.Default)
 
     private var entryDownloader = MutableStateFlow<IEntryDownloader?>(null)
@@ -38,11 +42,29 @@ data class EntryQueueElementViewModel(override val url: String): IEntryQueueElem
     private val _lastErrorMessage = MutableStateFlow<String?>(null)
     override val lastErrorMessage: StateFlow<String?> = _lastErrorMessage
 
-    private val _isDownloaded = MutableStateFlow(false)
-    override val isDownloaded: StateFlow<Boolean> = _isDownloaded
-
     private val _progress = MutableStateFlow<String?>(null)
     override val progress: StateFlow<String?> = _progress
+
+    private var userPath: String? = null
+    private val defaultPath: String
+        get() {
+            val entry = entry.value
+
+            val entryId = entry?.id ?: UUID.randomUUID().toString()
+            val entryName = entry?.title ?: "no title"
+
+            val authorId = entry?.author?.id ?: "unknown id"
+            val authorName = entry?.author?.name ?: "unknown author"
+
+            val folder = File(SettingsViewModel.folderToSave.value)
+
+            val pathToSave = folder.resolve("entry/$authorId-$authorName/$entryId-$entryName")
+            return pathToSave.canonicalPath
+        }
+
+    override val pathToSave: String
+        get() = userPath ?: defaultPath ?: "."
+
 
     init {
         entryDownloader.onEach { // on entry downloader change
@@ -58,79 +80,88 @@ data class EntryQueueElementViewModel(override val url: String): IEntryQueueElem
         }.launchIn(scope = scope)
     }
 
+    private val mutex = Mutex()
+
     override suspend fun initialize() {
-        _status.value = QueueElementStatus.WAITING_INIT
-        _entry.value = null
-        entryDownloader.value = null
+        mutex.withLock {
+            _status.value = QueueElementStatus.WAITING_INIT
+            _entry.value = null
+            entryDownloader.value = null
 
-        logger.info { "Parsing website" }
-        val website = UrlUtil.getWebsiteType(url)
+            logger.info { "Parsing website" }
+            val website = UrlUtil.getWebsiteType(url)
 
-        if (website == null) {
-            _lastErrorMessage.value = "Website $url is not supported"
-            _status.value = QueueElementStatus.ERROR
-            return
-        }
+            if (website == null) {
+                _lastErrorMessage.value = "Website $url is not supported"
+                _status.value = QueueElementStatus.ERROR
+                return
+            }
 
-        val token = SettingsViewModel.tokens.value.get(website)
-        val api = if (token != null) {
-            authKmtt(website, token)
-        } else {
-            publicKmtt(website)
-        }
+            val token = SettingsViewModel.tokens.value.get(website)
+            val api = if (token != null) {
+                authKmtt(website, token)
+            } else {
+                publicKmtt(website)
+            }
 
-        val entry: Entry
+            val entry: Entry
 
-        try {
-            entry = api.entry.getEntry(url)
-        } catch (ex: Exception) {
-            _lastErrorMessage.value = ex.message
-            _status.value = QueueElementStatus.ERROR
-            return
-        }
+            try {
+                entry = api.entry.getEntry(url)
+            } catch (ex: Exception) {
+                _lastErrorMessage.value = ex.message
+                _status.value = QueueElementStatus.ERROR
+                return
+            }
 
-        _entry.value = entry
-        entryDownloader.value = entryDownloader(entry, SettingsViewModel.retryAmount.value, SettingsViewModel.replaceErrorMedia.value)
-        _status.value = QueueElementStatus.READY_TO_USE
-    }
-
-    override suspend fun save(folder: File): Boolean {
-        val downloader = entryDownloader.value
-
-        requireNotNull(downloader) {
-            "Initialize element before saving"
-        }
-
-        return try {
+            _entry.value = entry
+            entryDownloader.value =
+                entryDownloader(entry, SettingsViewModel.retryAmount.value, SettingsViewModel.replaceErrorMedia.value)
             _status.value = QueueElementStatus.READY_TO_USE
-            downloader.save(folder)
-            _status.value = QueueElementStatus.SAVED
-            true
-        } catch (e: NoContentDownloadedException) {
-            _lastErrorMessage.value = "Download Entry, before saving it"
-            _status.value = QueueElementStatus.ERROR
-            false
         }
     }
 
-    override suspend fun download(): Boolean {
-        _status.value = QueueElementStatus.READY_TO_USE
-        val downloader = entryDownloader.value
+    override fun setPathToSave(folder: String) {
+        userPath = folder
+    }
 
-        requireNotNull(downloader) {
-            "Initialize element before saving"
-        }
+    override suspend fun save(): Boolean {
+        mutex.withLock {
+            val downloader = entryDownloader.value
 
-        val result = downloader.download()
+            requireNotNull(downloader) {
+                "Initialize element before saving"
+            }
 
-        return if (result) {
-            _status.value = QueueElementStatus.READY_TO_USE
-            _isDownloaded.value = downloader.isDownloaded.value
-            true
-        } else {
-            _status.value = QueueElementStatus.ERROR
-            _lastErrorMessage.value = "Can't download entry"
-            false
+            val downloaded: Boolean = if (!downloader.isDownloaded.value) {
+                downloader.download()
+            } else {
+                false
+            }
+
+            if (!downloaded) {
+                _lastErrorMessage.value = "Can't download entry"
+                _status.value = QueueElementStatus.ERROR
+                return false
+            }
+
+            val folder = File(convertToValidName(pathToSave))
+
+            val value = try {
+                _status.value = QueueElementStatus.READY_TO_USE
+                downloader.save(folder)
+                _status.value = QueueElementStatus.SAVED
+                true
+            } catch (ex: Exception) {
+                _lastErrorMessage.value = "$[{ex.javaClass.name}] ${ex.message}"
+                _status.value = QueueElementStatus.ERROR
+                logger.error {
+                    ex.toString()
+                }
+                false
+            }
+
+            return value
         }
     }
 
