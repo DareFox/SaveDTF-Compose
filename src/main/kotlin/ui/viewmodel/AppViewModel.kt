@@ -33,7 +33,6 @@ object AppViewModel {
                 return null
             }
         } catch(ex: Exception) {
-            println(ex)
             null
         }
     }

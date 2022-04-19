@@ -9,10 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import logic.Version
+import mu.KotlinLogging
 import ui.viewmodel.AppViewModel
 import ui.viewmodel.SettingsViewModel
 import java.awt.Desktop
 import java.net.URI
+
+private val logger = KotlinLogging.logger {  }
 
 @Composable
 fun CheckVersion(forced: Boolean = false) {
@@ -21,10 +24,17 @@ fun CheckVersion(forced: Boolean = false) {
     val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()
 
     LaunchedEffect(Unit) {
+        logger.info { "Checking updates" }
+
         lastVersion = AppViewModel.getLastVersionOrNull()
 
-        if (AppViewModel.currentVersionObject < lastVersion && forced || !ignoreUpdates) {
-            showPopup = true
+        logger.info { "GitHub version: $lastVersion" }
+        logger.info { "Current version: ${AppViewModel.currentVersionObject}" }
+
+        lastVersion?.let {
+            if (AppViewModel.currentVersionObject < it && forced || !ignoreUpdates) {
+                showPopup = true
+            }
         }
     }
 
