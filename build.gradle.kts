@@ -38,12 +38,10 @@ dependencies {
     // Kotlin Serialization. For caching
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
-
     // Http-client Ktor. For downloading media from servers
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
-
 
     // API for cmtt websites
     implementation("com.github.DareFox:kmttAPI:7a96f33161")
@@ -89,6 +87,7 @@ compose.desktop {
                 iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
                 dirChooser = true
                 upgradeUuid = DO_NOT_CHANGE_THIS_UUID;
+                menuGroup = "Programs" // Make it searchable in Start menu
             }
             linux {
                 iconFile.set(iconsRoot.resolve("DTF_logo.png"))
