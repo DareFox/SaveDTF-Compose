@@ -82,10 +82,10 @@ private class EntryDownloader(override val entry: Entry, val retryAmount: Int, v
                 )
                 yield()
 
-                _progress.value = "Entry was successfully downloaded"
+                _progress.value = null
                 true
             } catch (ex: HttpRequestTimeoutException) {
-                _progress.value = "Timeout Request Error"
+                _progress.value = null
                 false
             }
 
