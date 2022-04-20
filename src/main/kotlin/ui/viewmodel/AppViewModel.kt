@@ -11,7 +11,7 @@ import logic.ktor.rateRequest
 import util.toVersionOrNull
 
 object AppViewModel {
-    const val VERSION = "1.0.2"
+    const val VERSION = "1.0.3"
     val currentVersionObject = VERSION.toVersionOrNull()!!
 
     private val repoName = "DareFox/SaveDTF-compose"
