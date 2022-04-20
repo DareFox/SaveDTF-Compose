@@ -37,6 +37,23 @@ fun SettingsMenu() {
         SettingsCategory("Приложение") {
             val fields = mutableListOf<@Composable () -> Unit>()
 
+            val folderInput by SettingsViewModel.folderToSave.collectAsState()
+
+            fields += {
+                SettingsTextField(
+                    name = "Папка сохранения",
+                    input = folderInput ?: "",
+                    textPlaceholder = "Нажми на меня, чтобы выбрать папку",
+                    onFieldClick = {
+                        directoryDialog("Choose Folder") {
+                            if (it != null) {
+                                SettingsViewModel.setFolderToSave(it)
+                            }
+                        }
+                    }
+                ) {}
+            }
+
             fields += {
                 val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()
 
@@ -96,25 +113,8 @@ fun SettingsMenu() {
 
     categories += {
         SettingsCategory("Загрузка") {
-            val folderInput by SettingsViewModel.folderToSave.collectAsState()
-            val fields = mutableListOf<@Composable () -> Unit>()
-
-            fields += {
-                SettingsTextField(
-                    name = "Папка",
-                    input = folderInput ?: "",
-                    textPlaceholder = "Нажми на меня, чтобы выбрать папк",
-                    onFieldClick = {
-                        directoryDialog("Choose Folder") {
-                            if (it != null) {
-                                SettingsViewModel.setFolderToSave(it)
-                            }
-                        }
-                    }
-                ) {}
-            }
-
             var input by remember { mutableStateOf("${SettingsViewModel.retryAmount.value}") }
+            val fields = mutableListOf<@Composable () -> Unit>()
 
             fields += {
                 /*
