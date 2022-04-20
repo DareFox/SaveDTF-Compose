@@ -43,7 +43,7 @@ object SettingsViewModel {
         Website.TJ to getPrefToken(Website.TJ)
     ))
     private val _retryAmount = MutableStateFlow(getPrefRetryAmount())
-    private val _folderToSave = MutableStateFlow<String>(getPrefFolder())
+    private val _folderToSave = MutableStateFlow<String?>(getPrefFolder())
     private val _downloadVideo = MutableStateFlow(getPrefDownloadVideo())
     private val _downloadImage = MutableStateFlow(getPrefDownloadImage())
     private val _ignoreUpdate = MutableStateFlow(getPrefIgnoreUpdates())
@@ -51,13 +51,13 @@ object SettingsViewModel {
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
     val tokens: StateFlow<Map<Website, String?>> = _tokens
     val retryAmount: StateFlow<Int> = _retryAmount;
-    val folderToSave: StateFlow<String> = _folderToSave
+    val folderToSave: StateFlow<String?> = _folderToSave
     val downloadVideo: StateFlow<Boolean> = _downloadVideo
     val downloadImage: StateFlow<Boolean> = _downloadImage
     val ignoreUpdate: StateFlow<Boolean> = _ignoreUpdate
 
     private fun getPrefReplaceErrorMedia() = preferences.getBoolean(ERROR_MEDIA_BOOL_KEY, true)
-    private fun getPrefFolder() = preferences.get(SAVE_FOLDER_STR_KEY, File("./saved").canonicalPath)
+    private fun getPrefFolder() = preferences.get(SAVE_FOLDER_STR_KEY, null)
     private fun getPrefRetryAmount() = preferences.getInt(RETRY_AMOUNT_INT_KEY, 5)
     private fun getPrefToken(website: Website): String? {
         return preferences.node("tkn").get(website.name, null)
@@ -81,7 +81,7 @@ object SettingsViewModel {
         }
     }
 
-    fun setFolderToSave(folder: String) {
+    fun setFolderToSave(folder: String?) {
         preferences.put(SAVE_FOLDER_STR_KEY, folder)
         _folderToSave.value = getPrefFolder()
     }
