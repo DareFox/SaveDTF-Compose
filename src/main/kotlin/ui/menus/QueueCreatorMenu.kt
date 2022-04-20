@@ -18,6 +18,7 @@ import ui.SaveDtfTheme
 import ui.composables.FancyButton
 import ui.composables.FancyInputField
 import ui.composables.queue.QueueList
+import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import ui.viewmodel.queue.QueueViewModel
 
@@ -31,8 +32,8 @@ fun QueueCreatorMenuPreview() {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun QueueCreatorMenu() {
-    val viewmodel = QueueViewModel
-    val queue by viewmodel.queue.collectAsState()
+    val queueVM = QueueViewModel
+    val queue by queueVM.queue.collectAsState()
 
     Surface(Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(10.dp, 0.dp)) {
@@ -40,24 +41,28 @@ fun QueueCreatorMenu() {
             var input by rememberSaveable { mutableStateOf("") }
             var enable by rememberSaveable { mutableStateOf(false) }
 
+            val hasFolder by SettingsViewModel.folderToSave.collectAsState()
+            val supported = queueVM.canCreateQueueElement(input)
+            val errorMessage = when {
+                hasFolder == null -> "Установите папку для сохранений в настройках"
+                input.isNotEmpty() && !supported -> "Неверный URL"
+                else -> null
+            }
 
-            val supported = viewmodel.canCreateQueueElement(input)
-            val errorMessage = if (input.isNotEmpty() && !supported) "Неверный URL" else null
-
-            enable = input.isNotEmpty() && supported
+            enable = errorMessage == null
 
             FancyInputField(
                 onInputChange = {
                     input = it
                 },
                 onConfirm = {
-                    viewmodel.createAndAddQueueElement(it)
+                    queueVM.createAndAddQueueElement(it)
                     input = ""
                 },
                 input = input,
                 placeholderInput = "Вставь ссылку сюда",
                 enabled = enable,
-                isError = input.isNotEmpty() && !supported,
+                isError = errorMessage != null,
                 errorMessage = errorMessage
             )
             Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
@@ -83,7 +88,7 @@ fun QueueCreatorMenu() {
                 {
                     // Remove all from queue
                     FancyButton(isQueueNotEmpty, onClick = {
-                        viewmodel.clear()
+                        queueVM.clear()
                     }) {
                         Icon(FeatherIcons.Trash, null)
                     }
@@ -91,7 +96,7 @@ fun QueueCreatorMenu() {
                 {
                     // Update all elements
                     FancyButton(isQueueNotEmpty, onClick = {
-                        viewmodel.queue.value.forEach {
+                        queueVM.queue.value.forEach {
                             scope.launch {
                                 if (it.status.value != QueueElementStatus.IN_USE) {
                                     it.initialize()
@@ -106,8 +111,8 @@ fun QueueCreatorMenu() {
 
             Row {
                 Surface(modifier = Modifier.weight(1f)) {
-                    FancyButton(true, onClick = {
-                        viewmodel.createAndAddQueueElement(input)
+                    FancyButton(enable, onClick = {
+                        queueVM.createAndAddQueueElement(input)
                         input = ""
                     }, "Добавить в очередь")
                 }
