@@ -18,7 +18,7 @@ group = "me.darefox"
 
 // WHEN CHANGING VERSION, DON'T FORGET TO CHANGE VERSION
 // IN UI COMPOSABLE
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     google()
