@@ -14,6 +14,7 @@
 - Download article with comments
 - Download articles from bookmarks
 - Download all articles from user profile
+- Make downloaded articles more fancier ✨
 
 ## Installation ⚙️
 
