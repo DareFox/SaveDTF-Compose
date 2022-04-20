@@ -3,6 +3,8 @@
 
 **SaveDTF is a desktop app, powered by [Jetpack Compose for Desktop](https://www.jetbrains.com/ru-ru/lp/compose-mpp/ "Jetpack Compose for Desktop"). It can save pages from [DTF](https://dtf.ru "DTF"), [VC](https://vc.ru "VC") and [TJournal](https://tjournal.ru "TJournal")**
 
+**[Инструкция на русском языке](https://github.com/DareFox/SaveDTF-Compose/blob/main/README_RU.md)**
+
 ## Features ✨
 - Ability to download multiple articles at once 
 - Saving media along with the article
@@ -31,5 +33,5 @@ Apple requires all 3rd party apps to be signed and notarized (checked by Apple) 
 
 MIT
 
-**F-r-e-e, that spells free**
+**F-r-e-e, that spells free**!
 
