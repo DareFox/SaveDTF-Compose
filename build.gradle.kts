@@ -64,27 +64,26 @@ dependencies {
 }
 
 javafx {
-    version = "16"
+    version = "17.0.1"
     modules = listOf("javafx.swing")
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "16"
+    kotlinOptions.jvmTarget = "17"
 }
 
 val iconsRoot = project.file("src/main/resources/img")
-
 
 compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+
             packageName = "SaveDTF"
             packageVersion = version.toString()
-            description = "Забекапь все свои (и не только свои) статьи при помощи одной кнопки!"
+            description = "SaveDTF"
             vendor = "DareFox"
-            appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
 
             windows {
                 iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
@@ -97,8 +96,7 @@ compose.desktop {
             macOS {
                 iconFile.set(iconsRoot.resolve("DTF_logo.icns"))
             }
-
-            packageVersion = project.version.toString()
         }
+
     }
 }
