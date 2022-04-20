@@ -32,7 +32,7 @@ fun CheckVersion(forced: Boolean = false) {
         logger.info { "Current version: ${AppViewModel.currentVersionObject}" }
 
         lastVersion?.let {
-            if (AppViewModel.currentVersionObject < it && forced || !ignoreUpdates) {
+            if (AppViewModel.currentVersionObject < it && (forced || !ignoreUpdates)) {
                 showPopup = true
             }
         }
