@@ -44,7 +44,6 @@ private suspend fun Document.saveImages(progress: (String) -> Unit, retryAmount:
     val imageContainers = getElementsByClass("andropov_image").filter {
         it.attr("data-image-src").isNotEmpty()
     }
-
     return saveAndReplaceElement(
         folder = "img",
         elements = imageContainers,

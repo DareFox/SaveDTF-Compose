@@ -35,13 +35,19 @@ internal suspend fun downloadElementMedia(
     val finishedJobs = MutableStateFlow<Int>(0)
     val downloadMap = mutableMapOf<Element, BinaryMedia>()
 
-    if (elements.isNotEmpty()) {
-        elements.forEach { it ->
-            val downloadUrl = it.attr(attributeMediaURL)
-            val mediaID = downloadUrl.getMediaId()
+    try {
+        if (elements.isNotEmpty()) {
+            val progressJob: Job = downloaderScope.launch {
+                finishedJobs.collect {
+                    progress("Downloaded $it of ${elements.size}")
+                }
+            }
 
-            // Download media concurrently
-            downloadJobs += downloaderScope.launch {
+            elements.forEach {
+                val downloadUrl = it.attr(attributeMediaURL)
+                val mediaID = downloadUrl.getMediaId()
+
+                // Download media concurrently
                 val media = downloadMediaAsync(downloaderScope = downloaderScope,
                     mediaID = mediaID,
                     downloadUrl = downloadUrl,
@@ -49,21 +55,21 @@ internal suspend fun downloadElementMedia(
                     replaceError = replaceError
                 ).await()
 
+                yield()
                 downloadMap[it] = media
                 finishedJobs.update { counter -> counter + 1 }
             }
-        }
 
-        val progressJob: Job = downloaderScope.launch {
-            finishedJobs.collect {
-                progress("Downloaded $it of ${downloadJobs.size}")
-            }
-        }
 
-        downloadJobs.joinAll() // Wait all downloads
-        progressJob.cancel()
-        progress("All elements are downloaded")
-        logger.info { "All download jobs finished. Returning map of results" }
+            progressJob.cancel()
+            progress("All elements are downloaded")
+            logger.info { "All download jobs finished. Returning map of results" }
+        }
+    } catch (cancelled: CancellationException) {
+        downloadJobs.forEach {
+            it.cancel(cancelled)
+        }
+        throw cancelled
     }
     return downloadMap
 }
