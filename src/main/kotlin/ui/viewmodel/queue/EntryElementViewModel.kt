@@ -57,15 +57,16 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
 
                 val entryId = entry?.id ?: UUID.randomUUID().toString()
                 val entryName = entry?.title ?: "no title"
+                val entryFolder = convertToValidName("$entryId-$entryName")
 
                 val authorId = entry?.author?.id ?: "unknown id"
                 val authorName = entry?.author?.name ?: "unknown author"
-
+                val authorFolder = convertToValidName("$authorId-$authorName")
+                
                 val folder = File(it)
 
-                val pathToSave = folder.resolve("entry/$authorId-$authorName/$entryId-$entryName")
-
-                pathToSave.canonicalPath
+                val pathToSave = folder.resolve("entry/$authorFolder/$entryFolder")
+                pathToSave.absolutePath
             }
         }
 
@@ -164,7 +165,7 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
             }
 
 
-            val folder = File(convertToValidName(path))
+            val folder = File(path)
 
             yield()
             val value = try {

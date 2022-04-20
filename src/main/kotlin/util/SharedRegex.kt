@@ -40,10 +40,9 @@ object SharedRegex {
     val bookmarksRegex = """(dtf|vc|tjournal)\.ru\/bookmarks""".toRegex(RegexOption.IGNORE_CASE)
 
     /**
-     * https://stackoverflow.com/a/45615798/13494106
-     *
-     * God bless his soul
+     * Check if filename is valid
      */
     val filenameValidationRegex =
-        """\A(?!(?:COM[0-9]|CON|LPT[0-9]|NUL|PRN|AUX|com[0-9]|con|lpt[0-9]|nul|prn|aux)|[\s\.])[^\\\/:*"?<>|]{1,254}\z""".toRegex()
+        // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s25.html
+        """[\\\/:"*?<>|]+""".toRegex()
 }
