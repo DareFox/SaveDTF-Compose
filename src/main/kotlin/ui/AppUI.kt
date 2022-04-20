@@ -29,11 +29,11 @@ fun AppUI() {
             }
             Box {
                 TextNavBar(listOf(
-                    TextBarElement("Download") {
+                    TextBarElement("Скачать") {
                         navbarIndex = it
                         navbarElement = NavBar.DOWNLOAD_MENU
                     },
-                    TextBarElement("Settings") {
+                    TextBarElement("Настройки") {
                         navbarIndex = it
                         navbarElement = NavBar.SETTINGS_MENU
                     },
