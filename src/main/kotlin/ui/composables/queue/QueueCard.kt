@@ -64,6 +64,7 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
 fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
     val entry by viewModel.entry.collectAsState()
     val status by viewModel.status.collectAsState()
+    val error by viewModel.lastErrorMessage.collectAsState()
 
     val title = if (entry == null) "Статья" else {
         val entryTitle = entry?.title
@@ -76,7 +77,14 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
     }
     val author = entry?.author?.name ?: viewModel.url
 
-    GenericCard(viewModel, actionBar, title, author, status)
+    GenericCard(
+        viewModel = viewModel,
+        actionBar = actionBar,
+        title = title,
+        author = author,
+        status = status,
+        error = if (status == QueueElementStatus.ERROR) error else null
+    )
 }
 
 @Composable
