@@ -19,9 +19,9 @@ fun buildCache(
     if (preventCacheDuplication) {
         // Use double-check lock to prevent duplicate (https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java)
         cache = cachedCaches[id to cacheType] ?: synchronized(cachedCaches) {
-           cachedCaches[id to cacheType] ?: createCache(cacheType, id).also {
+            cachedCaches[id to cacheType] ?: createCache(cacheType, id).also {
                 cachedCaches[id to cacheType] = it
-           }
+            }
         }
     } else {
         cache = createCache(cacheType, id)

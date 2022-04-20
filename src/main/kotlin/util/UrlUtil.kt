@@ -16,7 +16,7 @@ object UrlUtil {
     }
 
     fun getWebsiteType(url: String): Website? {
-        return when(SharedRegex.websiteRegex.find(url)?.value) {
+        return when (SharedRegex.websiteRegex.find(url)?.value) {
             "dtf" -> Website.DTF
             "tjournal" -> Website.TJ
             "vc" -> Website.VC

@@ -28,11 +28,11 @@ object AppViewModel {
             val versionJson = json["tag_name"]?.jsonPrimitive
 
             if (versionJson?.isString == true) {
-               return versionJson.toString().toVersionOrNull()
+                return versionJson.toString().toVersionOrNull()
             } else {
                 return null
             }
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             null
         }
     }

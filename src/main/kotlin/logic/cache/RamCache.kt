@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Represents cache in RAM. Internally uses [FileCache] for saving cache between sessions and for saving up space in RAM
  */
 internal class RamCache(val id: String? = null) : BinaryCache {
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     private val cache: MutableMap<String, SoftReference<ByteArray>> = ConcurrentHashMap()
     private val fileCache = FileCache(id)
 
@@ -35,7 +35,7 @@ internal class RamCache(val id: String? = null) : BinaryCache {
             // This value can be collected by GC, so we check it on null
             if (value != null)
                 logger.info { "$key wasn't collected by GC. Returning ByteArray with size of ${value.size}" }
-                return value
+            return value
         }
 
         // If no cached value in memory, load it from file.

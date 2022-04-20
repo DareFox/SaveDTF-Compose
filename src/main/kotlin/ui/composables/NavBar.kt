@@ -23,9 +23,9 @@ fun NavBarPreview() {
         var position by remember { mutableStateOf(0) }
 
         TextNavBar(listOf(
-            TextBarElement("Token") { position = it},
-            TextBarElement("Test") { position = it},
-            TextBarElement("I forgor") { position = it}
+            TextBarElement("Token") { position = it },
+            TextBarElement("Test") { position = it },
+            TextBarElement("I forgor") { position = it }
         ), position)
 
     }
@@ -64,7 +64,7 @@ fun NavBar(elements: List<NavBarElement>, selectedIndex: Int) {
 
 data class NavBarElement(
     val onClick: (Int) -> Unit,
-    val composable: @Composable (MutableTransitionState<Boolean>, Int) -> Unit
+    val composable: @Composable (MutableTransitionState<Boolean>, Int) -> Unit,
 )
 
 data class IconBarElement(val icon: ImageVector, val onClick: (Int) -> Unit)

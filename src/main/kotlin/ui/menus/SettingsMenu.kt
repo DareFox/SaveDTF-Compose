@@ -2,7 +2,6 @@ package ui.menus
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -184,14 +183,14 @@ fun SettingsMenu() {
         SettingsCategory("Кэш") {
             var result by remember { mutableStateOf<Boolean?>(null) }
             val backgroundColor = animateColorAsState(
-                when(result) {
+                when (result) {
                     null -> MaterialTheme.colors.primary
                     result as Boolean -> Color.Green.copy(0.5f)
                     else -> Color.Red
                 }
             )
             val contentColor = animateColorAsState(
-                when(result) {
+                when (result) {
                     null -> MaterialTheme.colors.onPrimary
                     result as Boolean -> Color.White
                     else -> Color.Black
@@ -299,7 +298,7 @@ fun SettingsTextField(
 fun SettingsBoolField(
     name: String,
     input: Boolean,
-    onInputChange: (Boolean) -> Unit
+    onInputChange: (Boolean) -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier

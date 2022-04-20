@@ -27,7 +27,7 @@ private val LightColorPalette = lightColors(
     onSecondary = Color(0xFF000000),
     onError = Color(0xFFda1313),
 
-)
+    )
 
 private val DarkColorPalette = darkColors(
     primary = Color(0xFF81d4fa),
@@ -39,7 +39,7 @@ private val DarkColorPalette = darkColors(
     onSecondary = Color(0xFF000000),
     onError = Color(0xFFEF4E4E),
 
-)
+    )
 
 val Lato = FontFamily(
     Font(resource = "font/Lato-Regular.ttf"),
@@ -79,12 +79,12 @@ val typography = Typography(
         fontWeight = FontWeight.Bold
     ),
 
-)
+    )
 
 @Composable
 fun SaveDtfTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colors = if (darkTheme) {
         DarkColorPalette

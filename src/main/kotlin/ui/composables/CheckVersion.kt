@@ -15,7 +15,7 @@ import ui.viewmodel.SettingsViewModel
 import java.awt.Desktop
 import java.net.URI
 
-private val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger { }
 
 @Composable
 fun CheckVersion(forced: Boolean = false) {

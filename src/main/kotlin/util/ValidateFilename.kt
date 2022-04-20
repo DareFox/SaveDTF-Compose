@@ -8,7 +8,7 @@ fun convertToValidName(name: String): String {
     val isValid = try {
         file.canonicalPath
         true
-    } catch(_: IOException) {
+    } catch (_: IOException) {
         false
     }
 

@@ -38,7 +38,11 @@ suspend fun Document.downloadDocument(
     return allMap
 }
 
-private suspend fun Document.saveImages(progress: (String) -> Unit, retryAmount: Int, replaceError: Boolean): Map<String, ByteArray> {
+private suspend fun Document.saveImages(
+    progress: (String) -> Unit,
+    retryAmount: Int,
+    replaceError: Boolean,
+): Map<String, ByteArray> {
     progress("Parsing image elements")
 
     val imageContainers = getElementsByClass("andropov_image").filter {
@@ -58,7 +62,11 @@ private suspend fun Document.saveImages(progress: (String) -> Unit, retryAmount:
     }
 }
 
-private suspend fun Document.saveVideos(progress: (String) -> Unit, retryAmount: Int, replaceError: Boolean): Map<String, ByteArray> {
+private suspend fun Document.saveVideos(
+    progress: (String) -> Unit,
+    retryAmount: Int,
+    replaceError: Boolean,
+): Map<String, ByteArray> {
     progress("Parsing video elements")
     val videoContainers = getElementsByClass("andropov_video").filter {
         it.attr("data-video-mp4").isNotEmpty()

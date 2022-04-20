@@ -4,7 +4,8 @@ object SharedRegex {
     // ${'$'} is needed to escape $ symbol in kotlin
     val entryUrlRegex = """(dtf|vc|tjournal)\.ru\/(u\/|).+?\/.+?(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)
 
-    private val userIdRegex = """((?<=dtf\.ru\/u\/)|(?<=vc\.ru\/u\/)|(?<=tjournal\.ru\/u\/))\d+""".toRegex(RegexOption.IGNORE_CASE)
+    private val userIdRegex =
+        """((?<=dtf\.ru\/u\/)|(?<=vc\.ru\/u\/)|(?<=tjournal\.ru\/u\/))\d+""".toRegex(RegexOption.IGNORE_CASE)
 
     /**
      * Check if url is only user profile
@@ -43,5 +44,6 @@ object SharedRegex {
      *
      * God bless his soul
      */
-    val filenameValidationRegex = """\A(?!(?:COM[0-9]|CON|LPT[0-9]|NUL|PRN|AUX|com[0-9]|con|lpt[0-9]|nul|prn|aux)|[\s\.])[^\\\/:*"?<>|]{1,254}\z""".toRegex()
+    val filenameValidationRegex =
+        """\A(?!(?:COM[0-9]|CON|LPT[0-9]|NUL|PRN|AUX|com[0-9]|con|lpt[0-9]|nul|prn|aux)|[\s\.])[^\\\/:*"?<>|]{1,254}\z""".toRegex()
 }

@@ -6,7 +6,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,7 +87,7 @@ fun GenericCard(
     author: String,
     status: QueueElementStatus,
     error: String? = null,
-    painter: Painter? = null
+    painter: Painter? = null,
 ) {
     val color by animateColorAsState(when (status) {
         QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
@@ -94,7 +97,7 @@ fun GenericCard(
         QueueElementStatus.IN_USE -> Color.Yellow.copy(0.2f)
     })
 
-    val onColor by animateColorAsState(when(status) {
+    val onColor by animateColorAsState(when (status) {
         QueueElementStatus.INITIALIZING -> Color.White
         else -> Color.Black
     })
@@ -178,7 +181,8 @@ fun GenericCard(
                 )
             }
         }
-        Surface( // Footer
+        Surface(
+            // Footer
             modifier = Modifier.height(45.dp).fillMaxWidth(),
             color = color.compositeOver(MaterialTheme.colors.primaryVariant),
         ) {

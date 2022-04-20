@@ -28,7 +28,7 @@ internal suspend fun downloadElementMedia(
     attributeMediaURL: String,
     progress: (String) -> Unit,
     retryAmount: Int,
-    replaceError: BinaryMedia?
+    replaceError: BinaryMedia?,
 ): MutableMap<Element, BinaryMedia> {
     val downloaderScope = CoroutineScope(Dispatchers.IO)
     val downloadJobs = mutableListOf<Job>()
@@ -79,7 +79,7 @@ suspend fun downloadMediaAsync(
     downloadUrl: String,
     retryAmount: Int,
     downloaderScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
-    replaceError: BinaryMedia? = null
+    replaceError: BinaryMedia? = null,
 ) = downloaderScope.async {
     val cached = cache.getValueWithMetadata<MediaMetadata>(mediaID)
 

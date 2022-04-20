@@ -7,8 +7,8 @@ import util.getTempCacheFolder
  * Represents cache on hard drive level.
  * Works not fast as [RamCache], but it can handle large amounts of data and can save it between sessions
  */
-internal class FileCache(val subdirName: String? = null): BinaryCache {
-    private val logger = KotlinLogging.logger {  }
+internal class FileCache(val subdirName: String? = null) : BinaryCache {
+    private val logger = KotlinLogging.logger { }
     private val tempFolder
         get() = getTempCacheFolder(subdirName)
 

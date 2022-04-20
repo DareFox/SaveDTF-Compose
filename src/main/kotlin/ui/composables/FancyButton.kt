@@ -17,13 +17,17 @@ fun FancyButton(
     enabled: Boolean,
     onClick: () -> Unit,
     placeholderButton: String,
-    buttonColors: ButtonColors = ButtonDefaults.buttonColors()
-    ) {
+    buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
+) {
     FancyButton(
         enabled = enabled,
         onClick = onClick,
         buttonColors = buttonColors,
-        placeholderButton = { Text(placeholderButton, style = MaterialTheme.typography.subtitle2, fontWeight = FontWeight.Bold) }
+        placeholderButton = {
+            Text(placeholderButton,
+                style = MaterialTheme.typography.subtitle2,
+                fontWeight = FontWeight.Bold)
+        }
     )
 }
 
@@ -32,7 +36,7 @@ fun FancyButton(
     enabled: Boolean,
     onClick: () -> Unit,
     buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
-    placeholderButton: @Composable RowScope.() -> Unit
+    placeholderButton: @Composable RowScope.() -> Unit,
 ) {
     Button(
         enabled = enabled,

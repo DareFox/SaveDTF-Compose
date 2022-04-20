@@ -3,7 +3,7 @@ package ui.viewmodel.queue
 import kotlinx.coroutines.flow.StateFlow
 import ui.ISelectable
 
-sealed interface IQueueElementViewModel: ISelectable {
+sealed interface IQueueElementViewModel : ISelectable {
     enum class QueueElementStatus {
         INITIALIZING,
         ERROR,

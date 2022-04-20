@@ -18,11 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.Download
-import compose.icons.feathericons.RefreshCcw
 import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
-import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import ui.viewmodel.queue.QueueViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
