@@ -96,6 +96,14 @@ compose.desktop {
             macOS {
                 iconFile.set(iconsRoot.resolve("DTF_logo.icns"))
             }
+
+            modules("java.instrument",
+                "java.management",
+                "java.naming",
+                "java.prefs",
+                "jdk.jfr",
+                "jdk.unsupported",
+                "jdk.unsupported.desktop")
         }
 
     }
