@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.yield
 import logic.downloaders.IEntryDownloader
 import logic.downloaders.entryDownloader
 import mu.KotlinLogging
@@ -126,6 +127,7 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
         mutex.lock()
 
         try {
+            yield()
             _status.value = QueueElementStatus.IN_USE
             val downloader = entryDownloader.value
 
@@ -133,20 +135,24 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
                 "Initialize element before saving"
             }
 
+            yield()
             val downloaded: Boolean = if (!downloader.isDownloaded.value) {
                 downloader.download()
             } else {
                 true
             }
 
+            yield()
             if (!downloaded) {
                 _lastErrorMessage.value = "Can't download entry"
                 _status.value = QueueElementStatus.ERROR
                 return false
             }
 
+            yield()
             val folder = File(convertToValidName(pathToSave))
 
+            yield()
             val value = try {
                 downloader.save(folder)
                 _status.value = QueueElementStatus.SAVED
@@ -159,7 +165,7 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
                 }
                 false
             }
-
+            yield()
             return value
         } catch (_: CancellationException) {
             _lastErrorMessage.value = "Operation cancelled"
