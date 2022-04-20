@@ -9,7 +9,15 @@ plugins {
     id("org.openjfx.javafxplugin") version "0.0.10"
 }
 
+// DO NOT CHANGE IT!
+// THIS UUID IS USED FOR UPGRADING FEATURE AND SHOULD REMAIN CONSTANT
+// MORE HERE: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Native_distributions_and_local_execution#platform-specific-options
+val DO_NOT_CHANGE_THIS_UUID = "71454f6a-55e9-44d8-830b-59ca8fc9f418"
+
 group = "me.darefox"
+
+// WHEN CHANGING VERSION, DON'T FORGET TO CHANGE VERSION
+// IN UI COMPOSABLE
 version = "1.0.0"
 
 repositories {
@@ -19,7 +27,7 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
-val ktor_version = "1.6.8"
+val ktorVersion = "1.6.8"
 
 dependencies {
     implementation(compose.desktop.currentOs)
@@ -32,9 +40,9 @@ dependencies {
 
 
     // Http-client Ktor. For downloading media from servers
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
-    implementation("io.ktor:ktor-client-serialization:$ktor_version")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
 
 
     // API for cmtt websites
@@ -53,27 +61,44 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("ch.qos.logback:logback-core:1.2.11")
 
-
 }
 
 javafx {
-    version = "17.0.1"
+    version = "16"
     modules = listOf("javafx.swing")
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = "16"
 }
+
+val iconsRoot = project.file("src/main/resources/img")
+
 
 compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "SaveDTF"
             packageVersion = version.toString()
             description = "Забекапь все свои (и не только свои) статьи при помощи одной кнопки!"
             vendor = "DareFox"
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
+
+            windows {
+                iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
+                dirChooser = true
+                upgradeUuid = DO_NOT_CHANGE_THIS_UUID;
+            }
+            linux {
+                iconFile.set(iconsRoot.resolve("DTF_logo.png"))
+            }
+            macOS {
+                iconFile.set(iconsRoot.resolve("DTF_logo.icns"))
+            }
+
+            packageVersion = project.version.toString()
         }
     }
 }
