@@ -52,6 +52,7 @@ fun QueueCreatorMenu() {
                 },
                 onConfirm = {
                     viewmodel.createAndAddQueueElement(it)
+                    input = ""
                 },
                 input = input,
                 placeholderInput = "Вставь ссылку сюда",
@@ -107,6 +108,7 @@ fun QueueCreatorMenu() {
                 Surface(modifier = Modifier.weight(1f)) {
                     FancyButton(true, onClick = {
                         viewmodel.createAndAddQueueElement(input)
+                        input = ""
                     }, "Добавить в очередь")
                 }
                 buttons.forEach {
