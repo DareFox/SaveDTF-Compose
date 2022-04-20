@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ui.SaveDtfTheme
 import ui.viewmodel.AppViewModel
@@ -44,12 +45,12 @@ fun InfoBanner() {
             var infoText by remember { mutableStateOf("Забекапь все свои (и не только свои) статьи при помощи одной кнопки!") }
 
             Image(
-                painter = painterResource("img/charlie.jpg"),
+                painter = painterResource("img/charlie_95px.png"),
                 contentDescription = "SaveDTF Logo",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .shadow(10.dp, CircleShape, false)
-                    .size(80.dp)
+                    .size(95.dp)
                     .clip(CircleShape)
                     .background(Color.Black)
                     .clickable {
