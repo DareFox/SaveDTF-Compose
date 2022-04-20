@@ -47,25 +47,27 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
     private val _progress = MutableStateFlow<String?>(null)
     override val progress: StateFlow<String?> = _progress
 
+    private val savePath = SettingsViewModel.folderToSave
     private var userPath: String? = null
-    private val defaultPath: String
+
+    override val pathToSave: String?
         get() {
-            val entry = entry.value
+            return (userPath ?: savePath.value)?.let {
+                val entry = entry.value
 
-            val entryId = entry?.id ?: UUID.randomUUID().toString()
-            val entryName = entry?.title ?: "no title"
+                val entryId = entry?.id ?: UUID.randomUUID().toString()
+                val entryName = entry?.title ?: "no title"
 
-            val authorId = entry?.author?.id ?: "unknown id"
-            val authorName = entry?.author?.name ?: "unknown author"
+                val authorId = entry?.author?.id ?: "unknown id"
+                val authorName = entry?.author?.name ?: "unknown author"
 
-            val folder = File(SettingsViewModel.folderToSave.value)
+                val folder = File(it)
 
-            val pathToSave = folder.resolve("entry/$authorId-$authorName/$entryId-$entryName")
-            return pathToSave.canonicalPath
+                val pathToSave = folder.resolve("entry/$authorId-$authorName/$entryId-$entryName")
+
+                pathToSave.canonicalPath
+            }
         }
-
-    override val pathToSave: String
-        get() = userPath ?: defaultPath ?: "."
 
 
     init {
@@ -131,9 +133,21 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
             _status.value = QueueElementStatus.IN_USE
             val downloader = entryDownloader.value
 
-            requireNotNull(downloader) {
-                "Initialize element before saving"
+
+            if (downloader == null) {
+                _lastErrorMessage.value = "Initialize element before saving"
+                _status.value = QueueElementStatus.ERROR
+                return false
             }
+
+            yield()
+            val path = pathToSave
+            if (path == null) {
+                _lastErrorMessage.value = "No path to save"
+                _status.value = QueueElementStatus.ERROR
+                return false
+            }
+
 
             yield()
             val downloaded: Boolean = if (!downloader.isDownloaded.value) {
@@ -149,8 +163,8 @@ data class EntryQueueElementViewModel(override val url: String) : IEntryQueueEle
                 return false
             }
 
-            yield()
-            val folder = File(convertToValidName(pathToSave))
+
+            val folder = File(convertToValidName(path))
 
             yield()
             val value = try {

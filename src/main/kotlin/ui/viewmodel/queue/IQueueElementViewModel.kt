@@ -15,7 +15,7 @@ sealed interface IQueueElementViewModel : ISelectable {
     val status: StateFlow<QueueElementStatus>
     val lastErrorMessage: StateFlow<String?>
     val progress: StateFlow<String?>
-    val pathToSave: String
+    val pathToSave: String?
 
     suspend fun initialize()
     suspend fun save(): Boolean
