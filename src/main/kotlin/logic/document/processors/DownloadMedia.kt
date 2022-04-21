@@ -24,8 +24,7 @@ private val logger = KotlinLogging.logger { }
 private val cache = buildCache()
 
 internal suspend fun downloadElementMedia(
-    elements: List<Element>,
-    attributeMediaURL: String,
+    elements: List<Pair<Element, String>>,
     progress: (String) -> Unit,
     retryAmount: Int,
     replaceError: BinaryMedia?,
@@ -44,7 +43,7 @@ internal suspend fun downloadElementMedia(
             }
 
             elements.forEach {
-                val downloadUrl = it.attr(attributeMediaURL)
+                val downloadUrl = it.second
                 val mediaID = downloadUrl.getMediaId()
 
                 // Download media concurrently
@@ -56,7 +55,7 @@ internal suspend fun downloadElementMedia(
                 ).await()
 
                 yield()
-                downloadMap[it] = media
+                downloadMap[it.first] = media
                 finishedJobs.update { counter -> counter + 1 }
             }
 

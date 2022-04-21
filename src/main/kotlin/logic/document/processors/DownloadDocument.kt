@@ -1,6 +1,9 @@
 package logic.document.processors
 
+import io.ktor.util.*
+import kmtt.util.jsonParser
 import kotlinx.coroutines.yield
+import kotlinx.serialization.json.*
 import logic.cache.buildCache
 import logic.document.BinaryMedia
 import logic.document.Resources
@@ -47,11 +50,55 @@ private suspend fun Document.saveImages(
 
     val imageContainers = getElementsByClass("andropov_image").filter {
         it.attr("data-image-src").isNotEmpty()
+    }.map {
+        it to it.attr("data-image-src")
     }
+
+    val galleryImageContainers = getElementsByClass("gall").mapNotNull { gallery ->
+        val dataHolder = gallery.children().firstOrNull { child -> child.attr("name") == "gallery-data-holder" }
+
+
+        dataHolder?.let { holder ->
+            val data = Json.parseToJsonElement(holder.wholeText())
+
+            if (data is JsonArray) {
+                val elements = mutableListOf<Pair<Element, String>>()
+
+                data.forEach { element ->
+                    try {
+                        val id = element.jsonObject["image"]?.jsonObject?.get("data")?.jsonObject?.get("uuid")
+                        val url = id?.jsonPrimitive?.toString()?.let {
+                            // toString returns ""112032103012"", so we need to remove this quotes
+                            val trimmed = """(^"|"${'$'})""".toRegex().replace(it, "")
+
+                            "https://leonardo.osnova.io/$trimmed"
+                        }
+
+                        url?.let {
+                            elements += Element("div") to url
+                        }
+                    } catch (_: Exception) {}
+                }
+
+                // Replace old gallery elements with new elements
+                val newGallery = Element("div").addClass("gall")
+                gallery.replaceWith(newGallery)
+
+                elements.forEachIndexed { index, it ->
+                    newGallery.appendChild(it.first.attr("pos", index.toString()))
+                }
+
+                elements.toList() // make it immutable
+            } else {
+                null
+            }
+        }
+    }.flatten()
+
+
     return saveAndReplaceElement(
         folder = "img",
-        elements = imageContainers,
-        attributeURL = "data-image-src",
+        elements = imageContainers + galleryImageContainers,
         progress = { progress("Image: $it") },
         retryAmount = retryAmount,
         errorReplace = if (replaceError) Resources.imageLoadFail else null
@@ -70,12 +117,13 @@ private suspend fun Document.saveVideos(
     progress("Parsing video elements")
     val videoContainers = getElementsByClass("andropov_video").filter {
         it.attr("data-video-mp4").isNotEmpty()
+    }.map {
+        it to it.attr("data-video-mp4")
     }
 
     return saveAndReplaceElement(
         folder = "video",
         elements = videoContainers,
-        attributeURL = "data-video-mp4",
         progress = { progress("Video: $it") },
         retryAmount = retryAmount,
         errorReplace = if (replaceError) Resources.videoLoadFail else null
@@ -91,8 +139,7 @@ private suspend fun Document.saveVideos(
 
 private suspend fun saveAndReplaceElement(
     folder: String,
-    elements: List<Element>,
-    attributeURL: String,
+    elements: List<Pair<Element, String>>,
     progress: (String) -> Unit = {},
     retryAmount: Int,
     errorReplace: BinaryMedia? = null,
@@ -100,7 +147,7 @@ private suspend fun saveAndReplaceElement(
 ): MutableMap<String, ByteArray> {
     val elementPaths = mutableMapOf<String, ByteArray>()
     val resolvedFolder = File("").resolve(folder)
-    val responses = downloadElementMedia(elements, attributeURL, progress, retryAmount, errorReplace)
+    val responses = downloadElementMedia(elements, progress, retryAmount, errorReplace)
 
     responses.forEach { (element, binaryMedia) ->
         // Delete all children from Element node
