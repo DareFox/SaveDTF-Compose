@@ -16,7 +16,7 @@ import logic.ktor.Client
 import logic.ktor.rateRequest
 import mu.KotlinLogging
 import org.jsoup.nodes.Element
-import util.getMediaId
+import util.*
 import util.getValueWithMetadata
 import util.setValueWithMetadata
 
@@ -44,7 +44,7 @@ internal suspend fun downloadElementMedia(
 
             elements.forEach {
                 val downloadUrl = it.second
-                val mediaID = downloadUrl.getMediaId()
+                val mediaID = convertToValidName(downloadUrl.getMediaIdOrNull() ?: downloadUrl)
 
                 // Download media concurrently
                 val media = downloadMediaAsync(downloaderScope = downloaderScope,
