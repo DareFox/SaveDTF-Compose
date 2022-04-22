@@ -1,8 +1,8 @@
 package util
 
-import kmtt.util.jsonParser
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import logic.cache.BinaryCache
 import logic.cache.RamCache
 
@@ -17,7 +17,7 @@ const val postfix = ".json"
  */
 internal inline fun <reified T> BinaryCache.setValueWithMetadata(key: String, binary: ByteArray, metadata: T) {
     this.setValue(key, binary)
-    this.setValue(prefix + key + postfix, jsonParser.encodeToString(metadata).toByteArray())
+    this.setValue(prefix + key + postfix, Json.encodeToString(metadata).toByteArray())
 }
 
 /**
@@ -32,7 +32,7 @@ internal inline fun <reified T> BinaryCache.getValueWithMetadata(key: String): P
 
     return if (value != null) {
         val parsedMetadata: T? = if (metadata != null) {
-            jsonParser.decodeFromString<T>(String(metadata))
+            Json.decodeFromString<T>(String(metadata))
         } else {
             null
         }
