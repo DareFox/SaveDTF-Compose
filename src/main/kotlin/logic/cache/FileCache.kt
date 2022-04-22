@@ -1,6 +1,7 @@
 package logic.cache
 
 import mu.KotlinLogging
+import util.convertToValidName
 import util.getTempCacheFolder
 
 /**
@@ -13,12 +14,13 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
         get() = getTempCacheFolder(subdirName)
 
     override fun setValue(key: String, value: ByteArray) {
-        tempFolder.resolve(key).writeBytes(value)
+        tempFolder.resolve(convertToValidName(key)).writeBytes(value)
     }
 
     override fun getValueOrNull(key: String): ByteArray? {
-        val file = tempFolder.resolve(key)
-        return if (isExist(key)) {
+        val validKey = convertToValidName(key)
+        val file = tempFolder.resolve(validKey)
+        return if (isExist(validKey)) {
             file.readBytes()
         } else {
             null
@@ -26,11 +28,11 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
     }
 
     override fun remove(key: String): Boolean {
-        return tempFolder.resolve(key).deleteRecursively()
+        return tempFolder.resolve(convertToValidName(key)).deleteRecursively()
     }
 
     override fun isExist(key: String): Boolean {
-        val file = tempFolder.resolve(key)
+        val file = tempFolder.resolve(convertToValidName(key))
         return file.exists() && file.isFile
     }
 
