@@ -4,8 +4,24 @@ object SharedRegex {
     // ${'$'} is needed to escape $ symbol in kotlin
     val entryUrlRegex = """(dtf|vc|tjournal)\.ru\/(u\/|).+?\/.+?(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)
 
-    private val userIdRegex =
+    /**
+     * Get user id from url
+     *
+     * @sample userIdRegexUsage
+     */
+    val userIdRegex =
         """((?<=dtf\.ru\/u\/)|(?<=vc\.ru\/u\/)|(?<=tjournal\.ru\/u\/))\d+""".toRegex(RegexOption.IGNORE_CASE)
+
+    private fun userIdRegexUsage() {
+        val userProfile = "https://dtf.ru/u/68409-princessa-ada"
+        SharedRegex.userIdRegex.find(userProfile)?.value // returns 68409
+
+        val postInUserBlog = "https://dtf.ru/u/68409-princessa-ada/1170862-posmotrel-betmena"
+        SharedRegex.userIdRegex.find(postInUserBlog)?.value // returns 68409
+
+        val postInSubsite = "https://dtf.ru/music/1170937-lovejoy-concrete"
+        SharedRegex.userIdRegex.find(postInSubsite)?.value // returns null
+    }
 
     /**
      * Check if url is only user profile
