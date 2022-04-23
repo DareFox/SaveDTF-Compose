@@ -60,5 +60,5 @@ object SharedRegex {
      */
     val filenameValidationRegex =
         // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s25.html
-        """[\\\/:"*?<>|]+""".toRegex()
+        """([\\\/:"*?<>|]+|(\.\s*)*${'$'})""".toRegex()
 }
