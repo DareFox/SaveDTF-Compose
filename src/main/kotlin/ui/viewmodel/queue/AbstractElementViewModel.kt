@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.StateFlow
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 
+/**
+ * Abstract class that implements default fields of [IQueueElementViewModel]
+ */
 abstract class AbstractElementViewModel: IQueueElementViewModel {
     protected val _status = MutableStateFlow(QueueElementStatus.INITIALIZING)
     override val status: StateFlow<QueueElementStatus> = _status
@@ -37,5 +40,10 @@ abstract class AbstractElementViewModel: IQueueElementViewModel {
     protected fun error(message: String) {
         _lastErrorMessage.value = message
         _status.value = QueueElementStatus.ERROR
+    }
+
+    protected fun saved(message: String) {
+        _lastErrorMessage.value = null
+        _status.value = QueueElementStatus.SAVED
     }
 }
