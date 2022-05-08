@@ -15,11 +15,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.yield
-import logic.downloaders.IEntryDownloader
-import logic.downloaders.entryDownloader
+import logic.document.DocumentProcessor
 import mu.KotlinLogging
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import ui.viewmodel.SettingsViewModel
-import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus.*
 import util.UrlUtil
 import util.convertToValidName
@@ -35,7 +35,8 @@ private val logger = KotlinLogging.logger { }
 
 data class EntryQueueElementViewModel(override val url: String) : AbstractElementViewModel(), IEntryQueueElementViewModel {
     private val scope = CoroutineScope(Dispatchers.Default)
-    private var entryDownloader = MutableStateFlow<IEntryDownloader?>(null)
+    private var document: Document? = null
+    private val documentProcessor = MutableStateFlow<DocumentProcessor?>(null)
 
     private val _entry = MutableStateFlow<Entry?>(null)
     override val entry: StateFlow<Entry?> = _entry
@@ -61,7 +62,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
         }
 
     init {
-        entryDownloader.onEach { // on entry downloader change
+        documentProcessor.onEach { // on entry downloader change
             if (it == null) { // if no downloader -> no progress
                 logger.info { "No downloader, no progress" }
                 _progress.value = null
@@ -81,7 +82,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
             try {
                 _status.value = INITIALIZING
                 _entry.value = null
-                entryDownloader.value = null
+                documentProcessor.value = null
 
                 logger.info { "Parsing website" }
                 val website = UrlUtil.getWebsiteType(url).errorOnNull("Website $url is not supported")
@@ -95,12 +96,15 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
 
                 val entry = api.entry.getEntry(url)
                 _entry.value = entry
-                entryDownloader.value = entryDownloader(entry, SettingsViewModel.retryAmount.value, SettingsViewModel.replaceErrorMedia.value)
+
+                val html = entry.entryContent.errorOnNull("Entry content is null").html.errorOnNull("Entry html is null")
+                document = Jsoup.parse(html)
+
                 _status.value = READY_TO_USE
             } catch (ex: QueueElementException) {
                 error(ex.errorMessage)
             } catch (ex: Exception) {
-                error("$[{ex.javaClass.name}]: ${ex.message}")
+                error("[${ex.javaClass.name}]: ${ex.message}")
             }
         }
     }
@@ -111,39 +115,28 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
         try {
             yield()
             _status.value = IN_USE
-            val downloader = entryDownloader.value.errorOnNull("Initialize element before saving")
             val path = pathToSave.errorOnNull("No path to save")
+            val document = document.errorOnNull("Parsed document is null")
+
+            val processor = DocumentProcessor(document, File(path))
+            documentProcessor.value = processor
 
             yield()
-            val downloaded: Boolean = if (!downloader.isDownloaded.value) {
-                downloader.download()
-            } else {
-                true
+            processor.removeCSS()
+            processor.reformat()
+            entry.value?.title?.also {
+                processor.changeTitle(it)
             }
 
             yield()
-            if (!downloaded) {
-                throw QueueElementException("Can't download entry")
-            }
-
-
-            val folder = File(path)
-
-            yield()
-            val value = try {
-                downloader.save(folder)
-                _status.value = SAVED
+            return try {
+                processor.saveDocument(listOf(), 1, false)
+                saved("Saved")
                 true
-            } catch (ex: Exception) {
-                _lastErrorMessage.value = "[${ex.javaClass.name}] ${ex.message}"
-                _status.value = ERROR
-                logger.error {
-                    ex.toString()
-                }
+            } catch (e: Exception) {
+                error("[${e.javaClass.simpleName}]: ${e.message}")
                 false
             }
-            yield()
-            return value
         } catch (_: CancellationException) {
             error("Operation cancelled")
             return false
