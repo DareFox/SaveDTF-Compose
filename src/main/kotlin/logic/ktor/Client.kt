@@ -9,6 +9,7 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.sync.*
 import java.time.Duration
 import java.util.*
 
@@ -32,11 +33,16 @@ object Client {
     }
 }
 
+// limit coroutines amount at one time
+val semaphore = Semaphore(3, 0)
+
 /**
- * Send request with rate limit
+ * Send request with rate limit of 3 usages in 1 second and thread limit of 3 coroutines/threads
  */
 suspend inline fun <reified T> Client.rateRequest(crossinline block: HttpRequestBuilder.() -> Unit): T {
-    return rateLimiter.executeSuspendFunction {
-        httpClient.request(block)
+    return semaphore.withPermit {
+        rateLimiter.executeSuspendFunction {
+            httpClient.request(block)
+        }
     }
 }
