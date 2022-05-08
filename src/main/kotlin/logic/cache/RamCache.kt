@@ -13,7 +13,7 @@ internal class RamCache(val id: String? = null) : BinaryCache {
     private val fileCache = FileCache(id)
 
     override fun setValue(key: String, value: ByteArray) {
-        logger.info { "Setting key $key with ByteArray size ${value.size}" }
+        logger.debug { "Setting key $key with ByteArray size ${value.size}" }
         cache[key] = SoftReference(value)
 
         logger.info { "Calling FileCache to save value to disk" }
@@ -28,9 +28,10 @@ internal class RamCache(val id: String? = null) : BinaryCache {
      */
     override fun getValueOrNull(key: String): ByteArray? {
         logger.info { "GetValueOrNull: key $key" }
+
         if (isExistInMemory(key)) {
             logger.info { "$key exists in memory" }
-            val value = cache[key]!!.get()
+            val value = cache[key]?.get()
 
             // This value can be collected by GC, so we check it on null
             if (value != null)
