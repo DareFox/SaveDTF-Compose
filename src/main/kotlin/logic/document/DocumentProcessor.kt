@@ -76,6 +76,7 @@ class DocumentProcessor(document: Document, val saveFolder: File): AbstractProgr
     }
 
     private suspend fun saveTo(media: BinaryMedia, folder: String): File {
+        saveFolder.mkdirs()
         require(saveFolder.isDirectory) {
             "Parameter saveFolder is not a directory"
         }
