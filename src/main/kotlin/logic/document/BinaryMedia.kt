@@ -1,5 +1,7 @@
 package logic.document
 
+import util.validatePath
+
 data class BinaryMedia(val metadata: MediaMetadata, val binary: ByteArray) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -17,5 +19,9 @@ data class BinaryMedia(val metadata: MediaMetadata, val binary: ByteArray) {
         var result = metadata.hashCode()
         result = 31 * result + binary.contentHashCode()
         return result
+    }
+
+    fun getFileName(): String {
+        return (this.metadata.key + ".${this.metadata.subtype}").validatePath()
     }
 }

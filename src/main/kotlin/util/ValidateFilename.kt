@@ -21,6 +21,10 @@ fun convertToValidName(name: String, default: String = "null"): String {
     }
 }
 
+fun String.validatePath(default: String = "null"): String {
+    return convertToValidName(this, default)
+}
+
 private fun isValid(file: File): Boolean {
     return try {
         Paths.get(file.path)
