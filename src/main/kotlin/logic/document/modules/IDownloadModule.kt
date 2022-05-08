@@ -1,4 +1,4 @@
-package logic.document
+package logic.document.modules
 
 import logic.document.BinaryMedia
 import org.jsoup.nodes.Document
@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element
 /**
  * Module of [DocumentProcessor]
  */
-sealed interface IDownloadProcessor {
+sealed interface IDownloadModule {
     /**
      * If folder is null, [DocumentProcessor] will save media to folder with html
      */
@@ -26,7 +26,7 @@ sealed interface IDownloadProcessor {
     /**
      *  Transform element to use relativePath instead of url
      */
-    fun transform(element: Element, relativePath: String): Element
+    fun transform(element: Element, relativePath: String)
 
     /**
      *  What processor will download, e.g: Image, Video

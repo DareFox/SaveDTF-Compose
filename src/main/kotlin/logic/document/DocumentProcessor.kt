@@ -2,6 +2,7 @@ package logic.document
 
 import kotlinx.coroutines.yield
 import logic.abstracts.AbstractProgress
+import logic.document.modules.IDownloadModule
 import logic.ktor.Client
 import logic.ktor.downloadUrl
 import org.jsoup.Jsoup
@@ -41,7 +42,7 @@ class DocumentProcessor(document: Document, val saveFolder: File): AbstractProgr
         document = templateDocument
     }
 
-    suspend fun saveDocument(downloaderModules: List<IDownloadProcessor>, retryAmount: Int, replaceErrorMedia: Boolean) {
+    suspend fun saveDocument(downloaderModules: List<IDownloadModule>, retryAmount: Int, replaceErrorMedia: Boolean) {
         downloaderModules.forEach {downloader ->
             val toDownload = downloader.filter(document)
 
