@@ -12,7 +12,7 @@ import org.jsoup.nodes.Node
 import util.removeChildNodes
 
 object ImageDownloadModule: IDownloadModule {
-    override val folder: String? = "img"
+    override val folder: String = "img"
     override val onErrorMedia: BinaryMedia? = Resources.imageLoadFail
 
     override fun filter(document: Document): List<Pair<Element, String>> {
