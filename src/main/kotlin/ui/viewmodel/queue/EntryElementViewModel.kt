@@ -17,6 +17,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.yield
 import logic.document.DocumentProcessor
 import logic.document.modules.ImageDownloadModule
+import logic.document.modules.QuoteAuthor
 import logic.document.modules.VideoDownloadModule
 import mu.KotlinLogging
 import org.jsoup.Jsoup
@@ -132,7 +133,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
 
             yield()
             return try {
-                processor.saveDocument(listOf(ImageDownloadModule, VideoDownloadModule), 1, false)
+                processor.saveDocument(listOf(ImageDownloadModule, VideoDownloadModule, QuoteAuthor), 1, false)
                 saved("Saved")
                 true
             } catch (e: Exception) {
