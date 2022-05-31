@@ -59,6 +59,8 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("ch.qos.logback:logback-core:1.2.11")
 
+    // yt-dlp
+    implementation("com.github.yausername.youtubedl-android:library:0.13.0")
 }
 
 javafx {
