@@ -37,7 +37,7 @@ private val logger = KotlinLogging.logger { }
 data class EntryQueueElementViewModel(override val url: String) : AbstractElementViewModel(), IEntryQueueElementViewModel {
     private val scope = CoroutineScope(Dispatchers.Default)
     private var document: Document? = null
-    private val documentProcessor = MutableStateFlow<SettingsBasedDocumentProcessor?>(null)
+    private val documentProcessor = MutableStateFlow<DocumentProcessor?>(null)
 
     private val _entry = MutableStateFlow<Entry?>(null)
     override val entry: StateFlow<Entry?> = _entry
@@ -111,7 +111,6 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
 
     override suspend fun save(): Boolean {
         mutex.lock()
-
 
         try {
             yield()
