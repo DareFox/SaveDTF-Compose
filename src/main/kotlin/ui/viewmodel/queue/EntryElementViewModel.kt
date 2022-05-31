@@ -135,6 +135,12 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
             return try {
                 processor.saveDocument(listOf(ImageDownloadModule, VideoDownloadModule, QuoteAuthor), 1, false)
                 saved("Saved")
+                val pathScript = "C:\\Users\\user\\IdeaProjects\\SaveDTF-Compose\\clear_download_yt.py"
+                val process = ProcessBuilder("python", pathScript, path)
+                    .inheritIO()
+                    .start()
+
+                process.waitFor()
                 true
             } catch (e: Exception) {
                 error("[${e.javaClass.simpleName}]: ${e.message}")
