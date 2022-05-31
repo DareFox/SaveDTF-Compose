@@ -92,6 +92,7 @@ if __name__ == "__main__":
 
     data = download_video(data)
     data = delete_class(data)
+    data = delete_class(data, "propaganda")
     data = delete_class(data, "icon--entry_quote")
     data = delete_class(data, "content-header__item--listen")
     data = delete_editorial(data)
