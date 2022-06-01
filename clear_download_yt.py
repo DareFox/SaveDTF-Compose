@@ -16,8 +16,6 @@ def download_video(soup):
                 return video_file
         return ''
 
-    os.makedirs('video', exist_ok=True)
-    os.makedirs('poster', exist_ok=True)
     # vstavka = """\n<video controls="" poster="poster/{}" style="height: 100%; width: 100%; object-fit: contain">
 # <source src="video/{}"></video>"""
     vstavka_url = {
@@ -40,6 +38,10 @@ def download_video(soup):
             video_id = tg[i]['data-video-service-id']
         except KeyError:
             continue
+
+        os.makedirs('video', exist_ok=True)
+        os.makedirs('poster', exist_ok=True)
+
         url_download = vstavka_url[tg[i]['data-video-service']].format(video_id)
         with YoutubeDL(ydl_opts) as dl:
             dl.download([url_download])
