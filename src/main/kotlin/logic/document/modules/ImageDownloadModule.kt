@@ -16,56 +16,58 @@ object ImageDownloadModule: IDownloadModule {
     override val onErrorMedia: BinaryMedia? = Resources.imageLoadFail
 
     override fun filter(document: Document): List<Pair<Element, String>> {
-        return document.run {
-            val imageContainers = getElementsByClass("andropov_image").filter {
-                it.attr("data-image-src").isNotEmpty()
-            }.map {
-                it to it.attr("data-image-src")
-            }
+        return getImageContainers(document) + getGalleryImageContainers(document)
+    }
 
-            val galleryImageContainers = getElementsByClass("gall").mapNotNull { gallery ->
-                val dataHolder = gallery.children().firstOrNull { child -> child.attr("name") == "gallery-data-holder" }
-
-
-                dataHolder?.let { holder ->
-                    val data = Json.parseToJsonElement(holder.wholeText())
-
-                    if (data is JsonArray) {
-                        val elements = mutableListOf<Pair<Element, String>>()
-
-                        data.forEach { element ->
-                            try {
-                                val id = element.jsonObject["image"]?.jsonObject?.get("data")?.jsonObject?.get("uuid")
-                                val url = id?.jsonPrimitive?.toString()?.let {
-                                    // toString returns ""112032103012"", so we need to remove this quotes
-                                    val trimmed = """(^"|"${'$'})""".toRegex().replace(it, "")
-
-                                    "https://leonardo.osnova.io/$trimmed"
-                                }
-
-                                url?.let {
-                                    elements += Element("div") to url
-                                }
-                            } catch (_: Exception) {}
-                        }
-
-                        // Replace old gallery elements with new elements
-                        val newGallery = Element("div").addClass("gall")
-                        gallery.replaceWith(newGallery)
-
-                        elements.forEachIndexed { index, it ->
-                            newGallery.appendChild(it.first.attr("pos", index.toString()))
-                        }
-
-                        elements.toList() // make it immutable
-                    } else {
-                        null
-                    }
-                }
-            }.flatten()
-
-            galleryImageContainers + imageContainers
+    private fun getImageContainers(document: Document): List<Pair<Element, String>> {
+        return document.getElementsByClass("andropov_image").filter {
+            it.attr("data-image-src").isNotEmpty()
+        }.map {
+            it to it.attr("data-image-src")
         }
+    }
+
+    private fun getGalleryImageContainers(document: Document): List<Pair<Element, String>> {
+        return document.getElementsByClass("gall").mapNotNull { gallery ->
+            val dataHolder = gallery.children().firstOrNull { child -> child.attr("name") == "gallery-data-holder" }
+
+
+            dataHolder?.let { holder ->
+                val data = Json.parseToJsonElement(holder.wholeText())
+
+                if (data is JsonArray) {
+                    val elements = mutableListOf<Pair<Element, String>>()
+
+                    data.forEach { element ->
+                        try {
+                            val id = element.jsonObject["image"]?.jsonObject?.get("data")?.jsonObject?.get("uuid")
+                            val url = id?.jsonPrimitive?.toString()?.let {
+                                // toString returns ""112032103012"", so we need to remove this quotes
+                                val trimmed = """(^"|"${'$'})""".toRegex().replace(it, "")
+
+                                "https://leonardo.osnova.io/$trimmed"
+                            }
+
+                            url?.let {
+                                elements += Element("div") to url
+                            }
+                        } catch (_: Exception) {}
+                    }
+
+                    // Replace old gallery elements with new elements
+                    val newGallery = Element("div").addClass("gall")
+                    gallery.replaceWith(newGallery)
+
+                    elements.forEachIndexed { index, it ->
+                        newGallery.appendChild(it.first.attr("pos", index.toString()))
+                    }
+
+                    elements.toList() // make it immutable
+                } else {
+                    null
+                }
+            }
+        }.flatten()
     }
 
     override fun transform(element: Element, relativePath: String) {
