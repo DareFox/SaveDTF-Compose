@@ -20,14 +20,6 @@ object ImageDownloadModule: IDownloadModule {
 
     private fun getImageContainers(document: Document): List<Pair<Element, String>> {
         return document.getElementsByClass("andropov_image").filter {
-            it.attr("data-image-src").isNotEmpty()
-        }.map {
-            it to it.attr("data-image-src")
-        }
-    }
-
-    private fun getImageContainers(document: Document): List<Pair<Element, String>> {
-        return document.getElementsByClass("andropov_image").filter {
             // Check if element has link and is div
             // Why check div?
             // Because regular images are in container, but images of quotes aren't
