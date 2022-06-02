@@ -50,7 +50,7 @@ class DocumentProcessor(document: Document, val saveFolder: File): AbstractProgr
                 val prefix = "${downloader.downloadingContentType} ${index + 1}/${toDownload.size}"
                 val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
                 val media = progressSuspend(
-                    "$prefix: Downloading $url..."
+                    "$prefix: Downloading ${url.second}..."
                 ) {
                     Client.downloadUrl(url.second, retryAmount, errMedia)
                 }
