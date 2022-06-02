@@ -8,7 +8,6 @@ import logic.document.BinaryMedia
 import logic.document.Resources
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import org.jsoup.nodes.Node
 import util.recreateWithoutNodes
 
 object ImageDownloadModule: IDownloadModule {
@@ -24,6 +23,26 @@ object ImageDownloadModule: IDownloadModule {
             it.attr("data-image-src").isNotEmpty()
         }.map {
             it to it.attr("data-image-src")
+        }
+    }
+
+    private fun getImageContainers(document: Document): List<Pair<Element, String>> {
+        return document.getElementsByClass("andropov_image").filter {
+            // Check if element has link and is div
+            // Why check div?
+            // Because regular images are in container, but images of quotes aren't
+            it.attr("data-image-src").isNotEmpty() && it.tagName() == "div"
+        }.map { div ->
+            val img = Element("img").also {
+                // Set css style to img
+                it.attr("style", "object-fit: contain; width: 100%; height: 100%;")
+            }
+
+            val newDiv = div.recreateWithoutNodes()
+            newDiv.appendChild(img)
+
+            // return element and link to media
+            img to newDiv.attr("data-image-src")
         }
     }
 
@@ -49,7 +68,7 @@ object ImageDownloadModule: IDownloadModule {
                             }
 
                             url?.let {
-                                elements += Element("div") to url
+                                elements += Element("img") to url
                             }
                         } catch (_: Exception) {}
                     }
@@ -59,7 +78,17 @@ object ImageDownloadModule: IDownloadModule {
                     gallery.replaceWith(newGallery)
 
                     elements.forEachIndexed { index, it ->
-                        newGallery.appendChild(it.first.attr("pos", index.toString()))
+                        val img = it.first.also {
+                            // Set css style to img
+                            it.attr("style", "object-fit: contain; width: 100%; height: 100%;")
+                        }
+
+                        val div = Element("div").also {
+                            it.attr("pos", index.toString())
+                            it.appendChild(img)
+                        }
+
+                        newGallery.appendChild(div)
                     }
 
                     elements.toList() // make it immutable
@@ -70,14 +99,9 @@ object ImageDownloadModule: IDownloadModule {
         }.flatten()
     }
 
-    override fun transform(element: Element, relativePath: String) {
-        val img = Element("img")
-            .attr("src", relativePath)
-            .attr("style", "height: 100%; width: 100%; object-fit: contain")
 
-        element
-            .recreateWithoutNodes()
-            .appendChild(img)
+    override fun transform(element: Element, relativePath: String) {
+        element.attr("src", relativePath)
     }
 
     override val downloadingContentType: String = "Image"
