@@ -9,7 +9,7 @@ import logic.document.Resources
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
-import util.removeChildNodes
+import util.recreateWithoutNodes
 
 object ImageDownloadModule: IDownloadModule {
     override val folder: String = "img"
@@ -76,7 +76,7 @@ object ImageDownloadModule: IDownloadModule {
             .attr("style", "height: 100%; width: 100%; object-fit: contain")
 
         element
-            .removeChildNodes()
+            .recreateWithoutNodes()
             .appendChild(img)
     }
 

@@ -4,7 +4,7 @@ import logic.document.BinaryMedia
 import logic.document.Resources
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import util.removeChildNodes
+import util.recreateWithoutNodes
 
 object VideoDownloadModule: IDownloadModule {
     override val folder: String = "vid"
@@ -28,7 +28,7 @@ object VideoDownloadModule: IDownloadModule {
 
 
         element
-            .removeChildNodes()
+            .recreateWithoutNodes()
             .prependChild(base)
     }
 

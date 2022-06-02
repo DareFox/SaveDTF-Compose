@@ -4,8 +4,10 @@ import org.jsoup.nodes.Element
 
 /**
  * Remove child nodes by re-creating element with all it's attributes
+ *
+ * **WARNING: Old element will be linked to void, so reference to the new one**
  */
-fun Element.removeChildNodes(): Element {
+fun Element.recreateWithoutNodes(): Element {
     val attributes = this.attributes()
     val classNames = this.classNames()
     val id = this.id()
