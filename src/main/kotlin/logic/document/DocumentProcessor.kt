@@ -49,24 +49,24 @@ class DocumentProcessor(document: Document, val saveFolder: File): AbstractProgr
             toDownload.mapIndexed { index, url ->
                 val prefix = "${downloader.downloadingContentType} ${index + 1}/${toDownload.size}"
                 val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
-                val media = progressSuspend(
+                val media = withProgressSuspend(
                     "$prefix: Downloading ${url.second}..."
                 ) {
                     Client.downloadUrl(url.second, retryAmount, errMedia)
                 }
 
-                val file = progressSuspend("$prefix: Saving file...") {
+                val file = withProgressSuspend("$prefix: Saving file...") {
                     saveTo(media, downloader.folder ?: "")
                 }
 
                 val relativePath = file.relativeTo(saveFolder).path
-                progress("$prefix: Transforming document...") {
+                withProgress("$prefix: Transforming document...") {
                     downloader.transform(url.first, relativePath)
                 }
             }
         }
 
-        progressSuspend("HTML: Saving index.html...") {
+        withProgressSuspend("HTML: Saving index.html...") {
             val indexHTML = saveFolder.mkdirs().let { saveFolder.resolve("index.html") }
             yield()
             indexHTML.writeBytes(document.toString().toByteArray())

@@ -29,24 +29,24 @@ abstract class AbstractProgress: IProgress {
     }
 
     /**
-     *  Run block of code and set progress
+     *  Run block of code with setting progress and return result of evaluated block of code
      */
-    protected fun <T> progress(status: String, block: (() -> T)) {
+    protected fun <T> withProgress(status: String, block: (() -> T)): T {
         progress(status)
-        block.invoke()
+        return block()
     }
 
     /**
-     *  Run suspending block of code and set progress
+     *  Run suspending block of code with setting progress and return result of evaluated block of code
      */
-    protected suspend fun <T> progressSuspend(status: String, block: suspend (() -> T)): T {
+    protected suspend fun <T> withProgressSuspend(status: String, block: suspend (() -> T)): T {
         progress(status)
         yield()
         return block()
     }
 
     /**
-     * Clear current progress status
+     * Clear current progress status to null
      */
     protected fun clearProgress() {
         mutableProgress.value = null
