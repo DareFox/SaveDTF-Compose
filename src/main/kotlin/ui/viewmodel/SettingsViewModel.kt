@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import logic.cache.buildCache
-import java.io.File
 import java.util.prefs.Preferences
 
 object SettingsViewModel {
@@ -37,11 +36,13 @@ object SettingsViewModel {
     private const val MUTE_UPDATES_NOTIFICATION_KEY = "no_updates_${AppViewModel.VERSION}"
 
     private val _replaceErrorMedia = MutableStateFlow(getPrefReplaceErrorMedia())
-    private val _tokens = MutableStateFlow(mapOf<Website, String?>(
-        Website.DTF to getPrefToken(Website.DTF),
-        Website.VC to getPrefToken(Website.VC),
-        Website.TJ to getPrefToken(Website.TJ)
-    ))
+    private val _tokens = MutableStateFlow(
+        mapOf<Website, String?>(
+            Website.DTF to getPrefToken(Website.DTF),
+            Website.VC to getPrefToken(Website.VC),
+            Website.TJ to getPrefToken(Website.TJ)
+        )
+    )
     private val _retryAmount = MutableStateFlow(getPrefRetryAmount())
     private val _folderToSave = MutableStateFlow<String?>(getPrefFolder())
     private val _downloadVideo = MutableStateFlow(getPrefDownloadVideo())

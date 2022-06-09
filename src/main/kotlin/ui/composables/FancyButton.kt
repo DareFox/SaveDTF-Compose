@@ -24,9 +24,11 @@ fun FancyButton(
         onClick = onClick,
         buttonColors = buttonColors,
         placeholderButton = {
-            Text(placeholderButton,
+            Text(
+                placeholderButton,
                 style = MaterialTheme.typography.subtitle2,
-                fontWeight = FontWeight.Bold)
+                fontWeight = FontWeight.Bold
+            )
         }
     )
 }

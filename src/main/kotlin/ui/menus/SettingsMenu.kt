@@ -236,9 +236,11 @@ fun SettingsFields(field: List<@Composable () -> Unit>) {
 fun SettingsCategory(name: String, composable: @Composable () -> Unit) {
     Text(name, style = MaterialTheme.typography.h4)
     Spacer(modifier = Modifier.height(5.dp).fillMaxWidth())
-    Divider(color = MaterialTheme.colors.primary,
+    Divider(
+        color = MaterialTheme.colors.primary,
         thickness = 2.dp,
-        modifier = Modifier.clip(RoundedCornerShape(25)))
+        modifier = Modifier.clip(RoundedCornerShape(25))
+    )
     Spacer(modifier = Modifier.height(15.dp).fillMaxWidth())
 
     composable()
@@ -255,8 +257,9 @@ fun SettingsTextField(
     onInputChange: (String) -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier
-            .width(230.dp)
+        Box(
+            modifier = Modifier
+                .width(230.dp)
         ) {
             Text(name, style = MaterialTheme.typography.subtitle1)
         }
@@ -301,16 +304,19 @@ fun SettingsBoolField(
     onInputChange: (Boolean) -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
             Text(name, style = MaterialTheme.typography.subtitle1)
         }
         Box(modifier = Modifier.requiredWidth(100.dp).scale(1.2f)) {
-            Switch(input, onCheckedChange = onInputChange, colors = SwitchDefaults.colors(
-                checkedThumbColor = MaterialTheme.colors.primary,
-                checkedTrackColor = MaterialTheme.colors.primaryVariant
-            ))
+            Switch(
+                input, onCheckedChange = onInputChange, colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colors.primary,
+                    checkedTrackColor = MaterialTheme.colors.primaryVariant
+                )
+            )
         }
     }
 }

@@ -9,18 +9,21 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.sync.*
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.time.Duration
 import java.util.*
 
 object Client {
     private val rateLimitID = UUID.randomUUID().toString()
-    private val rateLimiterRegistry = RateLimiterRegistry.of(RateLimiterConfig
-        .custom()
-        .limitRefreshPeriod(Duration.ofSeconds(1))
-        .limitForPeriod(3)
-        .timeoutDuration(Duration.ofHours(300))
-        .build())
+    private val rateLimiterRegistry = RateLimiterRegistry.of(
+        RateLimiterConfig
+            .custom()
+            .limitRefreshPeriod(Duration.ofSeconds(1))
+            .limitForPeriod(3)
+            .timeoutDuration(Duration.ofHours(300))
+            .build()
+    )
 
     val rateLimiter: RateLimiter = rateLimiterRegistry.rateLimiter(rateLimitID)
     val httpClient: HttpClient = HttpClient() {

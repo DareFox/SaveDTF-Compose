@@ -8,7 +8,7 @@ import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 /**
  * Abstract class that implements default fields of [IQueueElementViewModel]
  */
-abstract class AbstractElementViewModel: IQueueElementViewModel {
+abstract class AbstractElementViewModel : IQueueElementViewModel {
     protected val _status = MutableStateFlow(QueueElementStatus.INITIALIZING)
     override val status: StateFlow<QueueElementStatus> = _status
 

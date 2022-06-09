@@ -97,18 +97,22 @@ fun GenericCard(
     error: String? = null,
     painter: Painter? = null,
 ) {
-    val color by animateColorAsState(when (status) {
-        QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
-        QueueElementStatus.INITIALIZING -> Color.Gray.copy(0.8f)
-        QueueElementStatus.READY_TO_USE -> Color.Gray.copy(0.00001f) // Composite over transparent color
-        QueueElementStatus.SAVED -> Color.Green.copy(0.5f)
-        QueueElementStatus.IN_USE -> Color.Yellow.copy(0.2f)
-    })
+    val color by animateColorAsState(
+        when (status) {
+            QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
+            QueueElementStatus.INITIALIZING -> Color.Gray.copy(0.8f)
+            QueueElementStatus.READY_TO_USE -> Color.Gray.copy(0.00001f) // Composite over transparent color
+            QueueElementStatus.SAVED -> Color.Green.copy(0.5f)
+            QueueElementStatus.IN_USE -> Color.Yellow.copy(0.2f)
+        }
+    )
 
-    val onColor by animateColorAsState(when (status) {
-        QueueElementStatus.INITIALIZING -> Color.White
-        else -> Color.Black
-    })
+    val onColor by animateColorAsState(
+        when (status) {
+            QueueElementStatus.INITIALIZING -> Color.White
+            else -> Color.Black
+        }
+    )
 
     LaunchedEffect(Unit) {
         if (viewModel.status.value == QueueElementStatus.INITIALIZING) {
