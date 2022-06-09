@@ -34,13 +34,20 @@ object Client {
 }
 
 // limit coroutines amount at one time
-val semaphore = Semaphore(3, 0)
+private val semaphore = Semaphore(3, 0)
+
+// Hide semaphore by function
+suspend fun <T> withSemaphore(block: suspend () -> T): T {
+    return semaphore.withPermit {
+        block()
+    }
+}
 
 /**
  * Send request with rate limit of 3 usages in 1 second and thread limit of 3 coroutines/threads
  */
 suspend inline fun <reified T> Client.rateRequest(crossinline block: HttpRequestBuilder.() -> Unit): T {
-    return semaphore.withPermit {
+    return withSemaphore {
         rateLimiter.executeSuspendFunction {
             httpClient.request(block)
         }
