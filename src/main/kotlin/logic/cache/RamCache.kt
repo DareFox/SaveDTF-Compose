@@ -40,7 +40,7 @@ internal class RamCache(val id: String? = null) : BinaryCache {
         }
 
         // If no cached value in memory, load it from file.
-        // If file doesn't exist, then return null
+        // Else if file doesn't exist, return null
         return if (fileCache.isExist(key)) {
             logger.info { "$key doesn't exists in memory, but exists on hard drive" }
             val value = fileCache.getValueOrNull(key)

@@ -7,7 +7,7 @@ interface BinaryCache {
     /** Get value from cache **/
     fun getValueOrNull(key: String): ByteArray?
 
-    /** Remove file from cache **/
+    /** Remove value from cache by key **/
     fun remove(key: String): Boolean
 
     /** Return `true` if value exists in cache, else `false` **/
