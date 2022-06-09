@@ -1,6 +1,6 @@
 package logic.document
 
-import util.readResource
+import util.filesystem.readResource
 
 object Resources {
     val imageLoadFail = BinaryMedia(

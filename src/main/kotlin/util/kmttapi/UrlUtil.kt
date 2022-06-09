@@ -1,4 +1,4 @@
-package util
+package util.kmttapi
 
 import kmtt.models.enums.Website
 

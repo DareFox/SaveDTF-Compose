@@ -23,8 +23,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus.*
-import util.UrlUtil
-import util.convertToValidName
+import util.kmttapi.UrlUtil
+import util.filesystem.convertToValidName
 import java.io.File
 import java.util.*
 

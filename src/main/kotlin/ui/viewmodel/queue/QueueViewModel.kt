@@ -4,7 +4,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import util.UrlUtil
+import util.kmttapi.UrlUtil
 
 object QueueViewModel {
     private val _queue = MutableStateFlow(setOf<IQueueElementViewModel>())

@@ -1,8 +1,8 @@
 package logic.cache
 
 import mu.KotlinLogging
-import util.convertToValidName
-import util.getTempCacheFolder
+import util.filesystem.convertToValidName
+import util.filesystem.getTempCacheFolder
 
 /**
  * Represents cache on hard drive level.

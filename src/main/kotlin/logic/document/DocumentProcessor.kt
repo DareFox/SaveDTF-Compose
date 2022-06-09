@@ -7,7 +7,7 @@ import logic.ktor.Client
 import logic.ktor.downloadUrl
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import util.readResource
+import util.filesystem.readResource
 import java.io.File
 
 class DocumentProcessor(document: Document, val saveFolder: File): AbstractProgress() {

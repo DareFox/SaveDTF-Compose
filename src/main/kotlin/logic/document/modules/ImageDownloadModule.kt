@@ -8,7 +8,7 @@ import logic.document.BinaryMedia
 import logic.document.Resources
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import util.recreateWithoutNodes
+import util.dom.recreateWithoutNodes
 
 object ImageDownloadModule: IDownloadModule {
     override val folder: String = "img"

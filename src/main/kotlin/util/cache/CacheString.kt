@@ -1,4 +1,4 @@
-package util
+package util.cache
 
 import logic.cache.BinaryCache
 import java.nio.charset.Charset

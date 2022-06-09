@@ -1,6 +1,6 @@
 package logic.document
 
-import util.validatePath
+import util.filesystem.validatePath
 
 data class BinaryMedia(val metadata: MediaMetadata, val binary: ByteArray) {
     override fun equals(other: Any?): Boolean {

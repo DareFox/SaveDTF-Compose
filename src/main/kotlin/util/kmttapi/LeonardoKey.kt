@@ -1,4 +1,4 @@
-package util
+package util.kmttapi
 
 /**
  * Get media id from Leonardo (media service). Returns `null` if url isn't valid

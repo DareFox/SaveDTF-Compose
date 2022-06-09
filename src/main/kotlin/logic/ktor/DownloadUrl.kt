@@ -10,10 +10,10 @@ import logic.cache.buildCache
 import logic.document.BinaryMedia
 import logic.document.MediaMetadata
 import mu.KotlinLogging
-import util.convertToValidName
-import util.getMediaIdOrNull
-import util.getValueWithMetadata
-import util.setValueWithMetadata
+import util.filesystem.convertToValidName
+import util.kmttapi.getMediaIdOrNull
+import util.cache.getValueWithMetadata
+import util.cache.setValueWithMetadata
 
 private val logger = KotlinLogging.logger { }
 private val cache = buildCache()

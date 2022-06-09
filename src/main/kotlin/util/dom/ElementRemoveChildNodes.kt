@@ -1,4 +1,4 @@
-package util
+package util.dom
 
 import org.jsoup.nodes.Element
 

@@ -1,4 +1,4 @@
-package util
+package util.kmttapi
 
 object SharedRegex {
     // ${'$'} is needed to escape $ symbol in kotlin
@@ -14,13 +14,13 @@ object SharedRegex {
 
     private fun userIdRegexUsage() {
         val userProfile = "https://dtf.ru/u/68409-princessa-ada"
-        SharedRegex.userIdRegex.find(userProfile)?.value // returns 68409
+        userIdRegex.find(userProfile)?.value // returns 68409
 
         val postInUserBlog = "https://dtf.ru/u/68409-princessa-ada/1170862-posmotrel-betmena"
-        SharedRegex.userIdRegex.find(postInUserBlog)?.value // returns 68409
+        userIdRegex.find(postInUserBlog)?.value // returns 68409
 
         val postInSubsite = "https://dtf.ru/music/1170937-lovejoy-concrete"
-        SharedRegex.userIdRegex.find(postInSubsite)?.value // returns null
+        userIdRegex.find(postInSubsite)?.value // returns null
     }
 
     /**
@@ -32,13 +32,13 @@ object SharedRegex {
 
     private fun userProfileLinkRegexUsage() {
         val userProfile = "https://dtf.ru/u/68409-princessa-ada"
-        SharedRegex.userProfileLinkRegex.find(userProfile)?.value // returns "dtf.ru/u/68409-princessa-ada"
+        userProfileLinkRegex.find(userProfile)?.value // returns "dtf.ru/u/68409-princessa-ada"
 
         val postInUserBlog = "https://dtf.ru/u/68409-princessa-ada/1160705-zagadka-ot-komiteta"
-        SharedRegex.userProfileLinkRegex.find(postInUserBlog)?.value // returns null
+        userProfileLinkRegex.find(postInUserBlog)?.value // returns null
 
         val postInSubsite = "https://dtf.ru/music/1161771-c418-the-end"
-        SharedRegex.userProfileLinkRegex.find(postInUserBlog)?.value // returns null
+        userProfileLinkRegex.find(postInUserBlog)?.value // returns null
     }
 
     /**

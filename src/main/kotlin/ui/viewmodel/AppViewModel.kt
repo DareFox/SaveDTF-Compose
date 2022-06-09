@@ -8,7 +8,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import logic.Version
 import logic.ktor.Client
 import logic.ktor.rateRequest
-import util.toVersionOrNull
+import util.string.toVersionOrNull
 
 object AppViewModel {
     const val VERSION = "1.0.4"

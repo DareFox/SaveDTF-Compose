@@ -1,4 +1,4 @@
-package util
+package util.cache
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString

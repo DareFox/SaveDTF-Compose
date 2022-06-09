@@ -1,4 +1,4 @@
-package util
+package util.string
 
 fun String.repeatOrEmpty(num: Int = 1): String {
     return if (num <= 0) {
