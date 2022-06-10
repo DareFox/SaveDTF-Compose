@@ -2,21 +2,19 @@ package ui.viewmodel.queue
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import logic.abstracts.AbstractProgress
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 
 /**
  * Abstract class that implements default fields of [IQueueElementViewModel]
  */
-abstract class AbstractElementViewModel : IQueueElementViewModel {
+abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgress() {
     protected val _status = MutableStateFlow(QueueElementStatus.INITIALIZING)
     override val status: StateFlow<QueueElementStatus> = _status
 
     protected val _lastErrorMessage = MutableStateFlow<String?>(null)
     override val lastErrorMessage: StateFlow<String?> = _lastErrorMessage
-
-    protected val _progress = MutableStateFlow<String?>(null)
-    override val progress: StateFlow<String?> = _progress
 
     protected var customPath: String? = null
     override val pathToSave: String?

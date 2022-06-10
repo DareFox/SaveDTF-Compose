@@ -15,9 +15,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.yield
-import logic.document.DocumentProcessor
-import logic.document.modules.ImageDownloadModule
-import logic.document.modules.VideoDownloadModule
+import logic.document.SettingsBasedDocumentProcessor
 import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -25,6 +23,7 @@ import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus.*
 import util.kmttapi.UrlUtil
 import util.filesystem.convertToValidName
+import util.progress.redirectTo
 import java.io.File
 import java.util.*
 
@@ -38,7 +37,7 @@ private val logger = KotlinLogging.logger { }
 data class EntryQueueElementViewModel(override val url: String) : AbstractElementViewModel(), IEntryQueueElementViewModel {
     private val scope = CoroutineScope(Dispatchers.Default)
     private var document: Document? = null
-    private val documentProcessor = MutableStateFlow<DocumentProcessor?>(null)
+    private val documentProcessor = MutableStateFlow<SettingsBasedDocumentProcessor?>(null)
 
     private val _entry = MutableStateFlow<Entry?>(null)
     override val entry: StateFlow<Entry?> = _entry
@@ -67,12 +66,11 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
         documentProcessor.onEach { // on entry downloader change
             if (it == null) { // if no downloader -> no progress
                 logger.info { "No downloader, no progress" }
-                _progress.value = null
+                clearProgress()
             } else {
                 logger.info { "Downloader exists, listening to progress" }
-                it.progress.onEach { progress -> // on progress of downloader change
-                    _progress.value = progress
-                }.launchIn(scope = scope)
+                // on progress of downloader change
+                it.redirectTo(mutableProgress, scope)
             }
         }.launchIn(scope = scope)
     }
@@ -114,36 +112,28 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
     override suspend fun save(): Boolean {
         mutex.lock()
 
+
         try {
             yield()
             _status.value = IN_USE
             val path = pathToSave.errorOnNull("No path to save")
             val document = document.errorOnNull("Parsed document is null")
 
-            val processor = DocumentProcessor(document, File(path))
+            val processor = SettingsBasedDocumentProcessor(File(path), document)
             documentProcessor.value = processor
 
-            yield()
-            processor.removeCSS()
-            processor.reformat()
-            entry.value?.title?.also {
-                processor.changeTitle(it)
-            }
+            processor.process()
 
-            yield()
-            return try {
-                processor.saveDocument(listOf(ImageDownloadModule, VideoDownloadModule), 1, false)
-                saved("Saved")
-                true
-            } catch (e: Exception) {
-                error("[${e.javaClass.simpleName}]: ${e.message}")
-                false
-            }
+            saved("Saved")
+            return true
         } catch (_: CancellationException) {
             error("Operation cancelled")
             return false
         } catch (ex: QueueElementException) {
             error(ex.errorMessage)
+            return false
+        } catch (ex: Exception) {
+            error("[${ex.javaClass.simpleName}]: ${ex.message}")
             return false
         }
         finally {
