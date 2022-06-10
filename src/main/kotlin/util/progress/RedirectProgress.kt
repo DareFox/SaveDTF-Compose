@@ -1,12 +1,7 @@
 package util.progress
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import logic.abstracts.IProgress
 
 /**
@@ -31,9 +26,14 @@ fun <T> IProgress.redirectTo(
     scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     transform: (String?) -> T
 ): Job {
-    return this.progress.onEach { update ->
-       to.value = transform(update)
-    }.launchIn(scope)
+    val flow = this.progress.onEach { update ->
+        yield()
+        to.value = transform(update)
+    }
+
+    return scope.launch(CoroutineName("StateFlow Redirection")) {
+        flow.collect()
+    }
 }
 
 /**
@@ -58,7 +58,12 @@ fun <T, X> StateFlow<T>.redirectTo(
     scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     transform: (T) -> X
 ): Job {
-    return this.onEach { update ->
+    val flow = this.onEach { update ->
+        yield()
         to.value = transform(update)
-    }.launchIn(scope)
+    }
+
+    return scope.launch(CoroutineName("StateFlow Redirection")) {
+        flow.collect()
+    }
 }
