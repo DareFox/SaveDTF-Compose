@@ -1,15 +1,15 @@
-package logic.document.modules
+package logic.document.operations.media.modules
 
-import logic.document.BinaryMedia
+import logic.document.operations.media.BinaryMedia
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
 /**
- * Module of [DocumentProcessor]
+ * Module of [MediaProcessor] that downloads binary media.
  */
 sealed interface IDownloadModule {
     /**
-     * If folder is null, [DocumentProcessor] will save media to folder with html
+     * If folder is null, [MediaProcessor] will save media to folder with html
      */
     val folder: String?
     /**
@@ -29,7 +29,7 @@ sealed interface IDownloadModule {
     fun transform(element: Element, relativePath: String)
 
     /**
-     *  What processor will download, e.g: Image, Video
+     *  What processor will download, e.g: Image, Video. Used in UI to show what media is downloading
      */
     val downloadingContentType: String
 }

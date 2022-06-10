@@ -1,4 +1,4 @@
-package logic.document
+package logic.document.operations.media
 
 import util.filesystem.readResource
 

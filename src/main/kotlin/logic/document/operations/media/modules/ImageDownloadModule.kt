@@ -1,11 +1,11 @@
-package logic.document.modules
+package logic.document.operations.media.modules
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.*
-import logic.document.BinaryMedia
-import logic.document.Resources
+import logic.document.operations.media.BinaryMedia
+import logic.document.operations.media.Resources
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import util.dom.recreateWithoutNodes

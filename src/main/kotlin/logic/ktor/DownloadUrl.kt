@@ -7,8 +7,8 @@ import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.*
 import logic.cache.buildCache
-import logic.document.BinaryMedia
-import logic.document.MediaMetadata
+import logic.document.operations.media.BinaryMedia
+import logic.document.operations.media.MediaMetadata
 import mu.KotlinLogging
 import util.filesystem.convertToValidName
 import util.kmttapi.getMediaIdOrNull
