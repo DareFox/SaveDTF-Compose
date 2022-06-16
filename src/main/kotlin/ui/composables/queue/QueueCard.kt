@@ -239,7 +239,10 @@ fun GenericCard(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    val scope = rememberCoroutineScope()
+                    val scope = rememberCoroutineScope {
+                        Dispatchers.IO
+                    }
+
                     val buttons = actionBar.toMutableList()
 
                     if (status == QueueElementStatus.SAVED) {
@@ -250,7 +253,7 @@ fun GenericCard(
 
                     if (status in listOf(QueueElementStatus.READY_TO_USE, QueueElementStatus.SAVED)) {
                         buttons += ActionBarElement(FeatherIcons.Download, "Сохранить") {
-                            scope.launch {
+                            scope.launch(CoroutineName("Save operation coroutine")) {
                                 if (status != QueueElementStatus.IN_USE) { // Double check
                                     it.save()
                                 }
@@ -260,7 +263,7 @@ fun GenericCard(
 
                     if (status != QueueElementStatus.INITIALIZING) {
                         buttons += ActionBarElement(FeatherIcons.RefreshCcw, "Обновить информацию") {
-                            scope.launch {
+                            scope.launch(CoroutineName("Init operation coroutine")) {
                                 it.initialize()
                             }
                         }
