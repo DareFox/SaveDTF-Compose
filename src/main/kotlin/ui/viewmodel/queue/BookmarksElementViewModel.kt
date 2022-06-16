@@ -11,6 +11,7 @@ import kotlinx.coroutines.sync.withLock
 import logic.document.SettingsBasedDocumentProcessor
 import org.jsoup.Jsoup
 import util.coroutine.cancelOnSuspendEnd
+import util.filesystem.toDirectory
 import util.progress.redirectTo
 import java.io.File
 
@@ -26,6 +27,7 @@ class BookmarksElementViewModel(
     private val client = authKmtt(site, token)
     private val scope = CoroutineScope(Dispatchers.Default)
     private var counter = 0
+    private var errorCounter = 0
 
     override suspend fun initialize() {
         mutexInitializer.withLock {
@@ -41,7 +43,6 @@ class BookmarksElementViewModel(
     }
 
     private suspend fun processDocument(list: List<Entry>): Boolean {
-        val path = pathToSave.errorOnNull("No path to save")
         var result = true
 
         for (entry in list) {
@@ -53,7 +54,7 @@ class BookmarksElementViewModel(
                     .errorOnNull("Entry html is null")
                     .let { Jsoup.parse(it) } // parse document
 
-                val processor = SettingsBasedDocumentProcessor(File(path), document)
+                val processor = SettingsBasedDocumentProcessor(entry.toDirectory(File(pathToSave)), document)
                 val newCounter = ++counter
 
                 processor
@@ -66,6 +67,7 @@ class BookmarksElementViewModel(
 
             } catch (ex: Exception) { // on error, change result to false
                 result = false
+                errorCounter++
             }
         }
 
@@ -83,11 +85,20 @@ class BookmarksElementViewModel(
                     if (!processDocument(it)) { // if there is error, change result to false
                         result = false
                     }
+                    progress("Requesting next chunk of entries...")
                 }
             }
 
-            counter = 0
+            if (errorCounter > 0) {
+                saved("Downloaded $counter bookmarks. Couldn't download $errorCounter bookmarks")
+            } else if (errorCounter == counter) {
+                error("Couldn't  ownload any of $errorCounter bookmarks")
+            } else {
+                saved("Downloaded all $counter bookmarks.")
+            }
         }
+
+        counter = 0
         return result
     }
 
