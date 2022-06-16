@@ -27,6 +27,9 @@ import compose.icons.feathericons.Download
 import compose.icons.feathericons.Folder
 import compose.icons.feathericons.RefreshCcw
 import compose.icons.feathericons.Trash2
+import kmtt.models.enums.Website
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.SaveDtfTheme
 import ui.viewmodel.queue.EntryQueueElementViewModel
@@ -75,7 +78,8 @@ fun BookmarksCard(viewModel: IBookmarksElementViewModel, actionBar: List<ActionB
         title = title,
         author = author,
         status = status,
-        error = if (status == QueueElementStatus.ERROR) error else null
+        error = if (status == QueueElementStatus.ERROR) error else null,
+        website = Website.TJ
     )
 }
 
@@ -102,7 +106,8 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
         title = title,
         author = author,
         status = status,
-        error = if (status == QueueElementStatus.ERROR) error else null
+        error = if (status == QueueElementStatus.ERROR) error else null,
+        website = Website.DTF
     )
 }
 
@@ -115,12 +120,20 @@ fun GenericCard(
     status: QueueElementStatus,
     error: String? = null,
     painter: Painter? = null,
+    website: Website,
 ) {
+    val mainColor = when(website) {
+        Website.DTF -> Color(0xFF3da9ff)
+        Website.TJ -> Color(0xFFffd260)
+        Website.VC -> Color(0xFFe55c78)
+    }
+
+
     val color by animateColorAsState(
         when (status) {
             QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
             QueueElementStatus.INITIALIZING -> Color.Gray.copy(0.8f)
-            QueueElementStatus.READY_TO_USE -> Color.Gray.copy(0.00001f) // Composite over transparent color
+            QueueElementStatus.READY_TO_USE -> mainColor
             QueueElementStatus.SAVED -> Color.Green.copy(0.5f)
             QueueElementStatus.IN_USE -> Color.Yellow.copy(0.2f)
         }
