@@ -60,8 +60,8 @@ class DocumentProcessor(
         var document = document
 
         operationsQueue.forEach { operation ->
+            yield()
             val progressJob = operation.redirectTo(mutableProgress)
-
             progressJob.cancelOnSuspendEnd {
                 document = operation.process(document)
             }
