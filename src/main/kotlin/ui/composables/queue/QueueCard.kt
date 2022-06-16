@@ -30,6 +30,7 @@ import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
 import ui.SaveDtfTheme
 import ui.viewmodel.queue.EntryQueueElementViewModel
+import ui.viewmodel.queue.IBookmarksElementViewModel
 import ui.viewmodel.queue.IEntryQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
@@ -56,8 +57,26 @@ fun PreviewCard() {
 @Composable
 fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
     when (viewModel) {
+        is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
         is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
     }
+}
+
+@Composable
+fun BookmarksCard(viewModel: IBookmarksElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
+    val status by viewModel.status.collectAsState()
+    val error by viewModel.lastErrorMessage.collectAsState()
+    val author = "You"
+    val title = "Bookmarks from ${viewModel.site.name}"
+
+    GenericCard(
+        viewModel = viewModel,
+        actionBar = actionBar,
+        title = title,
+        author = author,
+        status = status,
+        error = if (status == QueueElementStatus.ERROR) error else null
+    )
 }
 
 @Composable
