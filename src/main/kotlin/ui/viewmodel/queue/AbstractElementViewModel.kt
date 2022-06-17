@@ -51,7 +51,7 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         _status.value = QueueElementStatus.ERROR
     }
 
-    protected fun saved(message: String) {
+    protected fun saved() {
         _lastErrorMessage.value = null
         _status.value = QueueElementStatus.SAVED
     }

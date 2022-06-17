@@ -124,7 +124,8 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
 
             processor.process()
 
-            saved("Saved")
+            saved()
+            clearProgress()
             return true
         } catch (_: CancellationException) {
             error("Operation cancelled")
