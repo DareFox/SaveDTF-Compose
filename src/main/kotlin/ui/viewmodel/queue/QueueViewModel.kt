@@ -17,10 +17,18 @@ object QueueViewModel {
     private val _creationStateMap = MutableStateFlow(mapOf<IQueueElementViewModel, MutableTransitionState<Boolean>>())
     val creationStateMap: StateFlow<Map<IQueueElementViewModel, MutableTransitionState<Boolean>>> = _creationStateMap
 
-    private val urlChecks: List<(String) -> Boolean> = listOf(
-        UrlUtil::isEntry,
-        UrlUtil::isBookmarkLink,
-        { it == "debug" }
+    private val urlChecks: List<UrlChecker> = listOf(
+        UrlChecker(UrlUtil::isEntry) {
+            add(EntryQueueElementViewModel(it))
+        },
+        UrlChecker(UrlUtil::isBookmarkLink) {
+            add(createBookmarksElement(UrlUtil.getWebsiteType(it)!!)) // we do a little bit of trolling !!
+        },
+        UrlChecker( { it == "debug"} ) {
+            DebugQueueViewModel.startQueue.forEach {
+                add(it)
+            }
+        }
     )
 
     fun add(element: IQueueElementViewModel) {
@@ -46,25 +54,24 @@ object QueueViewModel {
         }
     }
 
-    fun addBookmarksElement(website: Website) {
+    fun createBookmarksElement(website: Website): BookmarksElementViewModel {
         val token = SettingsViewModel.tokens.value[Website.DTF].errorOnNull("$website token is null")
-        add(BookmarksElementViewModel(website, token))
+        return BookmarksElementViewModel(website, token)
     }
 
     fun canCreateQueueElement(url: String): Boolean {
-        return urlChecks.any { it(url) }
+        return urlChecks.any { it.check(url) }
     }
 
     fun createAndAddQueueElement(url: String) {
-        when {
-            url == "debug" ->  DebugQueueViewModel.startQueue.forEach {
-                add(it)
+        urlChecks.any {
+            val check = it.check(url)
+            if (check) {
+                it.execute(url)
             }
-//            UrlUtil.isUserProfile(url) -> TODO("todo UserProfileDownloader")
-            UrlUtil.isEntry(url) -> add(EntryQueueElementViewModel(url))
-            UrlUtil.isBookmarkLink(url) -> addBookmarksElement(UrlUtil.getWebsiteType(url)!!) // we do a little bit of trolling !!
-        }
 
+            check
+        }
     }
 
     fun setCreationState(state: MutableTransitionState<Boolean>, element: IQueueElementViewModel) {
@@ -75,3 +82,15 @@ object QueueViewModel {
         }
     }
 }
+
+data class UrlChecker(
+    /**
+     * Can this url be executed by this checker?
+     */
+    val check: (String) -> Boolean,
+
+    /**
+     * Execute action to do add url to queue
+     */
+    val execute: (String) -> Unit
+)
