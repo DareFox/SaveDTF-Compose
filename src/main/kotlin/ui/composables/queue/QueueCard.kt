@@ -48,69 +48,11 @@ data class ActionBarElement(
 )
 
 @Composable
-@Preview
-fun PreviewCard() {
-    SaveDtfTheme(false) {
-        QueueCard(
-            viewModel = EntryQueueElementViewModel("a"),
-            actionBar = listOf(ActionBarElement(FeatherIcons.Trash2, "delete") {})
-        )
-    }
-}
-
-@Composable
 fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
     when (viewModel) {
         is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
         is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
     }
-}
-
-@Composable
-fun BookmarksCard(viewModel: IBookmarksElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
-    val status by viewModel.status.collectAsState()
-    val error by viewModel.lastErrorMessage.collectAsState()
-    val author = viewModel.site.name
-    val title = "Bookmarks"
-
-    SimpleCard(
-        viewModel = viewModel,
-        actionBar = actionBar,
-        title = title,
-        author = author,
-        status = status,
-        error = if (status == QueueElementStatus.ERROR) error else null,
-        website = viewModel.site
-    )
-}
-
-@Composable
-fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
-    val entry by viewModel.entry.collectAsState()
-    val status by viewModel.status.collectAsState()
-    val error by viewModel.lastErrorMessage.collectAsState()
-    val website by viewModel.website.collectAsState()
-
-    val title = if (entry == null) "Статья" else {
-        val entryTitle = entry?.title
-
-        if (entryTitle?.isEmpty() != false) {
-            "Без названия"
-        } else {
-            entryTitle
-        }
-    }
-    val author = entry?.author?.name ?: viewModel.url
-
-    SimpleCard(
-        viewModel = viewModel,
-        actionBar = actionBar,
-        title = title,
-        author = author,
-        status = status,
-        error = if (status == QueueElementStatus.ERROR) error else null,
-        website = website
-    )
 }
 
 @Composable
