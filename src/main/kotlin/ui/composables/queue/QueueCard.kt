@@ -32,6 +32,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.SaveDtfTheme
+import ui.animations.pulseColor
 import ui.viewmodel.queue.EntryQueueElementViewModel
 import ui.viewmodel.queue.IBookmarksElementViewModel
 import ui.viewmodel.queue.IEntryQueueElementViewModel
@@ -72,7 +73,7 @@ fun BookmarksCard(viewModel: IBookmarksElementViewModel, actionBar: List<ActionB
     val author = viewModel.site.name
     val title = "Bookmarks"
 
-    GenericCard(
+    SimpleCard(
         viewModel = viewModel,
         actionBar = actionBar,
         title = title,
@@ -101,7 +102,7 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
     }
     val author = entry?.author?.name ?: viewModel.url
 
-    GenericCard(
+    SimpleCard(
         viewModel = viewModel,
         actionBar = actionBar,
         title = title,
@@ -113,16 +114,49 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
 }
 
 @Composable
-fun GenericCard(
+fun SimpleCard(
     viewModel: IQueueElementViewModel,
     actionBar: List<ActionBarElement> = listOf(),
     title: String,
     author: String,
     status: QueueElementStatus,
+    website: Website?,
     error: String? = null,
     painter: Painter? = null,
-    website: Website?,
+    pulseOnUse: Boolean = true,
 ) {
+    /**
+     * Indicator to start pulse animation
+     */
+    val pulse = when {
+        // set pulse only if feature was on (pulseOnUse == true)
+        pulseOnUse -> {
+            when(status) {
+                // on usage set start for pulse animation
+                QueueElementStatus.IN_USE, QueueElementStatus.INITIALIZING -> true
+                else -> false
+            }
+        }
+        else -> false
+    }
+
+    /**
+     *  Color which infinitely with pulse animation transforms between two colors
+     */
+    val colorPulse by animateColorAsState(
+        if (pulse) {
+            // start pulse animation
+            val color by pulseColor(targetColor = Color.White.copy(0.19f))
+            color
+        } else {
+            // no pulse -> use Transparent color
+            Color.Transparent
+        }
+    )
+
+    /**
+     * Color associated with website. Used when status of element is ready_to_use or in_use
+     */
     val websiteColor = when(website) {
         Website.DTF -> MaterialTheme.colors.primary
         Website.TJ -> Color(0xFFffd260)
@@ -130,24 +164,66 @@ fun GenericCard(
         else -> Color.Gray
     }
 
+    /**
+     * Main color. (duh)
+     */
     val mainColor by animateColorAsState(
-        when (status) {
-            QueueElementStatus.ERROR -> Color(0xFFd53333)
-            QueueElementStatus.INITIALIZING -> Color(0xFF808080)
-            QueueElementStatus.READY_TO_USE -> websiteColor
-            QueueElementStatus.SAVED -> Color(0xFF37ee9a)
-            QueueElementStatus.IN_USE -> Color(0xFFf8f89f)
-        }
+        colorPulse.compositeOver(
+            when (status) {
+                QueueElementStatus.ERROR -> Color(0xFFd53333)
+                QueueElementStatus.INITIALIZING -> Color(0xFF808080)
+                QueueElementStatus.READY_TO_USE, QueueElementStatus.IN_USE -> websiteColor
+                QueueElementStatus.SAVED -> Color(0xFF37ee9a)
+            }
+        )
     )
 
-    val secondaryColor by animateColorAsState( Color.Black.copy(0.15f).compositeOver(mainColor) )
 
+    /**
+     * Footer color. A little darker than the main color
+     */
+    val secondaryColor by animateColorAsState(
+        colorPulse
+            .compositeOver(Color.Black.copy(0.15f)
+            .compositeOver(mainColor))
+    )
+
+    /**
+     * Text and icons color
+     */
     val onColor by animateColorAsState(
         when (status) {
             QueueElementStatus.INITIALIZING -> Color.White
             else -> Color.Black
-        }
+        })
+
+    QueueCard(
+        viewModel = viewModel,
+        actionBar = actionBar,
+        title = title,
+        author = author,
+        status = status,
+        mainColor = mainColor,
+        footerColor = secondaryColor,
+        error = error,
+        painter = painter,
+        onColor = onColor
     )
+}
+
+@Composable
+fun QueueCard(
+    viewModel: IQueueElementViewModel,
+    actionBar: List<ActionBarElement> = listOf(),
+    title: String,
+    author: String,
+    status: QueueElementStatus,
+    mainColor: Color,
+    footerColor: Color,
+    onColor: Color,
+    error: String? = null,
+    painter: Painter? = null,
+    ) {
 
     LaunchedEffect(Unit) {
         if (viewModel.status.value == QueueElementStatus.INITIALIZING) {
@@ -161,7 +237,10 @@ fun GenericCard(
             .shadow(8.dp)
             .fillMaxWidth()
     ) {
-        Surface( // Main body
+        /**
+         * Main body
+         */
+        Surface(
             modifier = Modifier
                 .fillMaxWidth(),
             color = mainColor
@@ -228,10 +307,13 @@ fun GenericCard(
                 )
             }
         }
+
+        /**
+         * Footer
+         */
         Surface(
-            // Footer
             modifier = Modifier.height(45.dp).fillMaxWidth(),
-            color = secondaryColor,
+            color = footerColor,
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
