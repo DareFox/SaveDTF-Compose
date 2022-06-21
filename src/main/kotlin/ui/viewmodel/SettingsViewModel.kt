@@ -37,7 +37,7 @@ object SettingsViewModel {
 
     private val _replaceErrorMedia = MutableStateFlow(getPrefReplaceErrorMedia())
     private val _tokens = MutableStateFlow(
-        mapOf<Website, String?>(
+        mapOf<Website, String>(
             Website.DTF to getPrefToken(Website.DTF),
             Website.VC to getPrefToken(Website.VC),
             Website.TJ to getPrefToken(Website.TJ)
@@ -50,7 +50,7 @@ object SettingsViewModel {
     private val _ignoreUpdate = MutableStateFlow(getPrefIgnoreUpdates())
 
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
-    val tokens: StateFlow<Map<Website, String?>> = _tokens
+    val tokens: StateFlow<Map<Website, String>> = _tokens
     val retryAmount: StateFlow<Int> = _retryAmount;
     val folderToSave: StateFlow<String?> = _folderToSave
     val downloadVideo: StateFlow<Boolean> = _downloadVideo
