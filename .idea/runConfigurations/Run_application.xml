@@ -3,6 +3,7 @@
     <option name="MAIN_CLASS_NAME" value="MainKt" />
     <module name="saveDTF-compose.main" />
     <shortenClasspath name="NONE" />
+    <option name="VM_PARAMETERS" value="-Xmx1G" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
