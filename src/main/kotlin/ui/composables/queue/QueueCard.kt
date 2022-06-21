@@ -88,6 +88,7 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
     val entry by viewModel.entry.collectAsState()
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
+    val website by viewModel.website.collectAsState()
 
     val title = if (entry == null) "Статья" else {
         val entryTitle = entry?.title
@@ -107,7 +108,7 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
         author = author,
         status = status,
         error = if (status == QueueElementStatus.ERROR) error else null,
-        website = Website.DTF
+        website = website
     )
 }
 
