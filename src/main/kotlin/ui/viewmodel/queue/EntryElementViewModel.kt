@@ -86,14 +86,16 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
     override suspend fun initialize() {
         mutex.withLock {
             try {
-                _status.value = INITIALIZING
+                initializing()
                 _entry.value = null
                 documentProcessor.value = null
 
                 logger.info { "Parsing website" }
                 val website = UrlUtil.getWebsiteType(url).errorOnNull("Website $url is not supported")
+                _website.value = website
 
                 val token = SettingsViewModel.tokens.value[website]
+
                 val api = if (token != null) {
                     authKmtt(website, token)
                 } else {
@@ -106,7 +108,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
                 val html = entry.entryContent.errorOnNull("Entry content is null").html.errorOnNull("Entry html is null")
                 document = Jsoup.parse(html)
 
-                _status.value = READY_TO_USE
+                readyToUse()
             } catch (ex: QueueElementException) {
                 error(ex.errorMessage)
             } catch (ex: Exception) {
@@ -117,17 +119,15 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
 
     override suspend fun save(): Boolean {
         mutex.lock()
-
-
         try {
-            yield()
-            _status.value = IN_USE
+            inUse()
             val path = pathToSave.errorOnNull("No path to save")
             val document = document.errorOnNull("Parsed document is null")
 
             val processor = SettingsBasedDocumentProcessor(File(path), document)
             documentProcessor.value = processor
 
+            yield()
             processor.process()
 
             saved()
