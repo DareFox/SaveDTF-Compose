@@ -69,8 +69,8 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
 fun BookmarksCard(viewModel: IBookmarksElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
-    val author = "You"
-    val title = "Bookmarks from ${viewModel.site.name}"
+    val author = viewModel.site.name
+    val title = "Bookmarks"
 
     GenericCard(
         viewModel = viewModel,
@@ -79,7 +79,7 @@ fun BookmarksCard(viewModel: IBookmarksElementViewModel, actionBar: List<ActionB
         author = author,
         status = status,
         error = if (status == QueueElementStatus.ERROR) error else null,
-        website = Website.TJ
+        website = viewModel.site
     )
 }
 
