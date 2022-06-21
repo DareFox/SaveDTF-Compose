@@ -1,10 +1,13 @@
 package ui.viewmodel.queue
 
 import androidx.compose.animation.core.MutableTransitionState
+import exception.errorOnNull
+import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import ui.viewmodel.DebugQueueViewModel
+import ui.viewmodel.SettingsViewModel
 import util.kmttapi.UrlUtil
 
 object QueueViewModel {
@@ -19,6 +22,7 @@ object QueueViewModel {
         UrlUtil::isBookmarkLink,
         { it == "debug" }
     )
+
     fun add(element: IQueueElementViewModel) {
         _queue.update {
             it + element
@@ -42,6 +46,10 @@ object QueueViewModel {
         }
     }
 
+    fun addBookmarksElement(website: Website) {
+        val token = SettingsViewModel.tokens.value[Website.DTF].errorOnNull("$website token is null")
+        add(BookmarksElementViewModel(website, token))
+    }
     fun canCreateQueueElement(url: String): Boolean {
         return urlChecks.any { it(url) }
     }
