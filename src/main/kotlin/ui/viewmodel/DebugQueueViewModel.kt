@@ -8,6 +8,6 @@ import ui.viewmodel.queue.QueueViewModel
 
 object DebugQueueViewModel {
     val startQueue = listOf<IQueueElementViewModel>(
-        BookmarksElementViewModel(Website.DTF, SettingsViewModel.tokens.value[Website.DTF]!!)
+        BookmarksElementViewModel(Website.DTF)
     )
 }
