@@ -14,6 +14,11 @@ object QueueViewModel {
     private val _creationStateMap = MutableStateFlow(mapOf<IQueueElementViewModel, MutableTransitionState<Boolean>>())
     val creationStateMap: StateFlow<Map<IQueueElementViewModel, MutableTransitionState<Boolean>>> = _creationStateMap
 
+    private val urlChecks: List<(String) -> Boolean> = listOf(
+        UrlUtil::isEntry,
+        UrlUtil::isBookmarkLink,
+        { it == "debug" }
+    )
     fun add(element: IQueueElementViewModel) {
         _queue.update {
             it + element
@@ -38,7 +43,7 @@ object QueueViewModel {
     }
 
     fun canCreateQueueElement(url: String): Boolean {
-        return UrlUtil.isEntry(url) || url == "debug"
+        return urlChecks.any { it(url) }
     }
 
     fun createAndAddQueueElement(url: String) {
