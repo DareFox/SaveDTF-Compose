@@ -60,8 +60,8 @@ object SettingsViewModel {
     private fun getPrefReplaceErrorMedia() = preferences.getBoolean(ERROR_MEDIA_BOOL_KEY, true)
     private fun getPrefFolder() = preferences.get(SAVE_FOLDER_STR_KEY, null)
     private fun getPrefRetryAmount() = preferences.getInt(RETRY_AMOUNT_INT_KEY, 5)
-    private fun getPrefToken(website: Website): String? {
-        return preferences.node("tkn").get(website.name, null)
+    private fun getPrefToken(website: Website): String {
+        return preferences.node("tkn").get(website.name, "")
     }
 
     private fun getPrefDownloadVideo() = preferences.getBoolean(DOWNLOAD_VIDEO_BOOL_KEY, true)
