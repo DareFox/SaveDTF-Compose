@@ -25,7 +25,10 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         customPath = folder
     }
 
-    protected val mutexInitializer = Mutex()
+    /**
+     * Use it to restrict multiple parallel executions
+     */
+    protected val elementMutex = Mutex()
 
     protected val _selected = MutableStateFlow(false)
     override val selected: StateFlow<Boolean> = _selected

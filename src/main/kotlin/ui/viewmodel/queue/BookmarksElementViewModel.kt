@@ -4,7 +4,6 @@ import exception.errorOnNull
 import kmtt.impl.authKmtt
 import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
-import kmtt.models.subsite.Subsite
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
@@ -32,7 +31,7 @@ class BookmarksElementViewModel(
     private var errorCounter = 0
 
     override suspend fun initialize() {
-        mutexInitializer.withLock {
+        elementMutex.withLock {
             initializing()
             // if token updates we should recreate api client
             client = authKmtt(site, token)
@@ -83,7 +82,7 @@ class BookmarksElementViewModel(
         val allEntriesMessage = "Getting all entries..." +
                 " If you have a lot of entries, it could take a long time to get all of them"
 
-        mutexInitializer.withLock { // run only 1 function at a time
+        elementMutex.withLock { // run only 1 function at a time
             inUse()
             withProgressSuspend(allEntriesMessage) { // show progress message at start
                 client.user.getAllMyFavoriteEntries { // save each chunk
