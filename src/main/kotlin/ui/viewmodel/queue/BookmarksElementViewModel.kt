@@ -10,6 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
 import logic.document.SettingsBasedDocumentProcessor
 import org.jsoup.Jsoup
+import ui.viewmodel.SettingsViewModel
+import ui.viewmodel.SettingsViewModel.getToken
 import util.coroutine.cancelOnSuspendEnd
 import util.filesystem.toDirectory
 import util.progress.redirectTo
@@ -17,14 +19,14 @@ import java.io.File
 
 interface IBookmarksElementViewModel : IQueueElementViewModel {
     val site: Website
-    val token: String
 }
 
 class BookmarksElementViewModel(
     override val site: Website,
-    override val token: String,
 ) : AbstractElementViewModel(), IBookmarksElementViewModel {
-    private val client = authKmtt(site, token)
+    private val token: String
+        get() = SettingsViewModel.tokens.getToken(site)
+    private var client = authKmtt(site, token)
     private val scope = CoroutineScope(Dispatchers.Default)
     private var counter = 0
     private var errorCounter = 0
@@ -32,6 +34,8 @@ class BookmarksElementViewModel(
     override suspend fun initialize() {
         mutexInitializer.withLock {
             initializing()
+            // if token updates we should recreate api client
+            client = authKmtt(site, token)
             try {
                 // check if token works
                 client.user.getMe()
@@ -80,9 +84,10 @@ class BookmarksElementViewModel(
                 " If you have a lot of entries, it could take a long time to get all of them"
 
         mutexInitializer.withLock { // run only 1 function at a time
+            inUse()
             withProgressSuspend(allEntriesMessage) { // show progress message at start
                 client.user.getAllMyFavoriteEntries { // save each chunk
-                    if (!processDocument(it)) { // if there is error, change result to false
+                    if (!processDocument(it)) { // process document and if there is error, change final result to false
                         result = false
                     }
                     progress("Requesting next chunk of entries...")
@@ -112,15 +117,11 @@ class BookmarksElementViewModel(
         other as BookmarksElementViewModel
 
         if (site != other.site) return false
-        if (token != other.token) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = site.hashCode()
-        result = 31 * result + token.hashCode()
-        return result
+        return site.hashCode()
     }
-
 }
