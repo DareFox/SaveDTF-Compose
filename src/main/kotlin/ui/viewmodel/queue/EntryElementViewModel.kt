@@ -5,6 +5,7 @@ import exception.errorOnNull
 import kmtt.impl.authKmtt
 import kmtt.impl.publicKmtt
 import kmtt.models.entry.Entry
+import kmtt.models.enums.Website
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,7 @@ import java.util.*
 interface IEntryQueueElementViewModel : IQueueElementViewModel {
     val url: String
     val entry: StateFlow<Entry?>
+    val website: StateFlow<Website?>
 }
 
 private val logger = KotlinLogging.logger { }
@@ -39,8 +41,12 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
     private var document: Document? = null
     private val documentProcessor = MutableStateFlow<SettingsBasedDocumentProcessor?>(null)
 
+    private val _website = MutableStateFlow<Website?>(null)
+    override val website: StateFlow<Website?> = _website
+
     private val _entry = MutableStateFlow<Entry?>(null)
     override val entry: StateFlow<Entry?> = _entry
+
 
     override val pathToSave: String?
         get() {
