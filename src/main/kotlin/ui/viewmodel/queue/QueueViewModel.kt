@@ -4,6 +4,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import ui.viewmodel.DebugQueueViewModel
 import util.kmttapi.UrlUtil
 
 object QueueViewModel {
@@ -37,19 +38,19 @@ object QueueViewModel {
     }
 
     fun canCreateQueueElement(url: String): Boolean {
-        return UrlUtil.isEntry(url)
+        return UrlUtil.isEntry(url) || url == "debug"
     }
 
-    fun createAndAddQueueElement(url: String): IQueueElementViewModel? {
-        val element = when {
+    fun createAndAddQueueElement(url: String) {
+        when {
+            url == "debug" ->  DebugQueueViewModel.startQueue.forEach {
+                add(it)
+            }
 //            UrlUtil.isUserProfile(url) -> TODO("todo UserProfileDownloader")
-            UrlUtil.isEntry(url) -> EntryQueueElementViewModel(url)
+            UrlUtil.isEntry(url) -> add(EntryQueueElementViewModel(url))
 //            UrlUtil.isBookmarkLink(url) -> TODO("todo BookmarkDownloader")
-            else -> null
         }
 
-        element.also { if (it != null) add(it) }
-        return element
     }
 
     fun setCreationState(state: MutableTransitionState<Boolean>, element: IQueueElementViewModel) {
