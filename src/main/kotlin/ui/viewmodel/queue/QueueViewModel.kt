@@ -22,7 +22,7 @@ object QueueViewModel {
             add(EntryQueueElementViewModel(it))
         },
         UrlChecker(UrlUtil::isBookmarkLink) {
-            add(createBookmarksElement(UrlUtil.getWebsiteType(it)!!)) // we do a little bit of trolling !!
+            add(createBookmarks(UrlUtil.getWebsiteType(it)!!)) // we do a little bit of trolling !!
         },
         UrlChecker( { it == "debug"} ) {
             DebugQueueViewModel.startQueue.forEach {
@@ -54,9 +54,14 @@ object QueueViewModel {
         }
     }
 
-    fun createBookmarksElement(website: Website): BookmarksElementViewModel {
+    fun canCreateBookmarks(website: Website): Boolean {
+        // check if token isn't empty
+        return SettingsViewModel.tokens.value[Website.DTF]?.isNotEmpty() ?: false
+    }
+
+    fun createBookmarks(website: Website): BookmarksElementViewModel {
         val token = SettingsViewModel.tokens.value[Website.DTF].errorOnNull("$website token is null")
-        return BookmarksElementViewModel(website, token)
+        return BookmarksElementViewModel(website)
     }
 
     fun canCreateQueueElement(url: String): Boolean {
