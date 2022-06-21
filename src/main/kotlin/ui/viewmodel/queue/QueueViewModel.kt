@@ -50,6 +50,7 @@ object QueueViewModel {
         val token = SettingsViewModel.tokens.value[Website.DTF].errorOnNull("$website token is null")
         add(BookmarksElementViewModel(website, token))
     }
+
     fun canCreateQueueElement(url: String): Boolean {
         return urlChecks.any { it(url) }
     }
@@ -61,7 +62,7 @@ object QueueViewModel {
             }
 //            UrlUtil.isUserProfile(url) -> TODO("todo UserProfileDownloader")
             UrlUtil.isEntry(url) -> add(EntryQueueElementViewModel(url))
-//            UrlUtil.isBookmarkLink(url) -> TODO("todo BookmarkDownloader")
+            UrlUtil.isBookmarkLink(url) -> addBookmarksElement(UrlUtil.getWebsiteType(url)!!) // we do a little bit of trolling !!
         }
 
     }
