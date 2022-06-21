@@ -46,6 +46,10 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         _status.value = QueueElementStatus.READY_TO_USE
     }
 
+    protected fun inUse() {
+        _status.value = QueueElementStatus.IN_USE
+    }
+
     protected fun error(message: String) {
         _lastErrorMessage.value = message
         _status.value = QueueElementStatus.ERROR
