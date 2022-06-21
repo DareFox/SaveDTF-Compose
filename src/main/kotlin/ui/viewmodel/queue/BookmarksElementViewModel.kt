@@ -59,7 +59,7 @@ class BookmarksElementViewModel(
 
                 processor
                     .redirectTo(mutableProgress, scope) {// redirect progress of processor to this VM progress
-                        "Entry ${newCounter}: $it" // show entry counter
+                        "Entry #${newCounter}, $it" // show entry counter
                     }
                     .cancelOnSuspendEnd {
                         processor.process() // save document
@@ -90,11 +90,14 @@ class BookmarksElementViewModel(
             }
 
             if (errorCounter > 0) {
-                saved("Downloaded $counter bookmarks. Couldn't download $errorCounter bookmarks")
+                saved()
+                progress("Downloaded $counter bookmarks. Couldn't download $errorCounter bookmarks")
             } else if (errorCounter == counter) {
-                error("Couldn't  ownload any of $errorCounter bookmarks")
+                error("Couldn't download any of $errorCounter bookmarks")
+                clearProgress()
             } else {
-                saved("Downloaded all $counter bookmarks.")
+                saved()
+                progress("Downloaded all $counter bookmarks.")
             }
         }
 
