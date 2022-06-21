@@ -121,20 +121,24 @@ fun GenericCard(
     status: QueueElementStatus,
     error: String? = null,
     painter: Painter? = null,
-    website: Website,
+    website: Website?,
 ) {
     val mainColor = when(website) {
-        Website.DTF -> Color(0xFF3da9ff)
+        Website.DTF -> MaterialTheme.colors.primary
         Website.TJ -> Color(0xFFffd260)
         Website.VC -> Color(0xFFe55c78)
+        else -> Color.Gray
     }
 
+    val secondaryColor = Color.Black.copy(0.15f).compositeOver(mainColor)
 
     val color by animateColorAsState(
         when (status) {
+            // TODO: Replace color composition with just colors
+            // Why? Because of mainColor difference, composition varies
             QueueElementStatus.ERROR -> Color.Red.copy(0.7f)
             QueueElementStatus.INITIALIZING -> Color.Gray.copy(0.8f)
-            QueueElementStatus.READY_TO_USE -> mainColor
+            QueueElementStatus.READY_TO_USE -> Color.Gray.copy(0.000001f) // nothing
             QueueElementStatus.SAVED -> Color.Green.copy(0.5f)
             QueueElementStatus.IN_USE -> Color.Yellow.copy(0.2f)
         }
@@ -162,7 +166,7 @@ fun GenericCard(
         Surface( // Main body
             modifier = Modifier
                 .fillMaxWidth(),
-            color = color.compositeOver(MaterialTheme.colors.primary)
+            color = color.compositeOver(mainColor)
         ) {
             val progress by viewModel.progress.collectAsState()
 
@@ -229,7 +233,7 @@ fun GenericCard(
         Surface(
             // Footer
             modifier = Modifier.height(45.dp).fillMaxWidth(),
-            color = color.compositeOver(MaterialTheme.colors.primaryVariant),
+            color = color.compositeOver(secondaryColor),
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
