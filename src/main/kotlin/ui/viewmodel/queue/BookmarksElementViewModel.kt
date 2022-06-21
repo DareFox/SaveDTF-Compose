@@ -37,7 +37,7 @@ class BookmarksElementViewModel(
                 client.user.getMe()
                 readyToUse()
             } catch (ex: Exception) {
-                error(ex.message ?: ex.javaClass.simpleName)
+                error("Error while requesting your profile. Is your token in settings correct?")
             }
         }
     }
