@@ -132,11 +132,11 @@ fun GenericCard(
 
     val mainColor by animateColorAsState(
         when (status) {
-            QueueElementStatus.ERROR -> Color.Red.copy(0.8f)
-            QueueElementStatus.INITIALIZING -> Color.Gray.copy(0.8f)
+            QueueElementStatus.ERROR -> Color(0xFFd53333)
+            QueueElementStatus.INITIALIZING -> Color(0xFF808080)
             QueueElementStatus.READY_TO_USE -> websiteColor
-            QueueElementStatus.SAVED -> Color.Green.copy(0.8f)
-            QueueElementStatus.IN_USE -> Color.Yellow.copy(0.8f)
+            QueueElementStatus.SAVED -> Color(0xFF37ee9a)
+            QueueElementStatus.IN_USE -> Color(0xFFf8f89f)
         }
     )
 
