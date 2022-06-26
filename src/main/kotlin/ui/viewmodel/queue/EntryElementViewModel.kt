@@ -49,7 +49,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
 
 
     override val pathToSave: String?
-        get() {
+        get() { // TODO: ??????????????? Simplify!
             return super.pathToSave?.let {
                 val entry = entry.value
 
@@ -71,10 +71,10 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
     init {
         documentProcessor.onEach { // on entry downloader change
             if (it == null) { // if no downloader -> no progress
-                logger.info { "No downloader, no progress" }
+                logger.debug { "No downloader, no progress" }
                 clearProgress()
             } else {
-                logger.info { "Downloader exists, listening to progress" }
+                logger.debug { "Downloader exists, listening to progress" }
                 // on progress of downloader change
                 it.redirectTo(mutableProgress, scope)
             }

@@ -6,9 +6,13 @@ import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import mu.KotlinLogging
 import ui.viewmodel.DebugQueueViewModel
 import ui.viewmodel.SettingsViewModel
 import util.kmttapi.UrlUtil
+import kotlin.math.log
+
+private val logger = KotlinLogging.logger { }
 
 object QueueViewModel {
     private val _queue = MutableStateFlow(setOf<IQueueElementViewModel>())
@@ -33,22 +37,26 @@ object QueueViewModel {
 
     fun add(element: IQueueElementViewModel) {
         _queue.update {
+            logger.info { "Adding $element to queue" }
             it + element
         }
     }
 
     fun remove(element: IQueueElementViewModel) {
         _queue.update {
+            logger.info { "Removing $element from queue" }
             it - element
         }
 
         // Remove transition state
         _creationStateMap.update {
+            logger.debug { "Removing transition state of creation" }
             it - element
         }
     }
 
     fun clear() {
+        logger.info { "Clearing queue" }
         _queue.update {
             setOf()
         }
@@ -81,6 +89,7 @@ object QueueViewModel {
 
     fun setCreationState(state: MutableTransitionState<Boolean>, element: IQueueElementViewModel) {
         _creationStateMap.update {
+            logger.debug { "Setting creation state of $element element to [current = ${state.currentState}; target = ${state.targetState}]" }
             val mutable = it.toMutableMap()
             mutable[element] = state
             mutable
