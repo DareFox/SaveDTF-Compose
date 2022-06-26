@@ -7,6 +7,7 @@ import androidx.compose.ui.window.rememberWindowState
 import ui.AppUI
 import ui.SaveDtfTheme
 import ui.composables.CheckVersion
+import ui.menus.NotificationsUI
 
 fun main() = application {
     Window(
@@ -17,6 +18,7 @@ fun main() = application {
     ) {
         SaveDtfTheme(true) {
             AppUI()
+            NotificationsUI()
             CheckVersion()
         }
     }
