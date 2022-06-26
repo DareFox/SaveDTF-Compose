@@ -60,7 +60,7 @@ inline fun NotificationList() {
                     exit = shrinkVertically(),
                 ) {
                     Box(modifier = Modifier.padding(bottom = 30.dp)) {
-                        Notification(notifiaction.text) {
+                        SimpleNotification(notifiaction) {
                             state.targetState = false
                         }
                     }
