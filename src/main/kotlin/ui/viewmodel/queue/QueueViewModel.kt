@@ -56,7 +56,7 @@ object QueueViewModel {
 
     fun canCreateBookmarks(website: Website): Boolean {
         // check if token isn't empty
-        return SettingsViewModel.tokens.value[Website.DTF]?.isNotEmpty() ?: false
+        return SettingsViewModel.tokens.value[website]?.isNotEmpty() ?: false
     }
 
     fun createBookmarks(website: Website): BookmarksElementViewModel {
