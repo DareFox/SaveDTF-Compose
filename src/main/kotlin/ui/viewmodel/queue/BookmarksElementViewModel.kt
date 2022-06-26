@@ -20,7 +20,7 @@ interface IBookmarksElementViewModel : IQueueElementViewModel {
     val site: Website
 }
 
-class BookmarksElementViewModel(
+data class BookmarksElementViewModel(
     override val site: Website,
 ) : AbstractElementViewModel(), IBookmarksElementViewModel {
     private val token: String
@@ -107,20 +107,5 @@ class BookmarksElementViewModel(
 
         counter = 0
         return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as BookmarksElementViewModel
-
-        if (site != other.site) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return site.hashCode()
     }
 }
