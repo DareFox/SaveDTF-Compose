@@ -1,6 +1,7 @@
 package ui.menus
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
@@ -8,11 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.Download
-import compose.icons.feathericons.RefreshCcw
-import compose.icons.feathericons.Trash
+import compose.icons.feathericons.*
+import kmtt.models.enums.Website
 import kotlinx.coroutines.launch
 import ui.SaveDtfTheme
 import ui.composables.FancyButton
@@ -51,24 +53,71 @@ fun QueueCreatorMenu() {
 
             enable = errorMessage == null
 
-            FancyInputField(
-                onInputChange = {
-                    input = it
-                },
-                onConfirm = {
-                    queueVM.createAndAddQueueElement(it)
-                    input = ""
-                },
-                input = input,
-                placeholderInput = "Вставь ссылку сюда",
-                enabled = enable,
-                isError = errorMessage != null,
-                errorMessage = errorMessage
-            )
-            Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
 
             val isQueueNotEmpty = queue.isNotEmpty()
             val scope = rememberCoroutineScope()
+
+            var showBookmarksMenu by rememberSaveable { mutableStateOf(false) }
+
+            Row(Modifier.height(50.dp)) {
+                /* search field */
+                Surface(modifier = Modifier.weight(1f)) {
+                    FancyInputField(
+                        onInputChange = {
+                            input = it
+                        },
+                        onConfirm = {
+                            queueVM.createAndAddQueueElement(it)
+                            input = ""
+                        },
+                        input = input,
+                        placeholderInput = "Вставь ссылку сюда",
+                        enabled = enable,
+                        isError = errorMessage != null,
+                        errorMessage = errorMessage
+                    )
+
+                }
+
+                val bookmarkIcon = if (showBookmarksMenu) {
+                    FeatherIcons.ChevronRight
+                } else {
+                    FeatherIcons.Bookmark
+                }
+
+                if (showBookmarksMenu) {
+                    /* create bookmark element with associated website */
+                    Website.values().forEach { website ->
+                        val canCreateBookmark = QueueViewModel.canCreateBookmarks(website)
+
+                        Surface(modifier = Modifier.padding(start = 10.dp).width(50.dp)) {
+                            FancyButton(canCreateBookmark, onClick = {
+                                QueueViewModel.createBookmarks(website).let { QueueViewModel.add(it) }
+                            }, onDisabledClick = {
+                                println("stupid")
+                            }) {
+                                Image(getPainterByWebsite(website), null)
+                            }
+                        }
+                    }
+                }
+
+                /* bookmarks button */
+                Surface(modifier = Modifier.padding(start = 10.dp).width(50.dp)) {
+                    // Show/hide website selector
+                    FancyButton(true, onClick = {
+                        showBookmarksMenu = !showBookmarksMenu
+                    }) {
+                        Icon(bookmarkIcon, null)
+                    }
+                }
+
+
+
+            }
+            Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
+
+
 
             val buttons = mutableListOf<@Composable () -> Unit>(
                 {
@@ -123,10 +172,16 @@ fun QueueCreatorMenu() {
                     }
                 }
             }
-
-
             QueueList()
         }
+    }
+}
 
+@Composable
+private fun getPainterByWebsite(website: Website): Painter {
+    return when (website) {
+        Website.DTF -> painterResource("img/icons/dtf.svg")
+        Website.TJ -> painterResource("img/icons/tj.png")
+        Website.VC -> painterResource("img/icons/vcru.svg")
     }
 }
