@@ -1,10 +1,14 @@
 name: Жалоба на ошибку/баг
 description: Отправить отчет о ошибке
+labels: bug
+title: [BUG] 
 body:
 - type: textarea
   id: version
   attributes:
     label: Версия программы
+    placeholder: | 
+      Например: 1.0.3
   validations:
     required: true
 - type: textarea
@@ -13,7 +17,7 @@ body:
     label: Описание ошибки
     description: Четкое и краткое описание ошибки.
     placeholder: |
-      При нажатие на эту кнопку появляется ошибка.
+      При нажатие на эту кнопку появляется ошибка NullPointerReference.
     render: markdown
   validations:
     required: true
@@ -50,5 +54,7 @@ body:
   id: deviceinfo
   attributes:
     label: Сведения об устройстве
+    placeholder: |
+      ОС: [например, Windows 10 21H2] 
   validations:
     required: false
