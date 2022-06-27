@@ -2,7 +2,7 @@ name: Жалоба на ошибку/баг
 description: Отправить отчет о ошибке
 labels: bug
 title: | 
-  [BUG] 
+  [BUG] *Заголовок баг репорта*
 body:
 - type: textarea
   id: version
