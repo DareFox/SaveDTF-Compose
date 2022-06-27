@@ -1,61 +1,69 @@
-name: Жалоба на ошибку/баг
-description: Отправить отчет о ошибке
+name: Bug report
+description: Create and send a bug report to help us improve
 labels: bug
 title: | 
-  [BUG] *Заголовок баг репорта*
+  [BUG] *Title of issue*
 body:
 - type: textarea
   id: version
   attributes:
-    label: Версия программы
+    label: Program version
     placeholder: | 
-      Например: 1.0.3
+      e.g.: 1.0.3
   validations:
     required: true
 - type: textarea
   id: errordesc
   attributes:
-    label: Описание ошибки
-    description: Четкое и краткое описание ошибки.
+    label: Error description
+    description: A clear and concise description of what the bug is.
     placeholder: |
-      При нажатие на эту кнопку появляется ошибка NullPointerReference.
+      When pressing *this* button, program throws NullPointerReference.
     render: markdown
   validations:
     required: true
 - type: textarea
   id: howto
   attributes:
-    label: Как получить ошибку
-    description: Шаги для воспроизведения ошибки
+    label: How to reproduce error
+    description: Steps to reproduce the behavior
     placeholder: |
-      1. Перейдите в '...'
-      2. Прокрутите вниз до '....'
-      3. Нажмите на '....'.
-      4. Ошибка
+      1. Go to '...'
+      2. Scroll down to '....'
+      3. Click on '....'
+      4. See error
     render: markdown
   validations:
     required: true
 - type: textarea
   id: expectation
   attributes:
-    label: Ожидаемое поведение
+    label: Expected behavior
     description: |
-      Четкое и краткое описание того, что вы ожидали, что произойдет.
+      A clear and concise description of what you expected to happen.
     render: text
   validations:
     required: true
 - type: textarea
   id: screenshots
   attributes:
-    label: Скриншоты
-    description: Если возможно, добавьте скриншоты, чтобы помочь объяснить вашу проблему.
+    label: Screenshots
+    description: If you can, please add screenshots to help explain your problem.
   validations:
     required: false
 - type: textarea
   id: deviceinfo
   attributes:
-    label: Сведения об устройстве
+    label: Information about the device
     placeholder: |
-      ОС: [например, Windows 10 21H2] 
+      OS: [e.g. Windows 10 21H2]
+  validations:
+    required: false
+- type: textarea
+  id: context
+  attributes:
+    label: Additional context
+    description: Add any other information about the problem here.
+    render: markdown
   validations:
     required: false
