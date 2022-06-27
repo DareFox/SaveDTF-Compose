@@ -37,6 +37,5 @@ body:
     label: Additional context
     description: |
       Add any other context or screenshots about the feature request here.
-    render: markdown
   validations:
     required: false
