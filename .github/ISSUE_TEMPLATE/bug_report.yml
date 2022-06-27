@@ -55,7 +55,7 @@ body:
   id: deviceinfo
   attributes:
     label: Сведения об устройстве
-    placeholder: |
+    value: |
       ОС: [например, Windows 10 21H2] 
   validations:
     required: false
