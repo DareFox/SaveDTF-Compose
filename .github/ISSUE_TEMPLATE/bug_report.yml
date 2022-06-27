@@ -2,11 +2,13 @@ name: Жалоба на ошибку/баг
 description: Отправить отчет о ошибке
 body:
 - type: textarea
+  id: version
   attributes:
     label: Версия программы
   validations:
     required: true
 - type: textarea
+  id: errordesc
   attributes:
     label: Описание ошибки
     description: Четкое и краткое описание ошибки.
@@ -16,6 +18,7 @@ body:
   validations:
     required: true
 - type: textarea
+  id: howto
   attributes:
     label: Как получить ошибку
     description: Шаги для воспроизведения ошибки
@@ -28,6 +31,7 @@ body:
   validations:
     required: true
 - type: textarea
+  id: expectation
   attributes:
     label: Ожидаемое поведение
     description: |
@@ -36,12 +40,14 @@ body:
   validations:
     required: true
 - type: textarea
+  id: screenshots
   attributes:
     label: Скриншоты
     description: Если возможно, добавьте скриншоты, чтобы помочь объяснить вашу проблему.
   validations:
     required: false
 - type: textarea
+  id: deviceinfo
   attributes:
     label: Сведения об устройстве
   validations:
