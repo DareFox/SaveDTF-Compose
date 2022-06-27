@@ -1,0 +1,42 @@
+name: Запрос на добавление нового/улучшение функционала
+description: Предложите идею как можно улучшить программу
+labels: enhancement
+title: | 
+  [FEATURE] *Заголовок запроса на фичу*
+body:
+- type: textarea
+  id: issue
+  attributes:
+    label: Связана ли ваша просьба о фиче с какой-то текущей проблемой?
+    description: Четкое и краткое описание ошибки.
+    placeholder: |
+      Например. Мне неудобно, когда [...].
+    render: markdown
+  validations:
+    required: true
+- type: textarea
+  id: solution
+  attributes:
+    label: Опишите решение, которое вы думаете может исправить эту проблему
+    description: Четкое и краткое описание того, что вы хотите, чтобы произошло.
+    render: markdown
+  validations:
+    required: true
+- type: textarea
+  id: alternatives
+  attributes:
+    label: Опишите альтернативы, которые вы рассматривали
+    description: |
+      Напишите описание любых альтернативных решений или фич, которые вы рассматривали
+    render: markdown
+  validations:
+    required: false
+- type: textarea
+  id: context
+  attributes:
+    label: Дополнительный контекст
+    description: |
+      Добавьте сюда любой другой контекст или скриншоты, касающиеся вашей идеи по добавлению нового функционала.
+    render: markdown
+  validations:
+    required: false
