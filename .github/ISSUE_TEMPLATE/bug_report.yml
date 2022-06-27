@@ -1,0 +1,48 @@
+name: Жалоба на ошибку/баг
+description: Отправить отчет о ошибке
+body:
+- type: textarea
+  attributes:
+    label: Версия программы
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Описание ошибки
+    description: Четкое и краткое описание ошибки.
+    placeholder: |
+      При нажатие на эту кнопку появляется ошибка.
+    render: markdown
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Как получить ошибку
+    description: Шаги для воспроизведения ошибки
+    placeholder: |
+      1. Перейдите в '...'
+      2. Прокрутите вниз до '....'
+      3. Нажмите на '....'.
+      4. Ошибка
+    render: markdown
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Ожидаемое поведение
+    description: |
+      Четкое и краткое описание того, что вы ожидали, что произойдет.
+    render: text
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Скриншоты
+    description: Если возможно, добавьте скриншоты, чтобы помочь объяснить вашу проблему.
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: Сведения об устройстве
+  validations:
+    required: false
