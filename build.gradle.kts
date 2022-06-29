@@ -105,6 +105,5 @@ compose.desktop {
                 "jdk.unsupported.desktop"
             )
         }
-
     }
 }
