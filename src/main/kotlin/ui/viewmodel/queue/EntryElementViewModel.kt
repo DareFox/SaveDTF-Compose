@@ -122,12 +122,11 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
             processor.process()
 
             saved("Saved")
-            withContext(Dispatchers.IO) {
-                ProcessBuilder("python", "clear_download_yt.py", path)
-                    .inheritIO()
-                    .start()
-                    .waitFor()
-            }
+            val resourcesDir = File(System.getProperty("compose.application.resources.dir"))
+            ProcessBuilder("python", resourcesDir.resolve("clear_download_yt.py").path, path)
+                .inheritIO()
+                .start()
+                .waitFor()
             return true
         } catch (_: CancellationException) {
             error("Operation cancelled")
