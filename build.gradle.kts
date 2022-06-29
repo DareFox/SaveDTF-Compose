@@ -82,6 +82,7 @@ compose.desktop {
             description = "SaveDTF"
             vendor = "DareFox"
 
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("src/main/resources"))
             windows {
                 iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
                 dirChooser = true
