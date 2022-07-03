@@ -1,8 +1,6 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.konan.properties.saveToFile
 import java.util.*
 
 plugins {
@@ -13,24 +11,25 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "3.1.0"
 }
 
-// DO NOT CHANGE IT!
-// THIS UUID IS USED FOR UPGRADING FEATURE AND SHOULD REMAIN CONSTANT
-// MORE HERE: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Native_distributions_and_local_execution#platform-specific-options
-val DO_NOT_CHANGE_THIS_UUID = "71454f6a-55e9-44d8-830b-59ca8fc9f418"
-
-group = "me.darefox"
-
-// CHANGE VERSION HERE
-val versionObject = BuildVersion(2, 0, 0, 0)
-
-version = getBuildVersion(false).convertToSemanticVersion()
-
 repositories {
     google()
     mavenCentral()
     maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
+
+
+group = "me.darefox"
+
+// DO NOT CHANGE IT!
+// THIS UUID IS USED FOR UPGRADING FEATURE AND SHOULD REMAIN CONSTANT
+// MORE HERE: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Native_distributions_and_local_execution#platform-specific-options
+val DO_NOT_CHANGE_THIS_UUID = "71454f6a-55e9-44d8-830b-59ca8fc9f418"
+
+// CHANGE VERSION HERE
+val versionObject = BuildVersion(2, 0, 0, 0)
+version = getBuildVersion(false).convertToSemanticVersion()
+
 
 val ktorVersion = "1.6.8"
 
@@ -72,12 +71,15 @@ javafx {
 }
 
 var increment = true
+var isDevVersion = true
 
 tasks.withType {
     // if we're building packages, then don't increment build
     if (gradle.startParameter.taskNames.contains("package")) {
         increment = false
     }
+
+    isDevVersion = project.properties["buildType"] != "release"
 }
 
 buildConfig {
@@ -86,7 +88,7 @@ buildConfig {
     buildConfigField("String", "APP_FULL_VERSION", "\"${version}\"")
     buildConfigField("String", "APP_SEMANTIC_VERSION", "\"${version.convertToSemanticVersion()}\"")
     buildConfigField("kotlin.Long", "APP_BUILD_NUMBER", version.build.toString())
-    buildConfigField("kotlin.Boolean", "IS_DEV_VERSION", "true")
+    buildConfigField("kotlin.Boolean", "IS_DEV_VERSION", "$isDevVersion")
 }
 
 

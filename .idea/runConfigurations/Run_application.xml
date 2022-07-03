@@ -4,7 +4,7 @@
     <module name="saveDTF-compose.main" />
     <shortenClasspath name="NONE" />
     <method v="2">
-      <option name="Make" enabled="true" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build [DEV] version" run_configuration_type="GradleRunConfiguration" />
     </method>
   </configuration>
 </component>
