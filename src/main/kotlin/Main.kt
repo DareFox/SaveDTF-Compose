@@ -31,7 +31,6 @@ fun main() {
                     AppUI()
                     NotificationsUI()
                     CheckVersion()
-                    throw Exception("S")
                 }
             }
         }
