@@ -28,7 +28,9 @@ val DO_NOT_CHANGE_THIS_UUID = "71454f6a-55e9-44d8-830b-59ca8fc9f418"
 
 // CHANGE VERSION HERE
 val versionObject = BuildVersion(2, 0, 0, 0)
-version = getBuildVersion(false).convertToSemanticVersion()
+val currentVersion = getBuildVersion(false)
+
+version = currentVersion.convertToSemanticVersion()
 
 
 val ktorVersion = "1.6.8"
@@ -106,20 +108,25 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
 
             packageName = "SaveDTF"
-            packageVersion = version.toString()
             description = "SaveDTF"
             vendor = "DareFox"
 
             windows {
                 iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
+                packageVersion = currentVersion.convertToSemanticVersion()
                 dirChooser = true
-                upgradeUuid = DO_NOT_CHANGE_THIS_UUID;
+                upgradeUuid = DO_NOT_CHANGE_THIS_UUID
                 menuGroup = "Programs" // Make it searchable in Start menu
             }
             linux {
                 iconFile.set(iconsRoot.resolve("DTF_logo.png"))
+                debMaintainer = "easymalink@gmail.com"
+                appCategory = "net"
+                packageVersion = currentVersion.convertToSemanticVersion() + "+${currentVersion.build}"
+
             }
             macOS {
+                packageVersion = currentVersion.convertToSemanticVersion()
                 iconFile.set(iconsRoot.resolve("DTF_logo.icns"))
             }
 
