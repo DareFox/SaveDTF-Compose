@@ -1,12 +1,16 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.konan.properties.saveToFile
+import java.util.*
 
 plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
     id("org.jetbrains.compose") version "1.1.1"
     id("org.openjfx.javafxplugin") version "0.0.10"
+    id("com.github.gmazzo.buildconfig") version "3.1.0"
 }
 
 // DO NOT CHANGE IT!
@@ -16,9 +20,10 @@ val DO_NOT_CHANGE_THIS_UUID = "71454f6a-55e9-44d8-830b-59ca8fc9f418"
 
 group = "me.darefox"
 
-// WHEN CHANGING VERSION, DON'T FORGET TO CHANGE VERSION
-// IN UI COMPOSABLE
-version = "1.0.4"
+// CHANGE VERSION HERE
+val versionObject = BuildVersion(2, 0, 0, 0)
+
+version = getBuildVersion(false).convertToSemanticVersion()
 
 repositories {
     google()
@@ -66,6 +71,26 @@ javafx {
     modules = listOf("javafx.swing")
 }
 
+var increment = true
+
+tasks.withType {
+    // if we're building packages, then don't increment build
+    if (gradle.startParameter.taskNames.contains("package")) {
+        increment = false
+    }
+}
+
+buildConfig {
+    val version = getBuildVersion(increment)
+
+    buildConfigField("String", "APP_FULL_VERSION", "\"${version}\"")
+    buildConfigField("String", "APP_SEMANTIC_VERSION", "\"${version.convertToSemanticVersion()}\"")
+    buildConfigField("kotlin.Long", "APP_BUILD_NUMBER", version.build.toString())
+    buildConfigField("kotlin.Boolean", "IS_DEV_VERSION", "true")
+}
+
+
+
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
 }
@@ -106,6 +131,61 @@ compose.desktop {
                 "jdk.unsupported.desktop"
             )
         }
-
     }
 }
+
+data class BuildVersion(val major: Int, val minor: Int, val patch: Int, val build: Long) {
+    fun convertToSemanticVersion(): String = "$major.$minor.$patch"
+
+    override fun toString(): String {
+        return "$major.$minor.$patch ($build)"
+    }
+}
+
+fun getBuildVersion(increment: Boolean): BuildVersion {
+    val previous = getPreviousVersion()
+    val newVersion: BuildVersion = when {
+        previous == null ||
+                previous.major != versionObject.major ||
+                previous.minor != versionObject.minor ||
+                previous.patch != versionObject.patch -> versionObject.copy(build = 0L)
+        else -> previous.copy(build = if (increment) previous.build + 1 else previous.build)
+    }
+
+    return newVersion.also { saveVersion(it) }
+}
+
+fun getPreviousVersion(): BuildVersion? {
+    val propFile = file("version.properties")
+
+    if (!propFile.canRead()) {
+        throw IllegalAccessException("Cannot read version.properties")
+    }
+
+    val properties = Properties().also { it.load(propFile.bufferedReader()) }
+
+    return try {
+        val major = properties["MAJOR_VERSION"].toString().toInt()
+        val minor = properties["MINOR_VERSION"].toString().toInt()
+        val patch = properties["PATCH_VERSION"].toString().toInt()
+        val build = properties["BUILD_NUMBER"].toString().toLong()
+
+        BuildVersion(major, minor, patch, build)
+    } catch(ex: Exception) {
+        println(ex.toString())
+        null
+    }
+}
+
+fun saveVersion(version: BuildVersion) {
+    val propFile = file("version.properties").also { it.createNewFile() }
+    val properties = Properties().also { it.load(propFile.bufferedReader()) }
+
+    properties["MAJOR_VERSION"] = version.major.toString()
+    properties["MINOR_VERSION"] = version.minor.toString()
+    properties["PATCH_VERSION"] = version.patch.toString()
+    properties["BUILD_NUMBER"] = version.build.toString()
+
+    properties.store(propFile.bufferedWriter(), "Previous build version")
+}
+

@@ -8,10 +8,11 @@ import kotlinx.serialization.json.jsonPrimitive
 import logic.Version
 import logic.ktor.Client
 import logic.ktor.rateRequest
+import me.darefox.saveDTF_compose.BuildConfig
 import util.string.toVersionOrNull
 
 object AppViewModel {
-    const val VERSION = "1.0.4"
+    const val VERSION = BuildConfig.APP_SEMANTIC_VERSION
     val currentVersionObject = VERSION.toVersionOrNull()!!
 
     private val repoName = "DareFox/SaveDTF-compose"
