@@ -4,10 +4,7 @@ import me.darefox.saveDTF_compose.BuildConfig
 
 fun getCrashLogReport(ex: Exception): String {
     val stringBuilder = StringBuilder()
-
-    stringBuilder.title("LOGGER")
-    stringBuilder.append(BuildConfig.javaClass.classLoader.getResource("logback.xml"))
-
+    
     stringBuilder.title("PROGRAM VERSION")
     stringBuilder.append("""
         SaveDTF_Version = ${BuildConfig.APP_FULL_VERSION}
