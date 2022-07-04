@@ -76,8 +76,12 @@ var increment = true
 var isDevVersion = true
 
 tasks.withType {
+    val isPackageTask = gradle.startParameter.taskNames.any {
+        it.contains("package") // check if package* (package, packageDeb, packageMsi and etc...)
+    }
+
     // if we're building packages, then don't increment build
-    if (gradle.startParameter.taskNames.contains("package")) {
+    if (isPackageTask) {
         increment = false
     }
 
