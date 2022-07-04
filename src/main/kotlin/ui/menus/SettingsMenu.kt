@@ -187,20 +187,21 @@ fun SettingsMenu() {
                 }
             }
 
-            fields += {
-                SettingsTextField(
-                    name = "Время ожидание загрузки статьи",
-                    input = entryTimeout,
-                    textPlaceholder = "0 или отрицательное число секунд - бесконечное ожидание.",
-                    hideContent = false,
-                    width = textWidth
-                ) {
-                    it.toIntOrNull()?.also { timeout ->
-                        SettingsViewModel.setEntryTimeoutInSeconds(timeout)
-                    }
-                    entryTimeout = it
-                }
-            }
+            // TODO: Implement usage for entry timeout setting
+//            fields += {
+//                SettingsTextField(
+//                    name = "Время ожидание загрузки статьи",
+//                    input = entryTimeout,
+//                    textPlaceholder = "0 или отрицательное число секунд - бесконечное ожидание.",
+//                    hideContent = false,
+//                    width = textWidth
+//                ) {
+//                    it.toIntOrNull()?.also { timeout ->
+//                        SettingsViewModel.setEntryTimeoutInSeconds(timeout)
+//                    }
+//                    entryTimeout = it
+//                }
+//            }
 
 
             val replaceErrors by SettingsViewModel.replaceErrorMedia.collectAsState()
