@@ -1,6 +1,5 @@
 package ui.viewmodel
 
-import exception.errorOnNull
 import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,10 +11,13 @@ object SettingsViewModel {
     private val preferences = Preferences.userRoot().node("savedtf-prefs")
 
     private const val ERROR_MEDIA_BOOL_KEY = "replace_error_media"
-    private const val RETRY_AMOUNT_INT_KEY = "retry_amount"
+    private const val MEDIA_RETRY_AMOUNT_KEY = "retry_amount"
+    private const val MEDIA_TIMEOUT_TIME_KEY = "timeout_time_media"
+    private const val ENTRY_TIMEOUT_TIME_KEY = "timeout_time_entry"
     private const val SAVE_FOLDER_STR_KEY = "save_folder"
     private const val DOWNLOAD_VIDEO_BOOL_KEY = "download_video"
     private const val DOWNLOAD_IMAGE_BOOL_KEY = "download_image"
+
 
     /**
     ———————————No Updates?———————————
@@ -53,6 +55,8 @@ object SettingsViewModel {
     }
 
     private val _retryAmount = MutableStateFlow(getPrefRetryAmount())
+    private val _mediaTimeoutInSeconds = MutableStateFlow(getPrefMediaTimeout())
+    private val _entryTimeoutInSeconds = MutableStateFlow(getPrefEntryTimeout())
     private val _folderToSave = MutableStateFlow<String?>(getPrefFolder())
     private val _downloadVideo = MutableStateFlow(getPrefDownloadVideo())
     private val _downloadImage = MutableStateFlow(getPrefDownloadImage())
@@ -61,6 +65,8 @@ object SettingsViewModel {
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
     val tokens: StateFlow<Map<Website, String>> = _tokens
     val retryAmount: StateFlow<Int> = _retryAmount;
+    val mediaTimeoutInSeconds: StateFlow<Int> = _mediaTimeoutInSeconds;
+    val entryTimeoutInSeconds: StateFlow<Int> = _entryTimeoutInSeconds;
     val folderToSave: StateFlow<String?> = _folderToSave
     val downloadVideo: StateFlow<Boolean> = _downloadVideo
     val downloadImage: StateFlow<Boolean> = _downloadImage
@@ -68,13 +74,15 @@ object SettingsViewModel {
 
     private fun getPrefReplaceErrorMedia() = preferences.getBoolean(ERROR_MEDIA_BOOL_KEY, true)
     private fun getPrefFolder() = preferences.get(SAVE_FOLDER_STR_KEY, null)
-    private fun getPrefRetryAmount() = preferences.getInt(RETRY_AMOUNT_INT_KEY, 5)
+    private fun getPrefRetryAmount() = preferences.getInt(MEDIA_RETRY_AMOUNT_KEY, 3)
     private fun getPrefToken(website: Website): String {
         return preferences.node("tkn").get(website.name, "")
     }
     private fun getPrefDownloadVideo() = preferences.getBoolean(DOWNLOAD_VIDEO_BOOL_KEY, true)
     private fun getPrefDownloadImage() = preferences.getBoolean(DOWNLOAD_IMAGE_BOOL_KEY, true)
     private fun getPrefIgnoreUpdates() = preferences.getBoolean(MUTE_UPDATES_NOTIFICATION_KEY, false)
+    private fun getPrefMediaTimeout() = preferences.getInt(MEDIA_TIMEOUT_TIME_KEY, 300)
+    private fun getPrefEntryTimeout() = preferences.getInt(ENTRY_TIMEOUT_TIME_KEY, -1)
 
     fun setToken(token: String?, website: Website) {
         if (token == null || token.isEmpty() || token.isBlank()) {
@@ -101,8 +109,18 @@ object SettingsViewModel {
     }
 
     fun setRetryAmount(value: Int) {
-        preferences.putInt(RETRY_AMOUNT_INT_KEY, value)
+        preferences.putInt(MEDIA_RETRY_AMOUNT_KEY, value)
         _retryAmount.value = getPrefRetryAmount()
+    }
+
+    fun setMediaTimeoutInSeconds(value: Int) {
+        preferences.putInt(MEDIA_TIMEOUT_TIME_KEY, value)
+        _mediaTimeoutInSeconds.value = getPrefMediaTimeout()
+    }
+
+    fun setEntryTimeoutInSeconds(value: Int) {
+        preferences.putInt(ENTRY_TIMEOUT_TIME_KEY, value)
+        _entryTimeoutInSeconds.value = getPrefEntryTimeout()
     }
 
     fun setDownloadVideoMode(downloadIt: Boolean) {
