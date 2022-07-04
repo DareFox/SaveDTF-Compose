@@ -54,7 +54,7 @@ data class ProfileElementViewModel(
     override suspend fun save(): Boolean {
         var result = true
         val allEntriesMessage = "Getting all entries..." +
-                " If you have a lot of entries, it could take a long time to get all of them"
+                " If profile have a lot of entries, it could take a long time to get all of them"
 
         elementMutex.withLock {
             inUse()
@@ -83,6 +83,7 @@ data class ProfileElementViewModel(
         return result
     }
 
+    // TODO: Remove code duplication
     private suspend fun processDocument(list: List<Entry>): Boolean {
         var result = true
 
