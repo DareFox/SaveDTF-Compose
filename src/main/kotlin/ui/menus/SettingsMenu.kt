@@ -17,8 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import compose.icons.FeatherIcons
@@ -28,6 +31,7 @@ import ui.composables.CheckVersion
 import ui.composables.FancyButton
 import ui.composables.directoryDialog
 import ui.viewmodel.SettingsViewModel
+import util.desktop.openUrl
 
 @Composable
 fun SettingsMenu() {
@@ -87,6 +91,19 @@ fun SettingsMenu() {
         SettingsCategory("Токены") {
             val tokens by SettingsViewModel.tokens.collectAsState()
             val fields = mutableListOf<@Composable () -> Unit>()
+
+            fields += {
+                Text(
+                    text = "Как получить токен?",
+                    textDecoration = TextDecoration.Underline,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier.clickable {
+                        openUrl("https://github.com/DareFox/SaveDTF-Compose/blob/main/HOWTOGETTOKEN_RU.md")
+                    },
+                )
+            }
+
             tokens.forEach {
                 fields += {
                     val token = it.value ?: ""
