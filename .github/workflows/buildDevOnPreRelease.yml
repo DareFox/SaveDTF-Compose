@@ -26,6 +26,12 @@ jobs:
       
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+      
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
 
       - name: Build package
         run: ./gradlew packageDeb
@@ -54,12 +60,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
+      
       - name: Build package
         run: ./gradlew.bat packageExe
       
       - name: Find and save package path
         run: |
-          echo "FILEPATH=$(find . -name "*.exe")" >> $GITHUB_ENV
+          echo "FILEPATH=$(find . -iname "savedtf*.exe")" >> $GITHUB_ENV
         shell: bash
         
       - name: Upload package to Github release page
