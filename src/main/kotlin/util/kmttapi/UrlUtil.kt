@@ -6,7 +6,6 @@ object UrlUtil {
     fun isUserProfile(url: String): Boolean {
         return SharedRegex.userProfileLinkRegex.find(url) != null
     }
-
     fun isEntry(url: String): Boolean {
         return SharedRegex.entryUrlRegex.find(url) != null
     }
@@ -22,5 +21,15 @@ object UrlUtil {
             "vc" -> Website.VC
             else -> null
         }
+    }
+
+    fun getProfileID(url: String): Long {
+        val id = SharedRegex.userIdRegex.find(url)
+
+        requireNotNull(id) {
+            "Got null instead of user id, from user profile url $url"
+        }
+
+        return id.value.toLong()
     }
 }
