@@ -22,7 +22,7 @@ fun getCrashLogReport(ex: Exception): String {
     stringBuilder.title("STACKTRACE")
     stringBuilder.append(ex.stackTraceToString())
 
-    return stringBuilder.toString()
+    return stringBuilder.toString().trim()
 }
 
 private fun StringBuilder.title(title: String) {
