@@ -59,7 +59,8 @@ class SettingsBasedDocumentProcessor(
             if (shouldDownloadImage) saveMediaModules.add(ImageDownloadModule)
             if (shouldDownloadVideo) saveMediaModules.add(VideoDownloadModule)
 
-            val mediaOperation = SaveMediaOperation(saveMediaModules, retryAmount, shouldReplaceErrorMedia, saveFolder)
+            val timeoutMedia = SettingsViewModel.mediaTimeoutInSeconds.value
+            val mediaOperation = SaveMediaOperation(saveMediaModules, retryAmount, shouldReplaceErrorMedia, saveFolder, timeoutMedia)
 
             variableOperations.add(mediaOperation)
         }

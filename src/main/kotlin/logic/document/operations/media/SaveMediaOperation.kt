@@ -12,7 +12,8 @@ class SaveMediaOperation(
     val downloaderModules: List<IDownloadModule>,
     val retryAmount: Int,
     val replaceErrorMedia: Boolean,
-    val saveFolder: File
+    val saveFolder: File,
+    val timeoutInSeconds: Int
 ): AbstractProcessorOperation() {
     override val name: String = "Media saver"
 
@@ -26,7 +27,7 @@ class SaveMediaOperation(
                 val media = withProgressSuspend(
                     "$prefix: Downloading ${url.second}..."
                 ) {
-                    Client.downloadUrl(url.second, retryAmount, errMedia)
+                    Client.downloadUrl(url.second, retryAmount, errMedia, timeoutInSeconds)
                 }
 
                 val file = withProgressSuspend("$prefix: Saving file...") {

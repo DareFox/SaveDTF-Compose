@@ -20,10 +20,11 @@ private val cache = buildCache()
 private var timeout: Job? = null
 private val scope = CoroutineScope(Dispatchers.IO)
 
-suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: BinaryMedia? = null): BinaryMedia {
+suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: BinaryMedia? = null, timeoutInSeconds: Int): BinaryMedia {
     val mediaCacheID = convertToValidName(url.getMediaIdOrNull() ?: url)
     val cachedMedia = cache.getValueWithMetadata<MediaMetadata>(mediaCacheID)
-
+    val client = this
+    
     // Return cached version
     cachedMedia?.second?.let { meta ->
         return BinaryMedia(meta, cachedMedia.first)
@@ -35,19 +36,35 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
     do {
         timeout?.join() // Wait if there is too many requests
         val catched = kotlin.runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
-            this.rateRequest<HttpResponse> {
-                attemptCounter++
-                method = HttpMethod.Get
-                url(url)
-                timeout {
-                    connectTimeoutMillis = 250000
-                    requestTimeoutMillis = 30000
-                    socketTimeoutMillis = 30000
+            val shouldUseTimeoutRestriction = timeoutInSeconds > 0
+            val downloadJob: suspend () -> HttpResponse = {
+                client.rateRequest<HttpResponse> {
+                    attemptCounter++
+                    method = HttpMethod.Get
+                    url(url)
+                    timeout {
+                        connectTimeoutMillis = 250000
+                        requestTimeoutMillis = 30000
+                        socketTimeoutMillis = 30000
+                    }
                 }
+            }
+
+            if (shouldUseTimeoutRestriction) {
+                withTimeout(timeoutInSeconds * 1000L) {
+                    downloadJob()
+                }
+            } else {
+                downloadJob()
             }
         }
 
         val response = catched.getOrNull()
+
+        if (response == null) {
+            logger.error { "Response is null" }
+            logger.error { "Caught exception: ${catched.exceptionOrNull()} " }
+        }
 
         // Suspend all requests for 30 seconds on too many requests error
         if (response?.status ==  HttpStatusCode.TooManyRequests) {
