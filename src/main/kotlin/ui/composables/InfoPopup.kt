@@ -17,6 +17,25 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Info
 
 @Composable
+fun InfoPopupColumn(
+    title: String,
+    text: String,
+    onClose: () -> Unit,
+    buttons: List<Pair<String, () -> Unit>>
+) {
+    InfoPopup(title, text, onClose) {
+        Column {
+            buttons.forEachIndexed { index, button ->
+                if (index != 0) {
+                    Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
+                }
+                FancyButton(true, button.second, button.first)
+            }
+        }
+    }
+}
+
+@Composable
 fun InfoPopup(
     title: String,
     text: String,

@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import me.darefox.saveDTF_compose.BuildConfig
 import ui.SaveDtfTheme
 import ui.viewmodel.AppViewModel
 import util.string.repeatOrEmpty
@@ -62,7 +63,7 @@ fun InfoBanner() {
             Spacer(Modifier.width(20.dp))
             Column {
                 Text(
-                    text = "SaveDTF ${AppViewModel.currentVersionObject}",
+                    text = "SaveDTF ${AppViewModel.currentVersionObject} ${if (BuildConfig.IS_DEV_VERSION) "(${BuildConfig.APP_BUILD_NUMBER}) β" else ""}",
                     style = MaterialTheme.typography.h2,
                     color = MaterialTheme.colors.onBackground,
                 )

@@ -5,7 +5,7 @@
     <shortenClasspath name="NONE" />
     <option name="VM_PARAMETERS" value="-Xmx1G" />
     <method v="2">
-      <option name="Make" enabled="true" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build [DEV] version" run_configuration_type="GradleRunConfiguration" />
     </method>
   </configuration>
 </component>

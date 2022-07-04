@@ -50,31 +50,31 @@ val Lato = FontFamily(
 val typography = Typography(
     subtitle1 = TextStyle(
         fontFamily = Lato,
-        fontSize = 1.6.em,
-        fontWeight = FontWeight.ExtraLight,
+        fontSize = 1.4.em,
+        fontWeight = FontWeight.Light,
     ),
     subtitle2 = TextStyle(
         fontFamily = Lato,
-        fontSize = 1.3.em,
-        fontWeight = FontWeight.ExtraLight,
+        fontSize = 1.1.em,
+        fontWeight = FontWeight.Light,
     ),
     h1 = TextStyle(
-        fontSize = 3.0.em,
+        fontSize = 2.8.em,
         fontFamily = Lato,
         fontWeight = FontWeight.Bold,
     ),
     h2 = TextStyle(
-        fontSize = 2.5.em,
+        fontSize = 2.3.em,
         fontFamily = Lato,
         fontWeight = FontWeight.Bold,
     ),
     h3 = TextStyle(
-        fontSize = 2.0.em,
+        fontSize = 1.8.em,
         fontFamily = Lato,
         fontWeight = FontWeight.Bold
     ),
     h4 = TextStyle(
-        fontSize = 1.7.em,
+        fontSize = 1.5.em,
         fontFamily = Lato,
         fontWeight = FontWeight.Bold
     ),
