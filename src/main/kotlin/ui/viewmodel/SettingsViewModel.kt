@@ -1,5 +1,6 @@
 package ui.viewmodel
 
+import exception.errorOnNull
 import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,12 +38,20 @@ object SettingsViewModel {
 
     private val _replaceErrorMedia = MutableStateFlow(getPrefReplaceErrorMedia())
     private val _tokens = MutableStateFlow(
-        mapOf<Website, String?>(
+        mapOf<Website, String>(
             Website.DTF to getPrefToken(Website.DTF),
             Website.VC to getPrefToken(Website.VC),
             Website.TJ to getPrefToken(Website.TJ)
         )
     )
+
+    /**
+     * Get token from current state.
+     */
+    fun StateFlow<Map<Website, String>>.getToken(website: Website): String {
+        return tokens.value.get(website)!!
+    }
+
     private val _retryAmount = MutableStateFlow(getPrefRetryAmount())
     private val _folderToSave = MutableStateFlow<String?>(getPrefFolder())
     private val _downloadVideo = MutableStateFlow(getPrefDownloadVideo())
@@ -50,7 +59,7 @@ object SettingsViewModel {
     private val _ignoreUpdate = MutableStateFlow(getPrefIgnoreUpdates())
 
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
-    val tokens: StateFlow<Map<Website, String?>> = _tokens
+    val tokens: StateFlow<Map<Website, String>> = _tokens
     val retryAmount: StateFlow<Int> = _retryAmount;
     val folderToSave: StateFlow<String?> = _folderToSave
     val downloadVideo: StateFlow<Boolean> = _downloadVideo
@@ -60,10 +69,9 @@ object SettingsViewModel {
     private fun getPrefReplaceErrorMedia() = preferences.getBoolean(ERROR_MEDIA_BOOL_KEY, true)
     private fun getPrefFolder() = preferences.get(SAVE_FOLDER_STR_KEY, null)
     private fun getPrefRetryAmount() = preferences.getInt(RETRY_AMOUNT_INT_KEY, 5)
-    private fun getPrefToken(website: Website): String? {
-        return preferences.node("tkn").get(website.name, null)
+    private fun getPrefToken(website: Website): String {
+        return preferences.node("tkn").get(website.name, "")
     }
-
     private fun getPrefDownloadVideo() = preferences.getBoolean(DOWNLOAD_VIDEO_BOOL_KEY, true)
     private fun getPrefDownloadImage() = preferences.getBoolean(DOWNLOAD_IMAGE_BOOL_KEY, true)
     private fun getPrefIgnoreUpdates() = preferences.getBoolean(MUTE_UPDATES_NOTIFICATION_KEY, false)

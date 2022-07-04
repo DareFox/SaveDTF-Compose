@@ -5,6 +5,7 @@ import exception.errorOnNull
 import kmtt.impl.authKmtt
 import kmtt.impl.publicKmtt
 import kmtt.models.entry.Entry
+import kmtt.models.enums.Website
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,7 @@ import java.util.*
 interface IEntryQueueElementViewModel : IQueueElementViewModel {
     val url: String
     val entry: StateFlow<Entry?>
+    val website: StateFlow<Website?>
 }
 
 private val logger = KotlinLogging.logger { }
@@ -39,11 +41,15 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
     private var document: Document? = null
     private val documentProcessor = MutableStateFlow<SettingsBasedDocumentProcessor?>(null)
 
+    private val _website = MutableStateFlow<Website?>(null)
+    override val website: StateFlow<Website?> = _website
+
     private val _entry = MutableStateFlow<Entry?>(null)
     override val entry: StateFlow<Entry?> = _entry
 
+
     override val pathToSave: String?
-        get() {
+        get() { // TODO: ??????????????? Simplify!
             return super.pathToSave?.let {
                 val entry = entry.value
 
@@ -65,10 +71,10 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
     init {
         documentProcessor.onEach { // on entry downloader change
             if (it == null) { // if no downloader -> no progress
-                logger.info { "No downloader, no progress" }
+                logger.debug { "No downloader, no progress" }
                 clearProgress()
             } else {
-                logger.info { "Downloader exists, listening to progress" }
+                logger.debug { "Downloader exists, listening to progress" }
                 // on progress of downloader change
                 it.redirectTo(mutableProgress, scope)
             }
@@ -80,14 +86,16 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
     override suspend fun initialize() {
         mutex.withLock {
             try {
-                _status.value = INITIALIZING
+                initializing()
                 _entry.value = null
                 documentProcessor.value = null
 
                 logger.info { "Parsing website" }
                 val website = UrlUtil.getWebsiteType(url).errorOnNull("Website $url is not supported")
+                _website.value = website
 
                 val token = SettingsViewModel.tokens.value[website]
+
                 val api = if (token != null) {
                     authKmtt(website, token)
                 } else {
@@ -100,7 +108,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
                 val html = entry.entryContent.errorOnNull("Entry content is null").html.errorOnNull("Entry html is null")
                 document = Jsoup.parse(html)
 
-                _status.value = READY_TO_USE
+                readyToUse()
             } catch (ex: QueueElementException) {
                 error(ex.errorMessage)
             } catch (ex: Exception) {
@@ -111,20 +119,19 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
 
     override suspend fun save(): Boolean {
         mutex.lock()
-
-
         try {
-            yield()
-            _status.value = IN_USE
+            inUse()
             val path = pathToSave.errorOnNull("No path to save")
             val document = document.errorOnNull("Parsed document is null")
 
             val processor = SettingsBasedDocumentProcessor(File(path), document)
             documentProcessor.value = processor
 
+            yield()
             processor.process()
 
-            saved("Saved")
+            saved()
+            clearProgress()
             return true
         } catch (_: CancellationException) {
             error("Operation cancelled")

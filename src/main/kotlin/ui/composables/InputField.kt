@@ -31,6 +31,8 @@ fun FancyInputField(
     isError: Boolean,
     errorMessage: String?,
 ) {
+    val textStyle = MaterialTheme.typography.subtitle2
+
     OutlinedTextField(
         value = input,
         textStyle = MaterialTheme.typography.subtitle2,
@@ -42,7 +44,7 @@ fun FancyInputField(
         placeholder = {
             Text(
                 text = placeholderInput,
-                style = MaterialTheme.typography.subtitle2
+                style = textStyle.copy(fontSize = textStyle.fontSize.times(0.8))
             )
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),

@@ -16,7 +16,7 @@ internal class RamCache(val id: String? = null) : BinaryCache {
         logger.debug { "Setting key $key with ByteArray size ${value.size}" }
         cache[key] = SoftReference(value)
 
-        logger.info { "Calling FileCache to save value to disk" }
+        logger.debug { "Calling FileCache to save value to disk" }
         fileCache.setValue(key, value)
     }
 
@@ -27,22 +27,22 @@ internal class RamCache(val id: String? = null) : BinaryCache {
      *  - return value
      */
     override fun getValueOrNull(key: String): ByteArray? {
-        logger.info { "GetValueOrNull: key $key" }
+        logger.debug { "GetValueOrNull: key $key" }
 
         if (isExistInMemory(key)) {
-            logger.info { "$key exists in memory" }
+            logger.debug { "$key exists in memory" }
             val value = cache[key]?.get()
 
             // This value can be collected by GC, so we check it on null
             if (value != null)
-                logger.info { "$key wasn't collected by GC. Returning ByteArray with size of ${value.size}" }
+                logger.debug { "$key wasn't collected by GC. Returning ByteArray with size of ${value.size}" }
             return value
         }
 
         // If no cached value in memory, load it from file.
         // Else if file doesn't exist, return null
         return if (fileCache.isExist(key)) {
-            logger.info { "$key doesn't exists in memory, but exists on hard drive" }
+            logger.debug { "$key doesn't exists in memory, but exists on hard drive" }
             val value = fileCache.getValueOrNull(key)
             if (value != null) {
                 cache[key] = SoftReference(value)
@@ -50,7 +50,7 @@ internal class RamCache(val id: String? = null) : BinaryCache {
 
             value
         } else {
-            logger.info { "No cached value with key $key. Returning null" }
+            logger.debug { "No cached value with key $key. Returning null" }
             null
         }
     }
@@ -67,7 +67,7 @@ internal class RamCache(val id: String? = null) : BinaryCache {
     override fun clearAll(): Boolean {
         logger.info { "Clearing all RAM cache" }
         cache.clear()
-        logger.info { "Calling clearAll() on FileCache" }
+        logger.debug { "Calling clearAll() on FileCache" }
         return fileCache.clearAll()
     }
 

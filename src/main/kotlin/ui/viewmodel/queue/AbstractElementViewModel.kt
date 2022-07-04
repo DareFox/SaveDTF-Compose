@@ -2,6 +2,7 @@ package ui.viewmodel.queue
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.sync.Mutex
 import logic.abstracts.AbstractProgress
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
@@ -24,6 +25,11 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         customPath = folder
     }
 
+    /**
+     * Use it to restrict multiple parallel executions
+     */
+    protected val elementMutex = Mutex()
+
     protected val _selected = MutableStateFlow(false)
     override val selected: StateFlow<Boolean> = _selected
 
@@ -35,12 +41,24 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         _selected.value = false
     }
 
+    protected fun initializing() {
+        _status.value = QueueElementStatus.INITIALIZING
+    }
+
+    protected fun readyToUse() {
+        _status.value = QueueElementStatus.READY_TO_USE
+    }
+
+    protected fun inUse() {
+        _status.value = QueueElementStatus.IN_USE
+    }
+
     protected fun error(message: String) {
         _lastErrorMessage.value = message
         _status.value = QueueElementStatus.ERROR
     }
 
-    protected fun saved(message: String) {
+    protected fun saved() {
         _lastErrorMessage.value = null
         _status.value = QueueElementStatus.SAVED
     }
