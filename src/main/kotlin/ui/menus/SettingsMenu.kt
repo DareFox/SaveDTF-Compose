@@ -17,11 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import compose.icons.FeatherIcons
@@ -130,7 +129,11 @@ fun SettingsMenu() {
 
     categories += {
         SettingsCategory("Загрузка") {
-            var input by remember { mutableStateOf("${SettingsViewModel.retryAmount.value}") }
+            val textWidth = 400.dp
+            var retryAmount by remember { mutableStateOf("${SettingsViewModel.retryAmount.value}") }
+            var mediaTimeout by remember { mutableStateOf("${SettingsViewModel.mediaTimeoutInSeconds.value}") }
+            var entryTimeout by remember { mutableStateOf("${SettingsViewModel.entryTimeoutInSeconds.value}") }
+
             val fields = mutableListOf<@Composable () -> Unit>()
 
             fields += {
@@ -156,17 +159,49 @@ fun SettingsMenu() {
                     On recomposition, previous incorrect input will be wiped and TextInput will show current state of attempts
                  */
                 SettingsTextField(
-                    name = "Кол-во попыток",
-                    input = input,
-                    textPlaceholder = "0 — бесконечность, значение меньше нуля ",
-                    hideContent = false
+                    name = "Кол-во попыток загрузки медиа",
+                    input = retryAmount,
+                    textPlaceholder = "0 — бесконечность, отрицательное число - не пытаться ещё раз",
+                    hideContent = false,
+                    width = textWidth
                 ) {
                     it.toIntOrNull()?.also { retry ->
                         SettingsViewModel.setRetryAmount(retry)
                     }
-                    input = it
+                    retryAmount = it
                 }
             }
+
+            fields += {
+                SettingsTextField(
+                    name = "Время ожидание загрузки медиа файла",
+                    input = mediaTimeout,
+                    textPlaceholder = "0 или отрицательное число секунд - бесконечное ожидание.",
+                    hideContent = false,
+                    width = textWidth
+                ) {
+                    it.toIntOrNull()?.also { timeout ->
+                        SettingsViewModel.setMediaTimeoutInSeconds(timeout)
+                    }
+                    mediaTimeout = it
+                }
+            }
+
+            fields += {
+                SettingsTextField(
+                    name = "Время ожидание загрузки статьи",
+                    input = entryTimeout,
+                    textPlaceholder = "0 или отрицательное число секунд - бесконечное ожидание.",
+                    hideContent = false,
+                    width = textWidth
+                ) {
+                    it.toIntOrNull()?.also { timeout ->
+                        SettingsViewModel.setEntryTimeoutInSeconds(timeout)
+                    }
+                    entryTimeout = it
+                }
+            }
+
 
             val replaceErrors by SettingsViewModel.replaceErrorMedia.collectAsState()
 
@@ -271,12 +306,13 @@ fun SettingsTextField(
     hideContent: Boolean = false,
     onFieldClick: (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    width: Dp = 230.dp,
     onInputChange: (String) -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .width(230.dp)
+                .width(width)
         ) {
             Text(name, style = MaterialTheme.typography.subtitle1)
         }
