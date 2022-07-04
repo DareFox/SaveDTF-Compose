@@ -71,7 +71,7 @@ jobs:
       
       - name: Find and save package path
         run: |
-          echo "FILEPATH=$(find . -name "*.exe")" >> $GITHUB_ENV
+          echo "FILEPATH=$(find . -iname "savedtf*.exe")" >> $GITHUB_ENV
         shell: bash
         
       - name: Upload package to Github release page
