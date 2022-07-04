@@ -109,11 +109,13 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
 
             packageName = "SaveDTF"
             description = "SaveDTF"
             vendor = "DareFox"
+
+
 
             windows {
                 iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
