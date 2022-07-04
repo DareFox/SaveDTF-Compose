@@ -43,7 +43,7 @@ fun FancyButton(
     placeholderButton: @Composable RowScope.() -> Unit,
 ) {
     /* Use IntrinsicSize.Min to clip box inside surface */
-    Surface(Modifier.height(IntrinsicSize.Min).width(IntrinsicSize.Min)) {
+    Surface(Modifier.height(IntrinsicSize.Min).fillMaxWidth()) {
         Button(
             enabled = enabled,
             onClick = onClick,
