@@ -56,7 +56,6 @@ data class ProfileElementViewModel(
         val allEntriesMessage = "Getting all entries..." +
                 " If you have a lot of entries, it could take a long time to get all of them"
 
-        throw Exception("sus")
         elementMutex.withLock {
             inUse()
             withProgressSuspend(allEntriesMessage) {
