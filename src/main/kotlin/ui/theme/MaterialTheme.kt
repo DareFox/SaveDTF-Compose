@@ -37,9 +37,8 @@ private val DarkColorPalette = darkColors(
     secondary = Color(0xFFe88abf),
     secondaryVariant = Color(0xFFffbbf2),
     onSecondary = Color(0xFF000000),
-    onError = Color(0xFFEF4E4E),
-
-    )
+    onError = Color.Black,
+)
 
 val Lato = FontFamily(
     Font(resource = "font/Lato-Regular.ttf"),
