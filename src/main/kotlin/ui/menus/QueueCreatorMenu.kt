@@ -20,6 +20,9 @@ import ui.SaveDtfTheme
 import ui.composables.FancyButton
 import ui.composables.FancyInputField
 import ui.composables.queue.QueueList
+import ui.viewmodel.NotificationData
+import ui.viewmodel.NotificationType
+import ui.viewmodel.NotificationsViewModel
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import ui.viewmodel.queue.QueueViewModel
@@ -94,7 +97,11 @@ fun QueueCreatorMenu() {
                             FancyButton(canCreateBookmark, onClick = {
                                 QueueViewModel.createBookmarks(website).let { QueueViewModel.add(it) }
                             }, onDisabledClick = {
-                                println("stupid")
+                                NotificationsViewModel.add(NotificationData(
+                                    text = "Add $website token to save bookmarks from it",
+                                    type = NotificationType.ERROR,
+                                    onScreenDuration = 5
+                                ))
                             }) {
                                 Image(getPainterByWebsite(website), null)
                             }
