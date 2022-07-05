@@ -34,7 +34,7 @@ fun SimpleNotification(notificationData: NotificationData, onClose: () -> Unit) 
 
     val onColor = when (notificationData.type) {
         NotificationType.INFO -> MaterialTheme.colors.onPrimary
-        NotificationType.ERROR -> MaterialTheme.colors.onError
+        NotificationType.ERROR -> CustomPallet.onError
         NotificationType.SUCCESS -> CustomPallet.onSuccess
     }
 
