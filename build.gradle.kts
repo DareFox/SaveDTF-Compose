@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
+
 plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
@@ -31,7 +32,6 @@ val versionObject = BuildVersion(2, 0, 0, 0)
 val currentVersion = getBuildVersion(false)
 
 version = currentVersion.convertToSemanticVersion()
-
 
 val ktorVersion = "1.6.8"
 
@@ -64,7 +64,6 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("ch.qos.logback:logback-core:1.2.11")
-
 }
 
 javafx {
@@ -72,6 +71,13 @@ javafx {
     modules = listOf("javafx.swing")
 }
 
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "17"
+}
+
+/**
+ * Build number tasks
+ */
 var increment = true
 var isDevVersion = true
 
@@ -98,13 +104,9 @@ buildConfig {
 }
 
 
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-}
-
 val iconsRoot = project.file("src/main/resources/img")
 
+// Configuration for building native packages
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -118,6 +120,7 @@ compose.desktop {
 
 
             windows {
+                shortcut = true
                 iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
                 packageVersion = currentVersion.convertToSemanticVersion()
                 dirChooser = true
@@ -202,5 +205,146 @@ fun saveVersion(version: BuildVersion) {
     properties["BUILD_NUMBER"] = version.build.toString()
 
     properties.store(propFile.bufferedWriter(), "Previous build version")
+}
+
+
+/**
+ * L10n tasks
+ */
+val languages = getAllLanguageProperties()
+
+// Fallback language for proxy
+val baseClassLang = "en_US"
+
+// Package to save all generated classes
+val classPackage = "ui.i18n"
+
+// Create build/generated folder
+val generatedSourceDir = file("build/generated/language/kotlin/").also { dir ->
+    dir.deleteRecursively()
+    dir.mkdirs()
+}
+val generatedInterface = generateInterfaceCode(languages.first {
+    it.containsKey("LANG") && it["LANG"] == baseClassLang
+})
+val generatedProxy = generateProxyClassCode(generatedInterface)
+val generatedLanguageImpl = languages.map {
+    generateLanguageImplementationClass(it, generatedInterface)
+}
+
+// Save generated interface code
+generatedSourceDir.resolve("${generatedInterface.className}.kt").writeText(
+    generatedInterface.code
+)
+
+// Save generated proxy class
+generatedSourceDir.resolve("${generatedProxy.className}.kt").writeText(
+    generatedProxy.code
+)
+
+// Save generated lang implementations
+generatedLanguageImpl.forEach {
+    generatedSourceDir.resolve("${it.className}.kt").writeText(it.code)
+}
+
+// Make generated code visible from root of the project
+kotlin {
+    sourceSets["main"].apply {
+        kotlin.srcDir("build/generated/language/kotlin")
+    }
+}
+
+data class GeneratedInterface(val code: String, val className: String, val listOfKeys: List<String>)
+
+fun generateInterfaceCode(properties: Properties): GeneratedInterface {
+    val codeBuilder = StringBuilder(2000)
+    val keys = mutableListOf<String>()
+
+    codeBuilder.append("package $classPackage")
+    codeBuilder.append("\nsealed interface LanguageResource {")
+
+    properties.forEach { k, _ ->
+        val key = k.toString()
+
+        if (key == "LANG") return@forEach
+
+        codeBuilder.append("\n\tval $key: String").also {
+            keys += key
+        }
+    }
+
+    codeBuilder.append("\n}")
+    return GeneratedInterface(codeBuilder.toString(), "LanguageResource", keys)
+}
+data class GeneratedProxy(val code: String, val className: String, val baseInterface: GeneratedInterface)
+
+fun generateProxyClassCode(base: GeneratedInterface, className: String = "Proxy" + base.className): GeneratedProxy {
+    val codeBuilder = StringBuilder(2000)
+    val baseInterface = base.className
+
+    codeBuilder.append("package $classPackage")
+    codeBuilder.append("\nclass $className(val current: $baseInterface, val default: $baseInterface): $baseInterface {")
+
+    base.listOfKeys.forEach {
+        codeBuilder.append("\n\toverride val $it: String")
+
+        codeBuilder.append("get() = try {".tabStart(2))
+        codeBuilder.append("current.$it".tabStart(3))
+        codeBuilder.append("} catch (_: Error) {".tabStart(2))
+
+        // If current language fails (e.g no translation), then use default language
+        codeBuilder.append("default.$it".tabStart(3))
+        codeBuilder.append("}".tabStart(2))
+    }
+
+    codeBuilder.append("\n}")
+    return GeneratedProxy(codeBuilder.toString(), className, base)
+}
+
+data class GeneratedLanguageImpl(val code: String, val className: String, val baseInterface: GeneratedInterface)
+
+fun generateLanguageImplementationClass(languageProperties: Properties, base: GeneratedInterface) : GeneratedLanguageImpl {
+    val codeBuilder = StringBuilder(2000)
+    val baseInterface = base.className
+    val name = languageProperties["LANG"]
+    val className = "${name}LanguageResource"
+
+    codeBuilder.append("package $classPackage")
+    codeBuilder.append("\nobject $className: ${base.className} {")
+
+    base.listOfKeys.forEach {
+        val translationValue = languageProperties[it]?.toString()
+        val valueForInsertion = if (translationValue == null) {
+            "TODO(\"$name doesn't have translation for $it key\")"
+        } else {
+            "\"$translationValue\""
+        }
+
+        codeBuilder.append("override val $it: String".tabStart(1))
+        codeBuilder.append("get() = $valueForInsertion".tabStart(2))
+    }
+
+    codeBuilder.append("\n}")
+
+    return GeneratedLanguageImpl(codeBuilder.toString(), className, base)
+}
+
+fun getAllLanguageProperties(): List<Properties> {
+    val folder = file("src/main/resources/l10n")
+    val properties = mutableListOf<Properties>()
+
+    folder.walk().forEach { file ->
+        if (!file.isFile || file.extension != "properties") return@forEach
+
+        properties += Properties().also { it.load(file.bufferedReader()) }
+    }
+
+    return properties
+}
+
+fun String.tabStart(num: Int, newLine: Boolean = true): String {
+    val newLineChar = if (newLine) "\n" else ""
+
+    return newLineChar + "\t".repeat(num) + this
 }
 
