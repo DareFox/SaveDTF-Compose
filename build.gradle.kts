@@ -241,17 +241,26 @@ val generatedLanguageImpl = allLanguages.map {
 
     generateLanguageClass(it, generatedInterface, typeAlias)
 }
+
 // Save generated interface code
 generatedSourceDir.resolve("${generatedInterface.className}.kt").writeText(
     generatedInterface.code
 )
 
-// Create list for generated languages
-generatedSourceDir.resolve("langList.kt").writeText(
-    "package $classPackage" +
-            "\nval $registryName = mutableSetOf<${generatedInterface.className}>()"
-)
 
+// Create list for generated languages
+generatedSourceDir.resolve("langList.kt").let {
+    val codeBuilder = StringBuilder(200)
+
+    codeBuilder.append("package $classPackage")
+    codeBuilder.append("\nval AvailableLanguages = listOf<${generatedInterface.className}>(\n")
+    codeBuilder.append(generatedLanguageImpl.joinToString(",\n") {
+        "\t" + it.className
+    })
+    codeBuilder.append("\n)")
+
+    it.writeText(codeBuilder.toString())
+}
 // Save generated proxy class
 generatedSourceDir.resolve("${generatedProxy.className}.kt").writeText(
     generatedProxy.code
@@ -259,6 +268,7 @@ generatedSourceDir.resolve("${generatedProxy.className}.kt").writeText(
 
 // Save generated lang implementations
 generatedLanguageImpl.forEach {
+
     generatedSourceDir.resolve("${it.className}.kt").writeText(it.code)
 }
 
@@ -299,7 +309,7 @@ fun generateProxyClass(base: GeneratedInterface, className: String = "Proxy" + b
     val baseInterface = base.className
 
     codeBuilder.append("package $classPackage")
-    codeBuilder.append("\nclass ${className} (val current: $baseInterface, val default: $baseInterface): $baseInterface {")
+    codeBuilder.append("\nclass $className (val current: $baseInterface, val default: $baseInterface): $baseInterface {")
 
     base.listOfKeys.forEach {
         codeBuilder.append("override val $it: String".tabStart(1))
@@ -338,10 +348,7 @@ fun generateLanguageClass(
         codeBuilder.append("\n\ntypealias $aliasType = $className")
     }
 
-    codeBuilder.append("\n\nobject $className: ${base.className} {")
-
-    // Add to registry
-    codeBuilder.append("init { $registryName += this }".tabStart(1))
+    codeBuilder.append("\n\nobject $className: $baseInterface {")
 
     base.listOfKeys.forEach {
         val translationValue = languageProperties[it]?.toString()
