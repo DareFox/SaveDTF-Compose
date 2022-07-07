@@ -214,7 +214,7 @@ fun saveVersion(version: BuildVersion) {
 
 // Fallback language for proxy
 val defaultLang = "en_US"
-
+val registryName = "Languages"
 val allLanguages = getAllLanguageProperties()
 val defaultLangProperties = allLanguages.first {
     it.containsKey("LANG") && it["LANG"] == defaultLang
@@ -224,6 +224,7 @@ val defaultLangProperties = allLanguages.first {
 val classPackage = "ui.i18n"
 
 // Create build/generated folder
+// Also remove previous generated files
 val generatedSourceDir = file("build/generated/language/kotlin/").also { dir ->
     dir.deleteRecursively()
     dir.mkdirs()
@@ -240,10 +241,15 @@ val generatedLanguageImpl = allLanguages.map {
 
     generateLanguageClass(it, generatedInterface, typeAlias)
 }
-
 // Save generated interface code
 generatedSourceDir.resolve("${generatedInterface.className}.kt").writeText(
     generatedInterface.code
+)
+
+// Create list for generated languages
+generatedSourceDir.resolve("langList.kt").writeText(
+    "package $classPackage" +
+            "\nval $registryName = mutableSetOf<${generatedInterface.className}>()"
 )
 
 // Save generated proxy class
@@ -293,10 +299,10 @@ fun generateProxyClass(base: GeneratedInterface, className: String = "Proxy" + b
     val baseInterface = base.className
 
     codeBuilder.append("package $classPackage")
-    codeBuilder.append("\nclass $className(val current: $baseInterface, val default: $baseInterface): $baseInterface {")
+    codeBuilder.append("\nclass ${className} (val current: $baseInterface, val default: $baseInterface): $baseInterface {")
 
     base.listOfKeys.forEach {
-        codeBuilder.append("\n\toverride val $it: String")
+        codeBuilder.append("override val $it: String".tabStart(1))
 
         codeBuilder.append("get() = try {".tabStart(2))
         codeBuilder.append("current.$it".tabStart(3))
@@ -316,7 +322,11 @@ fun generateProxyClass(base: GeneratedInterface, className: String = "Proxy" + b
 
 data class GeneratedLanguageImpl(val code: String, val className: String, val baseInterface: GeneratedInterface)
 
-fun generateLanguageClass(languageProperties: Properties, base: GeneratedInterface, aliasType: String? = null) : GeneratedLanguageImpl {
+fun generateLanguageClass(
+    languageProperties: Properties,
+    base: GeneratedInterface,
+    aliasType: String? = null
+) : GeneratedLanguageImpl {
     val codeBuilder = StringBuilder(2000)
     val baseInterface = base.className
     val name = languageProperties["LANG"]
@@ -329,6 +339,9 @@ fun generateLanguageClass(languageProperties: Properties, base: GeneratedInterfa
     }
 
     codeBuilder.append("\n\nobject $className: ${base.className} {")
+
+    // Add to registry
+    codeBuilder.append("init { $registryName += this }".tabStart(1))
 
     base.listOfKeys.forEach {
         val translationValue = languageProperties[it]?.toString()
