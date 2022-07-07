@@ -231,6 +231,7 @@ val generatedSourceDir = file("build/generated/language/kotlin/").also { dir ->
 val generatedInterface = generateInterface(defaultLangProperties)
 
 val generatedProxy = generateProxyClass(generatedInterface)
+
 val generatedLanguageImpl = allLanguages.map {
     // Give default language typealias
     val typeAlias = if (it == defaultLangProperties) {
@@ -272,6 +273,7 @@ fun generateInterface(properties: Properties): GeneratedInterface {
     codeBuilder.append("\nsealed interface LanguageResource {")
 
     properties.forEach { k, _ ->
+        // create string field on each key & value pair
         val key = k.toString()
 
         if (key == "LANG") return@forEach
@@ -298,6 +300,9 @@ fun generateProxyClass(base: GeneratedInterface, className: String = "Proxy" + b
 
         codeBuilder.append("get() = try {".tabStart(2))
         codeBuilder.append("current.$it".tabStart(3))
+
+        // Catching Error instead of Exception
+        // because TO-DO function throws Error, not Exception (duh)
         codeBuilder.append("} catch (_: Error) {".tabStart(2))
 
         // If current language fails (e.g no translation), then use default language
@@ -355,6 +360,9 @@ fun getAllLanguageProperties(): List<Properties> {
     return properties
 }
 
+/**
+ * Add number of tabs at start of string
+ */
 fun String.tabStart(num: Int, newLine: Boolean = true): String {
     val newLineChar = if (newLine) "\n" else ""
 
