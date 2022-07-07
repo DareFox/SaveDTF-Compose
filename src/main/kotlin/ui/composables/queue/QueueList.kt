@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
+import ui.i18n.Lang
 import ui.viewmodel.queue.QueueViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -69,9 +70,10 @@ fun QueueList() {
                         ) {
                             Box(modifier = Modifier.padding(bottom = 30.dp)) {
                                 val status by entry.status.collectAsState()
+                                val lang by Lang.collectAsState()
 
                                 val buttons = mutableListOf(
-                                    ActionBarElement(FeatherIcons.Trash2, "delete") {
+                                    ActionBarElement(FeatherIcons.Trash2, lang.queueListRemove) {
                                         state.targetState = false
                                     },
                                 )

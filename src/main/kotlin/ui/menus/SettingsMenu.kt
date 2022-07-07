@@ -29,26 +29,28 @@ import compose.icons.feathericons.EyeOff
 import ui.composables.CheckVersion
 import ui.composables.FancyButton
 import ui.composables.directoryDialog
+import ui.i18n.Lang
 import ui.viewmodel.SettingsViewModel
 import util.desktop.openUrl
 
 @Composable
 fun SettingsMenu() {
     val categories = mutableListOf<@Composable () -> Unit>()
+    val lang by Lang.collectAsState()
 
     categories += {
-        SettingsCategory("Приложение") {
+        SettingsCategory(lang.settingsCategoryApp) {
             val fields = mutableListOf<@Composable () -> Unit>()
 
             val folderInput by SettingsViewModel.folderToSave.collectAsState()
 
             fields += {
                 SettingsTextField(
-                    name = "Папка сохранения",
+                    name = lang.settingsAppSaveFolder,
                     input = folderInput ?: "",
-                    textPlaceholder = "Нажми на меня, чтобы выбрать папку",
+                    textPlaceholder = lang.settingsAppSaveFolderPlaceholder,
                     onFieldClick = {
-                        directoryDialog("Choose Folder") {
+                        directoryDialog(lang.settingsAppNativeMenuDialog) {
                             if (it != null) {
                                 SettingsViewModel.setFolderToSave(it)
                             }
@@ -60,7 +62,7 @@ fun SettingsMenu() {
             fields += {
                 val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()
 
-                SettingsBoolField("Игнорировать обновления?", ignoreUpdates) {
+                SettingsBoolField(lang.settingsAppIgnoreUpdatesQuestion, ignoreUpdates) {
                     SettingsViewModel.setIgnoreUpdate(it)
                 }
             }
@@ -74,7 +76,7 @@ fun SettingsMenu() {
                         showWindow = !showWindow
                     },
                     buttonColors = ButtonDefaults.buttonColors(),
-                    placeholderButton = "Проверить обновления"
+                    placeholderButton = lang.settingsAppCheckUpdates
                 )
 
                 if (showWindow) {
@@ -87,18 +89,18 @@ fun SettingsMenu() {
     }
 
     categories += {
-        SettingsCategory("Токены") {
+        SettingsCategory(lang.settingsCategoryTokens) {
             val tokens by SettingsViewModel.tokens.collectAsState()
             val fields = mutableListOf<@Composable () -> Unit>()
 
             fields += {
                 Text(
-                    text = "Как получить токен?",
+                    text = lang.settingsTokensHowToGet,
                     textDecoration = TextDecoration.Underline,
                     style = MaterialTheme.typography.subtitle1,
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier.clickable {
-                        openUrl("https://github.com/DareFox/SaveDTF-Compose/blob/main/HOWTOGETTOKEN_RU.md")
+                        openUrl(lang.settingsTokensHowToGetURL)
                     },
                 )
             }
@@ -111,7 +113,7 @@ fun SettingsMenu() {
                         name = it.key.name,
                         input = token,
                         hideContent = true,
-                        textPlaceholder = "Вставь токен сюда"
+                        textPlaceholder = lang.settingsTokensPlaceholder
                     ) { input ->
                         if (input.isEmpty() || input.isBlank()) {
                             SettingsViewModel.setToken(null, it.key)
@@ -128,7 +130,7 @@ fun SettingsMenu() {
 
 
     categories += {
-        SettingsCategory("Загрузка") {
+        SettingsCategory(lang.settingsCategoryDownload) {
             val textWidth = 400.dp
             var retryAmount by remember { mutableStateOf("${SettingsViewModel.retryAmount.value}") }
             var mediaTimeout by remember { mutableStateOf("${SettingsViewModel.mediaTimeoutInSeconds.value}") }
@@ -159,9 +161,9 @@ fun SettingsMenu() {
                     On recomposition, previous incorrect input will be wiped and TextInput will show current state of attempts
                  */
                 SettingsTextField(
-                    name = "Кол-во попыток загрузки медиа",
+                    name = lang.settingsDownloadMediaAttempts,
                     input = retryAmount,
-                    textPlaceholder = "0 — бесконечность, отрицательное число - не пытаться ещё раз",
+                    textPlaceholder = lang.settingsDownloadMediaAttemptsPlaceholder,
                     hideContent = false,
                     width = textWidth
                 ) {
@@ -174,9 +176,9 @@ fun SettingsMenu() {
 
             fields += {
                 SettingsTextField(
-                    name = "Время ожидание загрузки медиа файла",
+                    name = lang.settingsDownloadMediaTimeout,
                     input = mediaTimeout,
-                    textPlaceholder = "0 или отрицательное число секунд - бесконечное ожидание.",
+                    textPlaceholder = lang.settingsDownloadMediaTimeoutPlaceholder,
                     hideContent = false,
                     width = textWidth
                 ) {
@@ -207,7 +209,7 @@ fun SettingsMenu() {
             val replaceErrors by SettingsViewModel.replaceErrorMedia.collectAsState()
 
             fields += {
-                SettingsBoolField("При ошибке сохранения медиа, заменять их на заглушку?", replaceErrors) {
+                SettingsBoolField(lang.settingsDownloadMediaReplaceOnError, replaceErrors) {
                     SettingsViewModel.setReplaceErrorMedia(it)
                 }
             }
@@ -215,7 +217,7 @@ fun SettingsMenu() {
             val downloadVideo by SettingsViewModel.downloadVideo.collectAsState()
 
             fields += {
-                SettingsBoolField("Скачивать видео?", downloadVideo) {
+                SettingsBoolField(lang.settingsDownloadVideoQuestion, downloadVideo) {
                     SettingsViewModel.setDownloadVideoMode(it)
                 }
             }
@@ -223,7 +225,7 @@ fun SettingsMenu() {
             val downloadImage by SettingsViewModel.downloadImage.collectAsState()
 
             fields += {
-                SettingsBoolField("Скачивать изображения?", downloadImage) {
+                SettingsBoolField(lang.settingsDownloadImageQuestion, downloadImage) {
                     SettingsViewModel.setDownloadImageMode(it)
                 }
             }
@@ -233,7 +235,7 @@ fun SettingsMenu() {
     }
 
     categories += {
-        SettingsCategory("Кэш") {
+        SettingsCategory(lang.settingsCategoryCache) {
             var result by remember { mutableStateOf<Boolean?>(null) }
             val backgroundColor = animateColorAsState(
                 when (result) {
@@ -256,7 +258,7 @@ fun SettingsMenu() {
                     result = SettingsViewModel.clearCache()
                 },
                 buttonColors = ButtonDefaults.buttonColors(backgroundColor.value, contentColor.value),
-                placeholderButton = "Очистить кэш"
+                placeholderButton = lang.settingsCacheClearAll
             )
         }
     }
@@ -326,6 +328,8 @@ fun SettingsTextField(
                 VisualTransformation.None
             }
 
+            val lang by Lang.collectAsState()
+
             OutlinedTextField(
                 enabled = onFieldClick == null,
                 value = input,
@@ -342,7 +346,7 @@ fun SettingsTextField(
                         val icon = if (passwordVisible) FeatherIcons.Eye else FeatherIcons.EyeOff
 
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(icon, "Hide/Show password")
+                            Icon(icon, lang.settingsTokensEyeIconDescription)
                         }
                     }
                 }

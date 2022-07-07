@@ -308,9 +308,11 @@ fun generateInterface(properties: Properties): GeneratedInterface {
         val comment = """
          /**
          * ### Default value ($tagFieldValue, $nameFieldValue): 
-         * **```
+         * 
+         * ```
          * $value
-         * ```**
+         * ```
+         * 
          */
         """.trimIndent()
 

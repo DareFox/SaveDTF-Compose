@@ -12,6 +12,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.X
+import ui.i18n.Lang
 import ui.theme.CustomPallet
 import ui.viewmodel.NotificationData
 import ui.viewmodel.NotificationType
@@ -50,6 +53,7 @@ fun Notification(
     onClose: () -> Unit,
     composable: @Composable () -> Unit,
 ) {
+    val lang by Lang.collectAsState()
     val shape = RoundedCornerShape(30)
 
     Surface(
@@ -73,7 +77,7 @@ fun Notification(
         ) {
             Icon(
                 imageVector = FeatherIcons.X,
-                contentDescription = "Close notification",
+                contentDescription = lang.notificationCloseDescription,
                 modifier = Modifier.clickable {
                     onClose()
                 },

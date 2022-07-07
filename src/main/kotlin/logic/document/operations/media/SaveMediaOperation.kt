@@ -6,6 +6,7 @@ import logic.document.operations.media.modules.IDownloadModule
 import logic.ktor.Client
 import logic.ktor.downloadUrl
 import org.jsoup.nodes.Document
+import ui.i18n.Lang
 import java.io.File
 
 class SaveMediaOperation(
@@ -15,8 +16,7 @@ class SaveMediaOperation(
     val saveFolder: File,
     val timeoutInSeconds: Int
 ): AbstractProcessorOperation() {
-    override val name: String = "Media saver"
-
+    override val name: String = Lang.value.saveMediaOperation
     override suspend fun process(document: Document): Document {
         downloaderModules.forEach {downloader ->
             val toDownload = downloader.filter(document)
@@ -25,23 +25,23 @@ class SaveMediaOperation(
                 val prefix = "${downloader.downloadingContentType} ${index + 1}/${toDownload.size}"
                 val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
                 val media = withProgressSuspend(
-                    "$prefix: Downloading ${url.second}..."
+                    Lang.value.saveMediaDownloading.format(prefix, url.second)
                 ) {
                     Client.downloadUrl(url.second, retryAmount, errMedia, timeoutInSeconds)
                 }
 
-                val file = withProgressSuspend("$prefix: Saving file...") {
+                val file = withProgressSuspend(Lang.value.savingFile.format(prefix)) {
                     saveTo(media, downloader.folder ?: "")
                 }
 
                 val relativePath = file.relativeTo(saveFolder).path
-                withProgress("$prefix: Transforming document...") {
+                withProgress(Lang.value.transformingDocument.format(prefix)) {
                     downloader.transform(url.first, relativePath)
                 }
             }
         }
 
-        withProgressSuspend("Saving index.html...") {
+        withProgressSuspend(Lang.value.savingIndexHtml) {
             val indexHTML = saveFolder.mkdirs().let { saveFolder.resolve("index.html") }
             yield()
             indexHTML.writeBytes(document.toString().toByteArray())

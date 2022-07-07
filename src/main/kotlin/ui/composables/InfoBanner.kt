@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import me.darefox.saveDTF_compose.BuildConfig
 import ui.SaveDtfTheme
+import ui.i18n.Lang
 import ui.viewmodel.AppViewModel
 import util.string.repeatOrEmpty
 
@@ -41,8 +42,9 @@ fun InfoBanner() {
             modifier = Modifier.padding(20.dp, 23.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val lang by Lang.collectAsState()
             var counter by remember { mutableStateOf(0) }
-            var infoText by remember { mutableStateOf("Забекапь все свои (и не только свои) статьи при помощи одной кнопки!") }
+            var infoText = lang.infoBanner
 
             Image(
                 painter = painterResource("img/charlie_95px.png"),
@@ -56,7 +58,7 @@ fun InfoBanner() {
                     .clickable {
                         counter++
                         if (counter >= 10) {
-                            infoText = "П Р Е К Р А Т И" + " И".repeatOrEmpty(counter - 10) + " ＞﹏＜"
+                            infoText = lang.infoBannerClickSpam.format(" ${lang.infoBannerClickSpamChar}".repeatOrEmpty(counter - 10))
                         }
                     }
             )
