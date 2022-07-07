@@ -75,6 +75,8 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
 }
 
+// TODO: Separate tasks to other *.gradle.kts files if possible
+
 /**
  * Build number tasks
  */
@@ -207,7 +209,6 @@ fun saveVersion(version: BuildVersion) {
     properties.store(propFile.bufferedWriter(), "Previous build version")
 }
 
-
 /**
  * L10n tasks
  */
@@ -215,10 +216,14 @@ fun saveVersion(version: BuildVersion) {
 // Fallback language for proxy
 val defaultLang = "en_US"
 val registryName = "Languages"
+
+val tagField = "LANG_TAG"
+val nameField = "LANG_NAME"
+
 val allLanguages = getAllLanguageProperties()
-val defaultLangProperties = allLanguages.first {
-    it.containsKey("LANG") && it["LANG"] == defaultLang
-}
+val defaultLangProperties = allLanguages.firstOrNull() {
+    it.containsKey(tagField) && it[tagField] == defaultLang
+} ?: throw IllegalArgumentException("No default language was detected with $tagField $defaultLang")
 
 // Package to save all generated classes
 val classPackage = "ui.i18n"
@@ -287,12 +292,14 @@ fun generateInterface(properties: Properties): GeneratedInterface {
 
     codeBuilder.append("package $classPackage")
     codeBuilder.append("\nsealed interface LanguageResource {")
-
+    // We
+    codeBuilder.append("\n\tval localeTag: String")
+    codeBuilder.append("\n\tval localeName: String")
     properties.forEach { k, _ ->
         // create string field on each key & value pair
         val key = k.toString()
 
-        if (key == "LANG") return@forEach
+        if (key == tagField || key == nameField)  return@forEach
 
         codeBuilder.append("\n\tval $key: String").also {
             keys += key
@@ -310,8 +317,13 @@ fun generateProxyClass(base: GeneratedInterface, className: String = "Proxy" + b
 
     codeBuilder.append("package $classPackage")
     codeBuilder.append("\nclass $className (val current: $baseInterface, val default: $baseInterface): $baseInterface {")
+    codeBuilder.append("\n\toverride val localeTag: String = current.localeTag")
+    codeBuilder.append("\n\toverride val localeName: String = current.localeName")
 
     base.listOfKeys.forEach {
+        // TODO: Provide convenient way to check metadata fields
+        if (it == tagField || it == nameField) return@forEach
+
         codeBuilder.append("override val $it: String".tabStart(1))
 
         codeBuilder.append("get() = try {".tabStart(2))
@@ -339,7 +351,7 @@ fun generateLanguageClass(
 ) : GeneratedLanguageImpl {
     val codeBuilder = StringBuilder(2000)
     val baseInterface = base.className
-    val name = languageProperties["LANG"]
+    val name = languageProperties[tagField]
     val className = "${name}LanguageResource"
 
     codeBuilder.append("package $classPackage")
@@ -349,6 +361,12 @@ fun generateLanguageClass(
     }
 
     codeBuilder.append("\n\nobject $className: $baseInterface {")
+
+    codeBuilder.append("\n\toverride val localeTag: String = " +
+            "\"${languageProperties[tagField] ?: throw IllegalArgumentException("No locale tag in $tagField field")}\"")
+
+    codeBuilder.append("\n\toverride val localeName: String = " +
+            "\"${languageProperties[nameField] ?: throw IllegalArgumentException("No locale name in $nameField field ($className)")}\"")
 
     base.listOfKeys.forEach {
         val translationValue = languageProperties[it]?.toString()
