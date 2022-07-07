@@ -290,17 +290,31 @@ fun generateInterface(properties: Properties): GeneratedInterface {
     val codeBuilder = StringBuilder(2000)
     val keys = mutableListOf<String>()
 
+    val tagFieldValue = properties[tagField]
+    val nameFieldValue = properties[nameField]
+
     codeBuilder.append("package $classPackage")
     codeBuilder.append("\nsealed interface LanguageResource {")
     // We
     codeBuilder.append("\n\tval localeTag: String")
     codeBuilder.append("\n\tval localeName: String")
-    properties.forEach { k, _ ->
+    properties.forEach { k, v ->
         // create string field on each key & value pair
+        val value = v.toString()
         val key = k.toString()
 
         if (key == tagField || key == nameField)  return@forEach
 
+        val comment = """
+         /**
+         * ### Default value ($tagFieldValue, $nameFieldValue): 
+         * **```
+         * $value
+         * ```**
+         */
+        """.trimIndent()
+
+        codeBuilder.append("\n", comment)
         codeBuilder.append("\n\tval $key: String").also {
             keys += key
         }
@@ -410,4 +424,3 @@ fun String.tabStart(num: Int, newLine: Boolean = true): String {
 
     return newLineChar + "\t".repeat(num) + this
 }
-
