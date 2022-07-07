@@ -211,10 +211,14 @@ fun saveVersion(version: BuildVersion) {
 /**
  * L10n tasks
  */
-val languages = getAllLanguageProperties()
 
 // Fallback language for proxy
-val baseClassLang = "en_US"
+val defaultLang = "en_US"
+
+val allLanguages = getAllLanguageProperties()
+val defaultLangProperties = allLanguages.first {
+    it.containsKey("LANG") && it["LANG"] == defaultLang
+}
 
 // Package to save all generated classes
 val classPackage = "ui.i18n"
@@ -224,12 +228,16 @@ val generatedSourceDir = file("build/generated/language/kotlin/").also { dir ->
     dir.deleteRecursively()
     dir.mkdirs()
 }
-val generatedInterface = generateInterfaceCode(languages.first {
-    it.containsKey("LANG") && it["LANG"] == baseClassLang
-})
-val generatedProxy = generateProxyClassCode(generatedInterface)
-val generatedLanguageImpl = languages.map {
-    generateLanguageImplementationClass(it, generatedInterface)
+val generatedInterface = generateInterface(defaultLangProperties)
+
+val generatedProxy = generateProxyClass(generatedInterface)
+val generatedLanguageImpl = allLanguages.map {
+    // Give default language typealias
+    val typeAlias = if (it == defaultLangProperties) {
+        "DefaultLanguageResource"
+    } else null
+
+    generateLanguageClass(it, generatedInterface, typeAlias)
 }
 
 // Save generated interface code
@@ -256,7 +264,7 @@ kotlin {
 
 data class GeneratedInterface(val code: String, val className: String, val listOfKeys: List<String>)
 
-fun generateInterfaceCode(properties: Properties): GeneratedInterface {
+fun generateInterface(properties: Properties): GeneratedInterface {
     val codeBuilder = StringBuilder(2000)
     val keys = mutableListOf<String>()
 
@@ -278,7 +286,7 @@ fun generateInterfaceCode(properties: Properties): GeneratedInterface {
 }
 data class GeneratedProxy(val code: String, val className: String, val baseInterface: GeneratedInterface)
 
-fun generateProxyClassCode(base: GeneratedInterface, className: String = "Proxy" + base.className): GeneratedProxy {
+fun generateProxyClass(base: GeneratedInterface, className: String = "Proxy" + base.className): GeneratedProxy {
     val codeBuilder = StringBuilder(2000)
     val baseInterface = base.className
 
@@ -303,14 +311,19 @@ fun generateProxyClassCode(base: GeneratedInterface, className: String = "Proxy"
 
 data class GeneratedLanguageImpl(val code: String, val className: String, val baseInterface: GeneratedInterface)
 
-fun generateLanguageImplementationClass(languageProperties: Properties, base: GeneratedInterface) : GeneratedLanguageImpl {
+fun generateLanguageClass(languageProperties: Properties, base: GeneratedInterface, aliasType: String? = null) : GeneratedLanguageImpl {
     val codeBuilder = StringBuilder(2000)
     val baseInterface = base.className
     val name = languageProperties["LANG"]
     val className = "${name}LanguageResource"
 
     codeBuilder.append("package $classPackage")
-    codeBuilder.append("\nobject $className: ${base.className} {")
+
+    if (aliasType != null) {
+        codeBuilder.append("\n\ntypealias $aliasType = $className")
+    }
+
+    codeBuilder.append("\n\nobject $className: ${base.className} {")
 
     base.listOfKeys.forEach {
         val translationValue = languageProperties[it]?.toString()
