@@ -373,7 +373,7 @@ fun generateLanguageClass(
         val valueForInsertion = if (translationValue == null) {
             "TODO(\"$name doesn't have translation for $it key\")"
         } else {
-            "\"$translationValue\""
+            "\"${translationValue.escapeAll()}\""
         }
 
         codeBuilder.append("override val $it: String".tabStart(1))
@@ -396,6 +396,10 @@ fun getAllLanguageProperties(): List<Properties> {
     }
 
     return properties
+}
+
+fun String.escapeAll(): String {
+    return this.replace("\"", "\\\"").replace("\n","\\n")
 }
 
 /**
