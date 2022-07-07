@@ -5,6 +5,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import logic.cache.buildCache
+import ui.i18n.AvailableLanguages
+import ui.i18n.DefaultLanguageResource
+import ui.i18n.LanguageResource
+import ui.i18n.ProxyLanguageResource
 import java.util.prefs.Preferences
 
 object SettingsViewModel {
@@ -17,7 +21,7 @@ object SettingsViewModel {
     private const val SAVE_FOLDER_STR_KEY = "save_folder"
     private const val DOWNLOAD_VIDEO_BOOL_KEY = "download_video"
     private const val DOWNLOAD_IMAGE_BOOL_KEY = "download_image"
-
+    private const val PROGRAM_LOCALE_KEY = "program_locale"
 
     /**
     ———————————No Updates?———————————
@@ -61,6 +65,7 @@ object SettingsViewModel {
     private val _downloadVideo = MutableStateFlow(getPrefDownloadVideo())
     private val _downloadImage = MutableStateFlow(getPrefDownloadImage())
     private val _ignoreUpdate = MutableStateFlow(getPrefIgnoreUpdates())
+    private val _proxyLocale = MutableStateFlow(getProxyLocale())
 
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
     val tokens: StateFlow<Map<Website, String>> = _tokens
@@ -71,6 +76,7 @@ object SettingsViewModel {
     val downloadVideo: StateFlow<Boolean> = _downloadVideo
     val downloadImage: StateFlow<Boolean> = _downloadImage
     val ignoreUpdate: StateFlow<Boolean> = _ignoreUpdate
+    val proxyLocale: StateFlow<LanguageResource> = _proxyLocale
 
     private fun getPrefReplaceErrorMedia() = preferences.getBoolean(ERROR_MEDIA_BOOL_KEY, true)
     private fun getPrefFolder() = preferences.get(SAVE_FOLDER_STR_KEY, null)
@@ -83,6 +89,11 @@ object SettingsViewModel {
     private fun getPrefIgnoreUpdates() = preferences.getBoolean(MUTE_UPDATES_NOTIFICATION_KEY, false)
     private fun getPrefMediaTimeout() = preferences.getInt(MEDIA_TIMEOUT_TIME_KEY, 300)
     private fun getPrefEntryTimeout() = preferences.getInt(ENTRY_TIMEOUT_TIME_KEY, -1)
+    private fun getPrefLocalTag() = preferences.get(PROGRAM_LOCALE_KEY, DefaultLanguageResource.localeName)
+    private fun getProxyLocale(default: LanguageResource = DefaultLanguageResource): LanguageResource {
+        val tag = getPrefLocalTag()
+        return ProxyLanguageResource(AvailableLanguages.firstOrNull { tag == it.localeTag} ?: default, default)
+    }
 
     fun setToken(token: String?, website: Website) {
         if (token == null || token.isEmpty() || token.isBlank()) {
@@ -136,6 +147,16 @@ object SettingsViewModel {
     fun setIgnoreUpdate(ignore: Boolean) {
         preferences.putBoolean(MUTE_UPDATES_NOTIFICATION_KEY, ignore)
         _ignoreUpdate.value = getPrefIgnoreUpdates()
+    }
+
+    fun setLocale(localeTag: String) {
+        preferences.put(PROGRAM_LOCALE_KEY, localeTag)
+        _proxyLocale.value = getProxyLocale()
+    }
+
+    fun setLocale(language: LanguageResource) {
+        preferences.put(PROGRAM_LOCALE_KEY, language.localeTag)
+        _proxyLocale.value = getProxyLocale()
     }
 
     fun clearCache(): Boolean {
