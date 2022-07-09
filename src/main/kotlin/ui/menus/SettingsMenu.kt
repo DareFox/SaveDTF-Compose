@@ -2,6 +2,7 @@ package ui.menus
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -24,12 +26,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.Eye
-import compose.icons.feathericons.EyeOff
+import compose.icons.feathericons.*
 import ui.composables.CheckVersion
 import ui.composables.FancyButton
 import ui.composables.directoryDialog
+import ui.i18n.AvailableLanguages
 import ui.i18n.Lang
+import ui.i18n.LanguageResource
 import ui.viewmodel.SettingsViewModel
 import util.desktop.openUrl
 
@@ -81,6 +84,17 @@ fun SettingsMenu() {
 
                 if (showWindow) {
                     CheckVersion(true)
+                }
+            }
+
+            fields += {
+                val currentLanguage by SettingsViewModel.proxyLocale.collectAsState()
+
+                SettingsDropdown("${currentLanguage.localeName} (${currentLanguage.localeTag})",
+                    AvailableLanguages.map {
+                    "${it.localeName} (${it.localeTag})" to it
+                }) {
+                    SettingsViewModel.setLocale(it)
                 }
             }
 
@@ -377,4 +391,53 @@ fun SettingsBoolField(
             )
         }
     }
+}
+
+@Composable
+fun <T> SettingsDropdown(
+    value: String,
+    items: List<Pair<String, T>>,
+    onFieldClick: (T) -> Unit
+) {
+    val lazyListState = rememberLazyListState()
+    val shape = RoundedCornerShape(5.dp)
+    var show by remember { mutableStateOf(false) }
+    val icon = if (show) FeatherIcons.ChevronUp else FeatherIcons.ChevronDown
+
+    Column {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(55.dp)
+                .clip(shape)
+                .border(1.dp, Color.Gray, shape)
+                .clickable {
+                show = !show
+            },
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
+                Text(text = value, style = MaterialTheme.typography.subtitle1)
+                Icon(icon, null)
+            }
+        }
+
+        if (show) {
+            LazyColumn(state = lazyListState, modifier = Modifier.heightIn(40.dp, 300.dp).clip(shape)) {
+                items(items, key = { it.first }) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .clickable {
+                            onFieldClick(it.second)
+                            show = !show
+                       }, contentAlignment = Alignment.CenterStart) {
+                        Text(text = it.first, style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(start = 10.dp))
+                    }
+                }
+            }
+        }
+    }
+
+
 }
