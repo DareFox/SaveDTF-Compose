@@ -38,13 +38,19 @@ fun InfoBanner() {
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colors.background
     ) {
+        val langState by Lang.collectAsState()
         Row(
             modifier = Modifier.padding(20.dp, 23.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val lang by Lang.collectAsState()
             var counter by remember { mutableStateOf(0) }
-            var infoText = lang.infoBanner
+
+            val infoText = if (counter - 10 > 0) {
+                val char = " " + langState.infoBannerClickSpamChar
+                langState.infoBannerClickSpam.format(char.repeatOrEmpty(counter - 10))
+            } else {
+                langState.infoBanner
+            }
 
             Image(
                 painter = painterResource("img/charlie_95px.png"),
@@ -57,9 +63,6 @@ fun InfoBanner() {
                     .background(Color.Black)
                     .clickable {
                         counter++
-                        if (counter >= 10) {
-                            infoText = lang.infoBannerClickSpam.format(" ${lang.infoBannerClickSpamChar}".repeatOrEmpty(counter - 10))
-                        }
                     }
             )
             Spacer(Modifier.width(20.dp))
