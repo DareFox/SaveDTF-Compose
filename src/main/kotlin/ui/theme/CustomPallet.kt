@@ -7,6 +7,6 @@ object CustomPallet {
     val success = Color.Green
     val onSuccess = Color.Black
 
-    val error = MaterialTheme.colors.error
+    val error = Color.Red
     val onError = Color.Black
 }
