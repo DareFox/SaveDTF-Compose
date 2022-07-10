@@ -46,35 +46,42 @@ val Lato = FontFamily(
     Font(resource = "font/Lato-Light.ttf", FontWeight.Light)
 )
 
+val Ubuntu = FontFamily(
+    Font(resource = "font/ubuntu/Ubuntu-Regular.ttf"),
+    Font(resource = "font/ubuntu/Ubuntu-Bold.ttf", FontWeight.Bold),
+    Font(resource = "font/ubuntu/Ubuntu-Light.ttf", FontWeight.Light),
+    Font(resource = "font/ubuntu/Ubuntu-Medium.ttf", FontWeight.Medium),
+)
+
 val typography = Typography(
     subtitle1 = TextStyle(
-        fontFamily = Lato,
-        fontSize = 1.4.em,
-        fontWeight = FontWeight.Light,
+        fontFamily = Ubuntu,
+        fontSize = 1.3.em,
+        fontWeight = FontWeight.Normal,
     ),
     subtitle2 = TextStyle(
-        fontFamily = Lato,
+        fontFamily = Ubuntu,
         fontSize = 1.1.em,
-        fontWeight = FontWeight.Light,
+        fontWeight = FontWeight.Normal,
     ),
     h1 = TextStyle(
         fontSize = 2.8.em,
-        fontFamily = Lato,
+        fontFamily = Ubuntu,
         fontWeight = FontWeight.Bold,
     ),
     h2 = TextStyle(
         fontSize = 2.3.em,
-        fontFamily = Lato,
+        fontFamily = Ubuntu,
         fontWeight = FontWeight.Bold,
     ),
     h3 = TextStyle(
         fontSize = 1.8.em,
-        fontFamily = Lato,
+        fontFamily = Ubuntu,
         fontWeight = FontWeight.Bold
     ),
     h4 = TextStyle(
         fontSize = 1.5.em,
-        fontFamily = Lato,
+        fontFamily = Ubuntu,
         fontWeight = FontWeight.Bold
     ),
 
