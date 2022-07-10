@@ -1,14 +1,11 @@
 package ui.menus
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -278,7 +275,6 @@ fun SettingsMenu() {
     }
 
     val lazyListState = rememberLazyListState()
-
     Box {
         LazyColumn(modifier = Modifier.padding(25.dp, 0.dp), state = lazyListState) {
             items(categories) {
@@ -297,7 +293,7 @@ fun SettingsMenu() {
 fun SettingsFields(field: List<@Composable () -> Unit>) {
     field.forEach {
         it()
-        Spacer(modifier = Modifier.fillMaxWidth().height(5.dp))
+        Spacer(modifier = Modifier.fillMaxWidth().height(15.dp))
     }
 }
 
