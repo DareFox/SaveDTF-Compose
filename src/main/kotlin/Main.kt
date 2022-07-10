@@ -11,6 +11,7 @@ import ui.AppUI
 import ui.SaveDtfTheme
 import ui.composables.CheckVersion
 import ui.composables.InfoPopupColumn
+import ui.i18n.Lang
 import ui.menus.NotificationsUI
 import util.desktop.openUrl
 import util.getCrashLogReport
@@ -47,6 +48,7 @@ fun main() {
     }
 }
 
+// TODO: Doesn't work, fix it again
 private fun CrashMenu(ex: Exception) {
     var show by mutableStateOf(true)
     val log = getCrashLogReport(ex)
@@ -57,18 +59,18 @@ private fun CrashMenu(ex: Exception) {
     }
 
     val actions = mutableListOf<Pair<String, () -> Unit>>().also {
-        it.add("Copy logs and report issue to GitHub" to {
+        it.add(Lang.value.crashReportCopyLogsAndReport to {
             copyLogToClipboard()
-            openUrl("https://github.com/DareFox/SaveDTF-Compose/issues/new?assignees=&labels=bug&template=bug_report.yml&title=%5BBUG%5D+%2ATitle+of+issue%2A%0A")
+            openUrl(Lang.value.crashReportURL)
         })
 
-        it.add("Copy logs" to ::copyLogToClipboard)
+        it.add(Lang.value.crashReportCopyLogs to ::copyLogToClipboard)
     }
 
     application {
         SaveDtfTheme(true) {
             if (show) {
-                InfoPopupColumn("CRASH (⊙﹏⊙′)", "Program has been crashed. Would you like to report it?", {
+                InfoPopupColumn(Lang.value.crashReportTitle, Lang.value.crashReportDescription, {
                     show = false
                 }, actions)
             }
