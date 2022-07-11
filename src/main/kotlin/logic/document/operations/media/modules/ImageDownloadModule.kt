@@ -15,7 +15,7 @@ object ImageDownloadModule: IDownloadModule {
     override val onErrorMedia: BinaryMedia? = Resources.imageLoadFail
 
     override fun filter(document: Document): List<Pair<Element, String>> {
-        return getImageContainers(document) + getGalleryImageContainers(document)
+        return getQuoteImageContainer(document) + getImageContainers(document) + getGalleryImageContainers(document)
     }
 
     private fun getImageContainers(document: Document): List<Pair<Element, String>> {
@@ -91,6 +91,16 @@ object ImageDownloadModule: IDownloadModule {
         }.flatten()
     }
 
+    private fun getQuoteImageContainer(document: Document): List<Pair<Element, String>> {
+        return document.getElementsByClass("block-quote__author-photo").filter {
+            it.attr("data-image-src").isNotEmpty() && it.tagName() == "img"
+        }.map {
+            // Set css style to img
+            it.attr("style", "height: 48px; width: 48px; margin-right: 20px; border-radius: 50%;")
+
+            it to it.attr("data-image-src")
+        }
+    }
 
     override fun transform(element: Element, relativePath: String) {
         element.attr("src", relativePath)

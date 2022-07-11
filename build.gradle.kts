@@ -3,8 +3,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.serialization") version "1.6.21"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("org.jetbrains.compose") version "1.1.1"
     id("org.openjfx.javafxplugin") version "0.0.10"
 }
@@ -58,7 +58,6 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("ch.qos.logback:logback-core:1.2.11")
-
 }
 
 javafx {
@@ -83,6 +82,7 @@ compose.desktop {
             description = "SaveDTF"
             vendor = "DareFox"
 
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("src/main/resources"))
             windows {
                 iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
                 dirChooser = true
@@ -106,6 +106,5 @@ compose.desktop {
                 "jdk.unsupported.desktop"
             )
         }
-
     }
 }
