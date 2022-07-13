@@ -34,10 +34,7 @@ import kotlinx.coroutines.launch
 import ui.SaveDtfTheme
 import ui.animations.pulseColor
 import ui.i18n.Lang
-import ui.viewmodel.queue.EntryQueueElementViewModel
-import ui.viewmodel.queue.IBookmarksElementViewModel
-import ui.viewmodel.queue.IEntryQueueElementViewModel
-import ui.viewmodel.queue.IQueueElementViewModel
+import ui.viewmodel.queue.*
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import java.awt.Desktop
 import java.io.File
