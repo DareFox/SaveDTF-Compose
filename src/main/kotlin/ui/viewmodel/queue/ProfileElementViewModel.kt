@@ -16,6 +16,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.yield
 import logic.document.SettingsBasedDocumentProcessor
 import org.jsoup.Jsoup
+import ui.i18n.Lang
 import util.coroutine.cancelOnSuspendEnd
 import util.filesystem.toDirectory
 import util.kmttapi.betterPublicKmtt
@@ -50,20 +51,19 @@ data class ProfileElementViewModel(
             } catch(ex: OsnovaRequestException) {
                 // 403 Forbidden
                 if (ex.httpResponse.status.value == 403) {
-                    error("Can't access user profile. Perhaps profile is hidden from anonymous users. If it's true, then add token in settings to access profile entries as authorized user")
+                    error(Lang.value.profileElementVmAccessError)
                 } else {
-                    error("Can't get user profile. Exception: $ex")
+                    error(Lang.value.profileElementVmGenericInitError.format(ex))
                 }
             } catch (ex: Exception) {
-                error("Can't get user profile. Exception: $ex")
+                error(Lang.value.profileElementVmGenericInitError.format(ex))
             }
         }
     }
 
     override suspend fun save(): Boolean {
         var result = true
-        val allEntriesMessage = "Getting all entries..." +
-                " If profile have a lot of entries, it could take a long time to get all of them"
+        val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
 
         elementMutex.withLock {
             inUse()
@@ -73,19 +73,19 @@ data class ProfileElementViewModel(
                     if (!processDocument(it)) { // process document and if there is error, change final result to false
                         result = false
                     }
-                    progress("Requesting next chunk of entries...")
+                    progress(Lang.value.profileElementVmNextChunk)
                 }
             }
 
             if (errorCounter > 0) {
                 saved()
-                progress("Downloaded $counter entries. Couldn't download $errorCounter entries:")
+                progress(Lang.value.profileElementVmSomeErrors.format(counter, errorCounter))
             } else if (errorCounter == counter) {
-                error("Couldn't download any of $errorCounter entries")
+                error(Lang.value.profileElementVmAllErrors.format(errorCounter))
                 clearProgress()
             } else {
                 saved()
-                progress("Downloaded all $counter entries.")
+                progress(Lang.value.profileElementVmNoErrors.format(counter))
             }
         }
 
