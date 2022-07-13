@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -29,7 +28,7 @@ import ui.composables.FancyButton
 import ui.composables.directoryDialog
 import ui.i18n.AvailableLanguages
 import ui.i18n.Lang
-import ui.i18n.LanguageResource
+import ui.theme.CustomPallet
 import ui.viewmodel.SettingsViewModel
 import util.desktop.openUrl
 
@@ -43,6 +42,36 @@ fun SettingsMenu() {
             val fields = mutableListOf<@Composable () -> Unit>()
 
             val folderInput by SettingsViewModel.folderToSave.collectAsState()
+
+            fields += {
+                var clicks by remember { mutableStateOf(0) }
+                var success by remember { mutableStateOf<Boolean?>(null) }
+                var isCleared by remember { mutableStateOf(false) }
+
+                val first = lang.settingsAppResetSettings
+                val second = lang.settingsAppResetSettingsConfirmation
+
+                val text = when {
+                    clicks <= 0 -> first
+                    clicks == 1 -> second
+                    else -> if (success!!) lang.settingsAppResetSettingsSuccess else lang.settingsAppResetSettingsError
+                }
+
+                val colors = when(success) {
+                    true -> ButtonDefaults.buttonColors(CustomPallet.successVariant)
+                    false -> ButtonDefaults.buttonColors(CustomPallet.error)
+                    else -> ButtonDefaults.buttonColors()
+                }
+
+                FancyButton(true, onClick = {
+                    clicks++
+
+                    if (clicks > 1 && !isCleared) {
+                        success = SettingsViewModel.resetAllSettings()
+                        isCleared = true // make reset button available only once
+                    }
+                }, placeholderButton = text, buttonColors = colors)
+            }
 
             fields += {
                 SettingsTextField(
@@ -251,7 +280,7 @@ fun SettingsMenu() {
             val backgroundColor = animateColorAsState(
                 when (result) {
                     null -> MaterialTheme.colors.primary
-                    result as Boolean -> Color.Green.copy(0.5f)
+                    result as Boolean -> CustomPallet.successVariant
                     else -> Color.Red
                 }
             )
