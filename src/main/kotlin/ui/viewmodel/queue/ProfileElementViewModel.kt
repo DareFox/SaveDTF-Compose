@@ -3,6 +3,7 @@ package ui.viewmodel.queue
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import exception.errorOnNull
+import kmtt.exception.OsnovaRequestException
 import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
 import kmtt.models.subsite.Subsite
@@ -46,6 +47,13 @@ data class ProfileElementViewModel(
             try {
                 _user.value = client.user.getUserByID(id)
                 readyToUse()
+            } catch(ex: OsnovaRequestException) {
+                // 403 Forbidden
+                if (ex.httpResponse.status.value == 403) {
+                    error("Can't access user profile. Perhaps profile is hidden from anonymous users. If it's true, then add token in settings to access profile entries as authorized user")
+                } else {
+                    error("Can't get user profile. Exception: $ex")
+                }
             } catch (ex: Exception) {
                 error("Can't get user profile. Exception: $ex")
             }
