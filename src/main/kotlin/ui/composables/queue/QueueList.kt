@@ -68,7 +68,7 @@ fun QueueList() {
                             enter = expandVertically(),
                             exit = shrinkVertically(),
                         ) {
-                            Box(modifier = Modifier.padding(bottom = 30.dp)) {
+                            Box(modifier = Modifier.padding(bottom = 10.dp)) {
                                 val status by entry.status.collectAsState()
                                 val lang by Lang.collectAsState()
 
