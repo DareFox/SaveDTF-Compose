@@ -191,9 +191,10 @@ fun QueueCard(
             Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp, bottom = 12.dp)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.h2,
+                    style = MaterialTheme.typography.h3,
                     maxLines = 1,
-                    color = onColor
+                    color = onColor,
+                    modifier = Modifier.padding(top = 10.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
