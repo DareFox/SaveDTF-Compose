@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import me.darefox.saveDTF_compose.BuildConfig
 import ui.SaveDtfTheme
+import ui.i18n.Lang
 import ui.viewmodel.AppViewModel
 import util.string.repeatOrEmpty
 
@@ -37,12 +38,19 @@ fun InfoBanner() {
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colors.background
     ) {
+        val langState by Lang.collectAsState()
         Row(
             modifier = Modifier.padding(20.dp, 23.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             var counter by remember { mutableStateOf(0) }
-            var infoText by remember { mutableStateOf("Забекапь все свои (и не только свои) статьи при помощи одной кнопки!") }
+
+            val infoText = if (counter - 10 > 0) {
+                val char = " " + langState.infoBannerClickSpamChar
+                langState.infoBannerClickSpam.format(char.repeatOrEmpty(counter - 10))
+            } else {
+                langState.infoBanner
+            }
 
             Image(
                 painter = painterResource("img/charlie_95px.png"),
@@ -55,9 +63,6 @@ fun InfoBanner() {
                     .background(Color.Black)
                     .clickable {
                         counter++
-                        if (counter >= 10) {
-                            infoText = "П Р Е К Р А Т И" + " И".repeatOrEmpty(counter - 10) + " ＞﹏＜"
-                        }
                     }
             )
             Spacer(Modifier.width(20.dp))

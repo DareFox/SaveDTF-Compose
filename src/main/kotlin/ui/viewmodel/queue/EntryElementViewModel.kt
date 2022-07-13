@@ -20,6 +20,7 @@ import logic.document.SettingsBasedDocumentProcessor
 import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import ui.i18n.Lang
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus.*
 import util.kmttapi.UrlUtil
@@ -91,7 +92,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
                 documentProcessor.value = null
 
                 logger.info { "Parsing website" }
-                val website = UrlUtil.getWebsiteType(url).errorOnNull("Website $url is not supported")
+                val website = UrlUtil.getWebsiteType(url).errorOnNull(Lang.value.entryQueueElementVmUrlNotSupported.format(url))
                 _website.value = website
 
                 val token = SettingsViewModel.tokens.value[website]
@@ -134,7 +135,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
             clearProgress()
             return true
         } catch (_: CancellationException) {
-            error("Operation cancelled")
+            error(Lang.value.entryQueueElementVmOperationCancelled)
             return false
         } catch (ex: QueueElementException) {
             error(ex.errorMessage)

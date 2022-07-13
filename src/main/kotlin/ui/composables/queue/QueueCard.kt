@@ -33,7 +33,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.SaveDtfTheme
 import ui.animations.pulseColor
-import ui.viewmodel.queue.*
+import ui.i18n.Lang
+import ui.viewmodel.queue.EntryQueueElementViewModel
+import ui.viewmodel.queue.IBookmarksElementViewModel
+import ui.viewmodel.queue.IEntryQueueElementViewModel
+import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import java.awt.Desktop
 import java.io.File
@@ -269,15 +273,16 @@ fun QueueCard(
                     }
 
                     val buttons = actionBar.toMutableList()
+                    val lang by Lang.collectAsState()
 
                     if (status == QueueElementStatus.SAVED) {
-                        buttons.add(ActionBarElement(FeatherIcons.Folder, "Открыть папку") {
+                        buttons.add(ActionBarElement(FeatherIcons.Folder, lang.queueCardOpen) {
                             Desktop.getDesktop().open(File(viewModel.pathToSave))
                         })
                     }
 
                     if (status in listOf(QueueElementStatus.READY_TO_USE, QueueElementStatus.SAVED)) {
-                        buttons += ActionBarElement(FeatherIcons.Download, "Сохранить") {
+                        buttons += ActionBarElement(FeatherIcons.Download, lang.queueCardSave) {
                             scope.launch(CoroutineName("Save operation coroutine")) {
                                 if (status != QueueElementStatus.IN_USE) { // Double check
                                     it.save()
@@ -287,7 +292,7 @@ fun QueueCard(
                     }
 
                     if (status != QueueElementStatus.INITIALIZING) {
-                        buttons += ActionBarElement(FeatherIcons.RefreshCcw, "Обновить информацию") {
+                        buttons += ActionBarElement(FeatherIcons.RefreshCcw, lang.queueCardRefresh) {
                             scope.launch(CoroutineName("Init operation coroutine")) {
                                 it.initialize()
                             }

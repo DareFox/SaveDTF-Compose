@@ -11,6 +11,7 @@ import ui.AppUI
 import ui.SaveDtfTheme
 import ui.composables.CheckVersion
 import ui.composables.InfoPopupColumn
+import ui.i18n.Lang
 import ui.menus.NotificationsUI
 import util.desktop.openUrl
 import util.getCrashLogReport
@@ -18,16 +19,20 @@ import java.awt.Toolkit
 import java.awt.Window
 import java.awt.datatransfer.StringSelection
 import java.awt.event.WindowEvent
+import kotlin.system.exitProcess
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    application {
+    var lastError: Throwable? by mutableStateOf(null)
+
+    // copied from https://github.com/JetBrains/compose-jb/issues/1764#issuecomment-1029805939
+    application(exitProcessOnExit = false) {
         CompositionLocalProvider(
             LocalWindowExceptionHandlerFactory provides object : WindowExceptionHandlerFactory {
                 override fun exceptionHandler(window: Window) = WindowExceptionHandler {
-                    CrashMenu(it as Exception)
+                    lastError = it
                     window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
-                    throw it
                 }
             }
         ) {
@@ -45,9 +50,16 @@ fun main() {
             }
         }
     }
-}
 
-private fun CrashMenu(ex: Exception) {
+
+    if (lastError != null) {
+        ComposeCrashMenu(lastError!!)
+        exitProcess(1)
+    } else {
+        exitProcess(0)
+    }
+}
+private fun ComposeCrashMenu(ex: Throwable) {
     var show by mutableStateOf(true)
     val log = getCrashLogReport(ex)
 
@@ -57,18 +69,18 @@ private fun CrashMenu(ex: Exception) {
     }
 
     val actions = mutableListOf<Pair<String, () -> Unit>>().also {
-        it.add("Copy logs and report issue to GitHub" to {
+        it.add(Lang.value.crashReportCopyLogsAndReport to {
             copyLogToClipboard()
-            openUrl("https://github.com/DareFox/SaveDTF-Compose/issues/new?assignees=&labels=bug&template=bug_report.yml&title=%5BBUG%5D+%2ATitle+of+issue%2A%0A")
+            openUrl(Lang.value.crashReportURL)
         })
 
-        it.add("Copy logs" to ::copyLogToClipboard)
+        it.add(Lang.value.crashReportCopyLogs to ::copyLogToClipboard)
     }
 
     application {
         SaveDtfTheme(true) {
             if (show) {
-                InfoPopupColumn("CRASH (⊙﹏⊙′)", "Program has been crashed. Would you like to report it?", {
+                InfoPopupColumn(Lang.value.crashReportTitle, Lang.value.crashReportDescription, {
                     show = false
                 }, actions)
             }
