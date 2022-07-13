@@ -53,6 +53,7 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
     when (viewModel) {
         is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
         is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
+        is IProfileElementViewModel -> ProfileCard(viewModel, actionBar)
     }
 }
 

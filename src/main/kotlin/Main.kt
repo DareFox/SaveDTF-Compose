@@ -51,6 +51,7 @@ fun main() {
         }
     }
 
+
     if (lastError != null) {
         ComposeCrashMenu(lastError!!)
         exitProcess(1)
