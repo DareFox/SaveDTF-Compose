@@ -19,16 +19,20 @@ import java.awt.Toolkit
 import java.awt.Window
 import java.awt.datatransfer.StringSelection
 import java.awt.event.WindowEvent
+import kotlin.system.exitProcess
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    application {
+    var lastError: Throwable? by mutableStateOf(null)
+
+    // copied from https://github.com/JetBrains/compose-jb/issues/1764#issuecomment-1029805939
+    application(exitProcessOnExit = false) {
         CompositionLocalProvider(
             LocalWindowExceptionHandlerFactory provides object : WindowExceptionHandlerFactory {
                 override fun exceptionHandler(window: Window) = WindowExceptionHandler {
-                    CrashMenu(it as Exception)
+                    lastError = it
                     window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
-                    throw it
                 }
             }
         ) {
@@ -46,10 +50,15 @@ fun main() {
             }
         }
     }
-}
 
-// TODO: Doesn't work, fix it again
-private fun CrashMenu(ex: Exception) {
+    if (lastError != null) {
+        ComposeCrashMenu(lastError!!)
+        exitProcess(1)
+    } else {
+        exitProcess(0)
+    }
+}
+private fun ComposeCrashMenu(ex: Throwable) {
     var show by mutableStateOf(true)
     val log = getCrashLogReport(ex)
 
