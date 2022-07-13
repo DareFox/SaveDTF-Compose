@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.yield
 import logic.document.SettingsBasedDocumentProcessor
 import org.jsoup.Jsoup
 import util.coroutine.cancelOnSuspendEnd
@@ -41,9 +42,9 @@ data class ProfileElementViewModel(
     override suspend fun initialize() {
         elementMutex.withLock {
             initializing()
+            client = betterPublicKmtt(site) // recreate client if token changed
             try {
                 _user.value = client.user.getUserByID(id)
-
                 readyToUse()
             } catch (ex: Exception) {
                 error("Can't get user profile. Exception: $ex")
@@ -60,6 +61,7 @@ data class ProfileElementViewModel(
             inUse()
             withProgressSuspend(allEntriesMessage) {
                 client.user.getAllUserEntries(id) {
+                    yield()
                     if (!processDocument(it)) { // process document and if there is error, change final result to false
                         result = false
                     }
@@ -88,6 +90,7 @@ data class ProfileElementViewModel(
         var result = true
 
         for (entry in list) {
+            yield()
             try {
                 val document = entry
                     .entryContent
