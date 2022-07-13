@@ -13,6 +13,7 @@ import java.util.prefs.Preferences
 
 object SettingsViewModel {
     private val preferences = Preferences.userRoot().node("savedtf-prefs")
+    private val eventListeners = mutableListOf<() -> Unit>()
 
     private const val ERROR_MEDIA_BOOL_KEY = "replace_error_media"
     private const val MEDIA_RETRY_AMOUNT_KEY = "retry_amount"
@@ -42,30 +43,24 @@ object SettingsViewModel {
      */
     private const val MUTE_UPDATES_NOTIFICATION_KEY = "no_updates_${AppViewModel.VERSION}"
 
-    private val _replaceErrorMedia = MutableStateFlow(getPrefReplaceErrorMedia())
-    private val _tokens = MutableStateFlow(
-        mapOf<Website, String>(
-            Website.DTF to getPrefToken(Website.DTF),
-            Website.VC to getPrefToken(Website.VC),
-            Website.TJ to getPrefToken(Website.TJ)
-        )
-    )
+    private val _replaceErrorMedia = createUpdatableState { getPrefReplaceErrorMedia() }
+    private val _tokens = createUpdatableState { getPrefAllTokens() }
 
     /**
      * Get token from current state.
      */
     fun StateFlow<Map<Website, String>>.getToken(website: Website): String {
-        return tokens.value.get(website)!!
+        return this.value.get(website)!!
     }
 
-    private val _retryAmount = MutableStateFlow(getPrefRetryAmount())
-    private val _mediaTimeoutInSeconds = MutableStateFlow(getPrefMediaTimeout())
-    private val _entryTimeoutInSeconds = MutableStateFlow(getPrefEntryTimeout())
-    private val _folderToSave = MutableStateFlow<String?>(getPrefFolder())
-    private val _downloadVideo = MutableStateFlow(getPrefDownloadVideo())
-    private val _downloadImage = MutableStateFlow(getPrefDownloadImage())
-    private val _ignoreUpdate = MutableStateFlow(getPrefIgnoreUpdates())
-    private val _proxyLocale = MutableStateFlow(getProxyLocale())
+    private val _retryAmount = createUpdatableState { getPrefRetryAmount() }
+    private val _mediaTimeoutInSeconds = createUpdatableState { getPrefMediaTimeout() }
+    private val _entryTimeoutInSeconds = createUpdatableState { getPrefEntryTimeout() }
+    private val _folderToSave = createUpdatableState<String?> { getPrefFolder() }
+    private val _downloadVideo = createUpdatableState { getPrefDownloadVideo() }
+    private val _downloadImage = createUpdatableState { getPrefDownloadImage() }
+    private val _ignoreUpdate = createUpdatableState { getPrefIgnoreUpdates() }
+    private val _proxyLocale = createUpdatableState { getProxyLocale() }
 
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
     val tokens: StateFlow<Map<Website, String>> = _tokens
@@ -77,6 +72,12 @@ object SettingsViewModel {
     val downloadImage: StateFlow<Boolean> = _downloadImage
     val ignoreUpdate: StateFlow<Boolean> = _ignoreUpdate
     val proxyLocale: StateFlow<LanguageResource> = _proxyLocale
+
+    private fun getPrefAllTokens() = mapOf(
+        Website.DTF to getPrefToken(Website.DTF),
+        Website.VC to getPrefToken(Website.VC),
+        Website.TJ to getPrefToken(Website.TJ)
+    )
 
     private fun getPrefReplaceErrorMedia() = preferences.getBoolean(ERROR_MEDIA_BOOL_KEY, true)
     private fun getPrefFolder() = preferences.get(SAVE_FOLDER_STR_KEY, null)
@@ -102,11 +103,7 @@ object SettingsViewModel {
             preferences.node("tkn").put(website.name, token.trim())
         }
 
-        _tokens.update {
-            val map = it.toMutableMap()
-            map[website] = getPrefToken(website)
-            map
-        }
+        _tokens.update { getPrefAllTokens() }
     }
 
     fun setFolderToSave(folder: String?) {
@@ -163,4 +160,49 @@ object SettingsViewModel {
         return buildCache().clearAll()
     }
 
+    /**
+     * Reset all preferences.
+     *
+     * True on success, false on failure
+     */
+    fun resetAllSettings(): Boolean {
+        return (try {
+            recursivePreferencesReset(preferences)
+            true
+        } catch (ex: Exception) {
+            false
+        }).also { updateAllStates() }
+    }
+
+    /**
+     * Create MutableStateFlow that updates on [updateAllStates] funciton call
+     */
+    private fun <T> createUpdatableState(getter: () -> T): MutableStateFlow<T> {
+        val state = MutableStateFlow(getter())
+
+        eventListeners.add {
+            state.update { getter() }
+        }
+
+        return state
+    }
+
+    /**
+     * Update all states by calling set up getter function in [eventListeners]
+     */
+    private fun updateAllStates() {
+        eventListeners.forEach {
+            it()
+        }
+    }
+
+    private fun recursivePreferencesReset(preferences: Preferences) {
+        // Remove all key-value pairs (child nodes not affected)
+        preferences.clear()
+
+        // Retrieve all child nodes of this preferences object and clear them too
+        preferences.childrenNames().forEach {
+            recursivePreferencesReset(preferences.node(it))
+        }
+    }
 }
