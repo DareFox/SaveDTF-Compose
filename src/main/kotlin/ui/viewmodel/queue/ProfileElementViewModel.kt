@@ -26,11 +26,12 @@ import java.io.File
 interface IProfileElementViewModel : IQueueElementViewModel {
     val site: Website
     val user: StateFlow<Subsite?>
+    val id: Long
 }
 
 data class ProfileElementViewModel(
     override val site: Website,
-    val id: Long
+    override val id: Long
 ): AbstractElementViewModel(), IProfileElementViewModel {
     val _user = MutableStateFlow<Subsite?>(null)
 
