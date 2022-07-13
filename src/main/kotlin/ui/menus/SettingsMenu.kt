@@ -401,19 +401,22 @@ fun SettingsBoolField(
     onInputChange: (Boolean) -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(name, style = MaterialTheme.typography.subtitle1)
-        }
-        Box(modifier = Modifier.requiredWidth(100.dp).scale(1.2f)) {
-            Switch(
-                input, onCheckedChange = onInputChange, colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colors.primary,
-                    checkedTrackColor = MaterialTheme.colors.primaryVariant
+        Text(name, style = MaterialTheme.typography.subtitle1, modifier = Modifier.weight(2.2f))
+        Spacer(modifier = Modifier.weight(0.3f))
+        Surface(modifier = Modifier.weight(1f)) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                // TODO: Fix clipping
+                Switch(
+                    input, onCheckedChange = onInputChange, colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.primary,
+                        checkedTrackColor = MaterialTheme.colors.primaryVariant
+                    ),
+                    modifier = Modifier.wrapContentSize(
+                        align = Alignment.TopEnd,
+                        unbounded = true
+                    ).scale(1.3f)
                 )
-            )
+            }
         }
     }
 }
