@@ -79,13 +79,13 @@ data class ProfileElementViewModel(
 
             if (errorCounter > 0) {
                 saved()
-                progress("Downloaded $counter bookmarks. Couldn't download $errorCounter bookmarks")
+                progress("Downloaded $counter entries. Couldn't download $errorCounter entries:")
             } else if (errorCounter == counter) {
-                error("Couldn't download any of $errorCounter bookmarks")
+                error("Couldn't download any of $errorCounter entries")
                 clearProgress()
             } else {
                 saved()
-                progress("Downloaded all $counter bookmarks.")
+                progress("Downloaded all $counter entries.")
             }
         }
 
