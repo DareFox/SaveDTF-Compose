@@ -3,6 +3,9 @@ package logic.document.operations
 import logic.document.AbstractProcessorOperation
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
+import org.jsoup.parser.Tag
 import util.filesystem.readResource
 
 /**
@@ -26,12 +29,27 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
                 .first()
         }
 
+        val javascript = withProgressSuspend("Getting JS for wrapper") {
+            readResource("templates/index.js").readText()
+        }
+
+        val css = withProgressSuspend("Getting CSS for wrapper") {
+            readResource("templates/style.css").readText()
+        }
+
         requireNotNull(wrapper) {
             "There's no wrapper in html template"
         }
 
         withProgressSuspend("Combining template with document") {
-            wrapper.appendChild(document.body())
+            wrapper
+                .appendChild(document.body())
+                .appendChild(Element("script").also {
+                    it.html(javascript)
+                })
+                .appendChild(Element("style").also {
+                    it.html(css)
+                })
         }
 
         return templateDocument
