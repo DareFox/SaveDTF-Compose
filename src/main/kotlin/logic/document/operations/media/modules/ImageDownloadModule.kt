@@ -42,13 +42,15 @@ object ImageDownloadModule: IDownloadModule {
         return document.getElementsByClass("gall").mapNotNull { gallery ->
             val dataHolder = gallery.children().firstOrNull { child -> child.attr("name") == "gallery-data-holder" }
 
-
+            // If gallery data exists
             dataHolder?.let { holder ->
+                // Parse it
                 val data = Json.parseToJsonElement(holder.wholeText())
 
                 if (data is JsonArray) {
                     val elements = mutableListOf<Pair<Element, String>>()
 
+                    // Convert data object to images ID
                     data.forEach { element ->
                         try {
                             val id = element.jsonObject["image"]?.jsonObject?.get("data")?.jsonObject?.get("uuid")
@@ -65,8 +67,13 @@ object ImageDownloadModule: IDownloadModule {
                         } catch (_: Exception) {}
                     }
 
+                    // Limit gallery size in class to maxium of 5 element
+                    // Required by CSS/JS gallery module:
+                    // https://github.com/sir-coffee-or-tea/darefox-dtf-saver-css
+                    val gallerySizeClass = "gall--${elements.size.coerceAtMost(5)}"
+
                     // Replace old gallery elements with new elements
-                    val newGallery = Element("div").addClass("gall")
+                    val newGallery = Element("div").addClass("gall").addClass(gallerySizeClass)
                     gallery.replaceWith(newGallery)
 
                     elements.forEachIndexed { index, it ->
