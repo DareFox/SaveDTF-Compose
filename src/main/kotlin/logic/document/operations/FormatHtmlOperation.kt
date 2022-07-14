@@ -37,6 +37,11 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
             readResource("templates/style.css").readText()
         }
 
+        val galleryModal = withProgressSuspend("Getting gallery module") {
+            val code = readResource("templates/galleryModal.html").readText()
+            Jsoup.parse(code)
+        }
+
         requireNotNull(wrapper) {
             "There's no wrapper in html template"
         }
@@ -44,11 +49,13 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
         withProgressSuspend("Combining template with document") {
             wrapper
                 .appendChild(document.body())
-                .appendChild(Element("script").also {
-                    it.html(javascript)
-                })
+                .appendChild(galleryModal.body())
                 .appendChild(Element("style").also {
                     it.html(css)
+                })
+                // Important: Add JS as last element
+                .appendChild(Element("script").also {
+                    it.html(javascript)
                 })
         }
 
