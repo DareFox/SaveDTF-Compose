@@ -20,6 +20,7 @@ import ui.SaveDtfTheme
 import ui.composables.FancyButton
 import ui.composables.FancyInputField
 import ui.composables.queue.QueueList
+import ui.i18n.Lang
 import ui.viewmodel.NotificationData
 import ui.viewmodel.NotificationType
 import ui.viewmodel.NotificationsViewModel
@@ -48,9 +49,10 @@ fun QueueCreatorMenu() {
 
             val hasFolder by SettingsViewModel.folderToSave.collectAsState()
             val supported = queueVM.canCreateQueueElement(input)
+            val lang by Lang.collectAsState()
             val errorMessage = when {
-                hasFolder == null -> "Установите папку для сохранений в настройках"
-                input.isNotEmpty() && !supported -> "Неверный URL"
+                hasFolder == null -> lang.queueCreatorFolderError
+                input.isNotEmpty() && !supported -> lang.queueCreatorInvalidURL
                 else -> null
             }
 
@@ -74,7 +76,7 @@ fun QueueCreatorMenu() {
                             input = ""
                         },
                         input = input,
-                        placeholderInput = "Вставь ссылку сюда",
+                        placeholderInput = lang.queueCreatorPlaceholder,
                         enabled = enable,
                         isError = errorMessage != null,
                         errorMessage = errorMessage
@@ -98,7 +100,7 @@ fun QueueCreatorMenu() {
                                 QueueViewModel.createBookmarks(website).let { QueueViewModel.add(it) }
                             }, onDisabledClick = {
                                 NotificationsViewModel.add(NotificationData(
-                                    text = "Add $website token to save bookmarks from it",
+                                    text = lang.queueCreatorNoTokenError.format(website),
                                     type = NotificationType.ERROR,
                                     onScreenDuration = 5
                                 ))
@@ -170,7 +172,7 @@ fun QueueCreatorMenu() {
                     FancyButton(enable, onClick = {
                         queueVM.createAndAddQueueElement(input)
                         input = ""
-                    }, "Добавить в очередь")
+                    }, lang.queueCreatorAddToQueue)
                 }
                 buttons.forEach {
                     // add buttons

@@ -33,10 +33,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.SaveDtfTheme
 import ui.animations.pulseColor
-import ui.viewmodel.queue.EntryQueueElementViewModel
-import ui.viewmodel.queue.IBookmarksElementViewModel
-import ui.viewmodel.queue.IEntryQueueElementViewModel
-import ui.viewmodel.queue.IQueueElementViewModel
+import ui.i18n.Lang
+import ui.viewmodel.queue.*
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import java.awt.Desktop
 import java.io.File
@@ -52,6 +50,7 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
     when (viewModel) {
         is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
         is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
+        is IProfileElementViewModel -> ProfileCard(viewModel, actionBar)
     }
 }
 
@@ -192,9 +191,10 @@ fun QueueCard(
             Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp, bottom = 12.dp)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.h2,
+                    style = MaterialTheme.typography.h3,
                     maxLines = 1,
-                    color = onColor
+                    color = onColor,
+                    modifier = Modifier.padding(top = 10.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -271,15 +271,16 @@ fun QueueCard(
                     }
 
                     val buttons = actionBar.toMutableList()
+                    val lang by Lang.collectAsState()
 
                     if (status == QueueElementStatus.SAVED) {
-                        buttons.add(ActionBarElement(FeatherIcons.Folder, "Открыть папку") {
+                        buttons.add(ActionBarElement(FeatherIcons.Folder, lang.queueCardOpen) {
                             Desktop.getDesktop().open(File(viewModel.pathToSave))
                         })
                     }
 
                     if (status in listOf(QueueElementStatus.READY_TO_USE, QueueElementStatus.SAVED)) {
-                        buttons += ActionBarElement(FeatherIcons.Download, "Сохранить") {
+                        buttons += ActionBarElement(FeatherIcons.Download, lang.queueCardSave) {
                             scope.launch(CoroutineName("Save operation coroutine")) {
                                 if (status != QueueElementStatus.IN_USE) { // Double check
                                     it.save()
@@ -289,7 +290,7 @@ fun QueueCard(
                     }
 
                     if (status != QueueElementStatus.INITIALIZING) {
-                        buttons += ActionBarElement(FeatherIcons.RefreshCcw, "Обновить информацию") {
+                        buttons += ActionBarElement(FeatherIcons.RefreshCcw, lang.queueCardRefresh) {
                             scope.launch(CoroutineName("Init operation coroutine")) {
                                 it.initialize()
                             }

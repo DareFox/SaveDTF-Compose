@@ -10,6 +10,7 @@ import logic.cache.buildCache
 import logic.document.operations.media.BinaryMedia
 import logic.document.operations.media.MediaMetadata
 import mu.KotlinLogging
+import ui.i18n.Lang
 import util.filesystem.convertToValidName
 import util.kmttapi.getMediaIdOrNull
 import util.cache.getValueWithMetadata
@@ -100,9 +101,9 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
 
             // If no replaceOnError media, throw exception
             if (response == null) {
-                throw catched.exceptionOrNull() ?: RuntimeException("No response from server or can't connect to server")
+                throw catched.exceptionOrNull() ?: RuntimeException(Lang.value.ktorServerNoResponse)
             } else {
-                throw IllegalArgumentException("Server responded with ${response.status} status")
+                throw IllegalArgumentException(Lang.value.ktorErrorResponseStatus.format(response.status))
             }
         }
 

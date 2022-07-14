@@ -3,6 +3,7 @@ package ui.composables.queue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import ui.i18n.Lang
 import ui.viewmodel.queue.IEntryQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel
 
@@ -12,12 +13,13 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
     val website by viewModel.website.collectAsState()
+    val lang by Lang.collectAsState()
 
-    val title = if (entry == null) "Статья" else {
+    val title = if (entry == null) lang.entryCard else {
         val entryTitle = entry?.title
 
         if (entryTitle?.isEmpty() != false) {
-            "Без названия"
+            lang.entryNoTitle
         } else {
             entryTitle
         }

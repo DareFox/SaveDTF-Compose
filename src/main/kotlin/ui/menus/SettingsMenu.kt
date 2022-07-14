@@ -1,13 +1,11 @@
 package ui.menus
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -24,31 +22,64 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.Eye
-import compose.icons.feathericons.EyeOff
+import compose.icons.feathericons.*
 import ui.composables.CheckVersion
 import ui.composables.FancyButton
 import ui.composables.directoryDialog
+import ui.i18n.AvailableLanguages
+import ui.i18n.Lang
+import ui.theme.CustomPallet
 import ui.viewmodel.SettingsViewModel
 import util.desktop.openUrl
 
 @Composable
 fun SettingsMenu() {
     val categories = mutableListOf<@Composable () -> Unit>()
+    val lang by Lang.collectAsState()
 
     categories += {
-        SettingsCategory("Приложение") {
+        SettingsCategory(lang.settingsCategoryApp) {
             val fields = mutableListOf<@Composable () -> Unit>()
 
             val folderInput by SettingsViewModel.folderToSave.collectAsState()
 
             fields += {
+                var clicks by remember { mutableStateOf(0) }
+                var success by remember { mutableStateOf<Boolean?>(null) }
+                var isCleared by remember { mutableStateOf(false) }
+
+                val first = lang.settingsAppResetSettings
+                val second = lang.settingsAppResetSettingsConfirmation
+
+                val text = when {
+                    clicks <= 0 -> first
+                    clicks == 1 -> second
+                    else -> if (success!!) lang.settingsAppResetSettingsSuccess else lang.settingsAppResetSettingsError
+                }
+
+                val colors = when(success) {
+                    true -> ButtonDefaults.buttonColors(CustomPallet.successVariant)
+                    false -> ButtonDefaults.buttonColors(CustomPallet.error)
+                    else -> ButtonDefaults.buttonColors()
+                }
+
+                FancyButton(true, onClick = {
+                    clicks++
+
+                    if (clicks > 1 && !isCleared) {
+                        success = SettingsViewModel.resetAllSettings()
+                        isCleared = true // make reset button available only once
+                    }
+                }, placeholderButton = text, buttonColors = colors)
+            }
+
+            fields += {
                 SettingsTextField(
-                    name = "Папка сохранения",
+                    name = lang.settingsAppSaveFolder,
                     input = folderInput ?: "",
-                    textPlaceholder = "Нажми на меня, чтобы выбрать папку",
+                    textPlaceholder = lang.settingsAppSaveFolderPlaceholder,
                     onFieldClick = {
-                        directoryDialog("Choose Folder") {
+                        directoryDialog(lang.settingsAppNativeMenuDialog) {
                             if (it != null) {
                                 SettingsViewModel.setFolderToSave(it)
                             }
@@ -60,7 +91,7 @@ fun SettingsMenu() {
             fields += {
                 val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()
 
-                SettingsBoolField("Игнорировать обновления?", ignoreUpdates) {
+                SettingsBoolField(lang.settingsAppIgnoreUpdatesQuestion, ignoreUpdates) {
                     SettingsViewModel.setIgnoreUpdate(it)
                 }
             }
@@ -74,11 +105,22 @@ fun SettingsMenu() {
                         showWindow = !showWindow
                     },
                     buttonColors = ButtonDefaults.buttonColors(),
-                    placeholderButton = "Проверить обновления"
+                    placeholderButton = lang.settingsAppCheckUpdates
                 )
 
                 if (showWindow) {
                     CheckVersion(true)
+                }
+            }
+
+            fields += {
+                val currentLanguage by SettingsViewModel.proxyLocale.collectAsState()
+
+                SettingsDropdown("${currentLanguage.localeName} (${currentLanguage.localeTag})",
+                    AvailableLanguages.map {
+                    "${it.localeName} (${it.localeTag})" to it
+                }) {
+                    SettingsViewModel.setLocale(it)
                 }
             }
 
@@ -87,18 +129,18 @@ fun SettingsMenu() {
     }
 
     categories += {
-        SettingsCategory("Токены") {
+        SettingsCategory(lang.settingsCategoryTokens) {
             val tokens by SettingsViewModel.tokens.collectAsState()
             val fields = mutableListOf<@Composable () -> Unit>()
 
             fields += {
                 Text(
-                    text = "Как получить токен?",
+                    text = lang.settingsTokensHowToGet,
                     textDecoration = TextDecoration.Underline,
                     style = MaterialTheme.typography.subtitle1,
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier.clickable {
-                        openUrl("https://github.com/DareFox/SaveDTF-Compose/blob/main/HOWTOGETTOKEN_RU.md")
+                        openUrl(lang.settingsTokensHowToGetURL)
                     },
                 )
             }
@@ -111,7 +153,7 @@ fun SettingsMenu() {
                         name = it.key.name,
                         input = token,
                         hideContent = true,
-                        textPlaceholder = "Вставь токен сюда"
+                        textPlaceholder = lang.settingsTokensPlaceholder
                     ) { input ->
                         if (input.isEmpty() || input.isBlank()) {
                             SettingsViewModel.setToken(null, it.key)
@@ -128,7 +170,7 @@ fun SettingsMenu() {
 
 
     categories += {
-        SettingsCategory("Загрузка") {
+        SettingsCategory(lang.settingsCategoryDownload) {
             val textWidth = 400.dp
             var retryAmount by remember { mutableStateOf("${SettingsViewModel.retryAmount.value}") }
             var mediaTimeout by remember { mutableStateOf("${SettingsViewModel.mediaTimeoutInSeconds.value}") }
@@ -159,9 +201,9 @@ fun SettingsMenu() {
                     On recomposition, previous incorrect input will be wiped and TextInput will show current state of attempts
                  */
                 SettingsTextField(
-                    name = "Кол-во попыток загрузки медиа",
+                    name = lang.settingsDownloadMediaAttempts,
                     input = retryAmount,
-                    textPlaceholder = "0 — бесконечность, отрицательное число - не пытаться ещё раз",
+                    textPlaceholder = lang.settingsDownloadMediaAttemptsPlaceholder,
                     hideContent = false,
                     width = textWidth
                 ) {
@@ -174,9 +216,9 @@ fun SettingsMenu() {
 
             fields += {
                 SettingsTextField(
-                    name = "Время ожидание загрузки медиа файла",
+                    name = lang.settingsDownloadMediaTimeout,
                     input = mediaTimeout,
-                    textPlaceholder = "0 или отрицательное число секунд - бесконечное ожидание.",
+                    textPlaceholder = lang.settingsDownloadMediaTimeoutPlaceholder,
                     hideContent = false,
                     width = textWidth
                 ) {
@@ -207,7 +249,7 @@ fun SettingsMenu() {
             val replaceErrors by SettingsViewModel.replaceErrorMedia.collectAsState()
 
             fields += {
-                SettingsBoolField("При ошибке сохранения медиа, заменять их на заглушку?", replaceErrors) {
+                SettingsBoolField(lang.settingsDownloadMediaReplaceOnError, replaceErrors) {
                     SettingsViewModel.setReplaceErrorMedia(it)
                 }
             }
@@ -215,7 +257,7 @@ fun SettingsMenu() {
             val downloadVideo by SettingsViewModel.downloadVideo.collectAsState()
 
             fields += {
-                SettingsBoolField("Скачивать видео?", downloadVideo) {
+                SettingsBoolField(lang.settingsDownloadVideoQuestion, downloadVideo) {
                     SettingsViewModel.setDownloadVideoMode(it)
                 }
             }
@@ -223,7 +265,7 @@ fun SettingsMenu() {
             val downloadImage by SettingsViewModel.downloadImage.collectAsState()
 
             fields += {
-                SettingsBoolField("Скачивать изображения?", downloadImage) {
+                SettingsBoolField(lang.settingsDownloadImageQuestion, downloadImage) {
                     SettingsViewModel.setDownloadImageMode(it)
                 }
             }
@@ -233,12 +275,12 @@ fun SettingsMenu() {
     }
 
     categories += {
-        SettingsCategory("Кэш") {
+        SettingsCategory(lang.settingsCategoryCache) {
             var result by remember { mutableStateOf<Boolean?>(null) }
             val backgroundColor = animateColorAsState(
                 when (result) {
                     null -> MaterialTheme.colors.primary
-                    result as Boolean -> Color.Green.copy(0.5f)
+                    result as Boolean -> CustomPallet.successVariant
                     else -> Color.Red
                 }
             )
@@ -256,13 +298,12 @@ fun SettingsMenu() {
                     result = SettingsViewModel.clearCache()
                 },
                 buttonColors = ButtonDefaults.buttonColors(backgroundColor.value, contentColor.value),
-                placeholderButton = "Очистить кэш"
+                placeholderButton = lang.settingsCacheClearAll
             )
         }
     }
 
     val lazyListState = rememberLazyListState()
-
     Box {
         LazyColumn(modifier = Modifier.padding(25.dp, 0.dp), state = lazyListState) {
             items(categories) {
@@ -281,7 +322,7 @@ fun SettingsMenu() {
 fun SettingsFields(field: List<@Composable () -> Unit>) {
     field.forEach {
         it()
-        Spacer(modifier = Modifier.fillMaxWidth().height(5.dp))
+        Spacer(modifier = Modifier.fillMaxWidth().height(15.dp))
     }
 }
 
@@ -326,6 +367,8 @@ fun SettingsTextField(
                 VisualTransformation.None
             }
 
+            val lang by Lang.collectAsState()
+
             OutlinedTextField(
                 enabled = onFieldClick == null,
                 value = input,
@@ -342,7 +385,7 @@ fun SettingsTextField(
                         val icon = if (passwordVisible) FeatherIcons.Eye else FeatherIcons.EyeOff
 
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(icon, "Hide/Show password")
+                            Icon(icon, lang.settingsTokensEyeIconDescription)
                         }
                     }
                 }
@@ -358,19 +401,71 @@ fun SettingsBoolField(
     onInputChange: (Boolean) -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(name, style = MaterialTheme.typography.subtitle1, modifier = Modifier.weight(2.2f))
+        Spacer(modifier = Modifier.weight(0.3f))
+        Surface(modifier = Modifier.weight(1f)) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                // TODO: Fix clipping
+                Switch(
+                    input, onCheckedChange = onInputChange, colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.primary,
+                        checkedTrackColor = MaterialTheme.colors.primaryVariant
+                    ),
+                    modifier = Modifier.wrapContentSize(
+                        align = Alignment.TopEnd,
+                        unbounded = true
+                    ).scale(1.3f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun <T> SettingsDropdown(
+    value: String,
+    items: List<Pair<String, T>>,
+    onFieldClick: (T) -> Unit
+) {
+    val lazyListState = rememberLazyListState()
+    val shape = RoundedCornerShape(5.dp)
+    var show by remember { mutableStateOf(false) }
+    val icon = if (show) FeatherIcons.ChevronUp else FeatherIcons.ChevronDown
+
+    Column {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(55.dp)
+                .clip(shape)
+                .border(1.dp, Color.Gray, shape)
+                .clickable {
+                show = !show
+            },
+            contentAlignment = Alignment.CenterStart
         ) {
-            Text(name, style = MaterialTheme.typography.subtitle1)
+            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
+                Text(text = value, style = MaterialTheme.typography.subtitle1)
+                Icon(icon, null)
+            }
         }
-        Box(modifier = Modifier.requiredWidth(100.dp).scale(1.2f)) {
-            Switch(
-                input, onCheckedChange = onInputChange, colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colors.primary,
-                    checkedTrackColor = MaterialTheme.colors.primaryVariant
-                )
-            )
+
+        if (show) {
+            LazyColumn(state = lazyListState, modifier = Modifier.heightIn(40.dp, 300.dp).clip(shape)) {
+                items(items, key = { it.first }) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .clickable {
+                            onFieldClick(it.second)
+                            show = !show
+                       }, contentAlignment = Alignment.CenterStart) {
+                        Text(text = it.first, style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(start = 10.dp))
+                    }
+                }
+            }
         }
     }
+
+
 }

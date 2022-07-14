@@ -2,7 +2,7 @@ package util
 
 import me.darefox.saveDTF_compose.BuildConfig
 
-fun getCrashLogReport(ex: Exception): String {
+fun getCrashLogReport(ex: Throwable): String {
     val stringBuilder = StringBuilder()
     
     stringBuilder.title("PROGRAM VERSION")
@@ -22,7 +22,7 @@ fun getCrashLogReport(ex: Exception): String {
     stringBuilder.title("STACKTRACE")
     stringBuilder.append(ex.stackTraceToString())
 
-    return stringBuilder.toString()
+    return stringBuilder.toString().trim()
 }
 
 private fun StringBuilder.title(title: String) {

@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
 import logic.document.SettingsBasedDocumentProcessor
 import org.jsoup.Jsoup
+import ui.i18n.Lang
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.SettingsViewModel.getToken
 import util.coroutine.cancelOnSuspendEnd
@@ -40,7 +41,7 @@ data class BookmarksElementViewModel(
                 client.user.getMe()
                 readyToUse()
             } catch (ex: Exception) {
-                error("Error while requesting your profile. Is your token in settings correct?")
+                error(Lang.value.bookmarksElementVmProfileError)
             }
         }
     }
@@ -79,29 +80,27 @@ data class BookmarksElementViewModel(
 
     override suspend fun save(): Boolean {
         var result = true
-        val allEntriesMessage = "Getting all entries..." +
-                " If you have a lot of entries, it could take a long time to get all of them"
 
         elementMutex.withLock { // run only 1 function at a time
             inUse()
-            withProgressSuspend(allEntriesMessage) { // show progress message at start
+            withProgressSuspend(Lang.value.bookmarksElementVmAllEntriesMessage) { // show progress message at start
                 client.user.getAllMyFavoriteEntries { // save each chunk
                     if (!processDocument(it)) { // process document and if there is error, change final result to false
                         result = false
                     }
-                    progress("Requesting next chunk of entries...")
+                    progress(Lang.value.bookmarksElementVmNextChunk)
                 }
             }
 
             if (errorCounter > 0) {
                 saved()
-                progress("Downloaded $counter bookmarks. Couldn't download $errorCounter bookmarks")
+                progress(Lang.value.bookmarksElementVmSomeErrors.format(counter, errorCounter))
             } else if (errorCounter == counter) {
-                error("Couldn't download any of $errorCounter bookmarks")
+                error(Lang.value.bookmarksElementVmAllErrors.format(errorCounter))
                 clearProgress()
             } else {
                 saved()
-                progress("Downloaded all $counter bookmarks.")
+                progress(Lang.value.bookmarksElementVmNoErrors.format(counter))
             }
         }
 

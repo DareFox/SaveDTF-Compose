@@ -22,6 +22,12 @@ object QueueViewModel {
     val creationStateMap: StateFlow<Map<IQueueElementViewModel, MutableTransitionState<Boolean>>> = _creationStateMap
 
     private val urlChecks: List<UrlChecker> = listOf(
+        UrlChecker(UrlUtil::isUserProfile) {
+            add(ProfileElementViewModel(
+                UrlUtil.getWebsiteType(it)!!,
+                UrlUtil.getProfileID(it)
+            ))
+        },
         UrlChecker(UrlUtil::isEntry) {
             add(EntryQueueElementViewModel(it))
         },

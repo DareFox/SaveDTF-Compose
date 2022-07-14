@@ -1,26 +1,41 @@
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.*
 import ui.AppUI
 import ui.SaveDtfTheme
 import ui.composables.CheckVersion
-import ui.composables.InfoPopup
 import ui.composables.InfoPopupColumn
+import ui.i18n.Lang
 import ui.menus.NotificationsUI
 import util.desktop.openUrl
 import util.getCrashLogReport
 import java.awt.Toolkit
+import java.awt.Window
 import java.awt.datatransfer.StringSelection
+import java.awt.event.WindowEvent
+import kotlin.system.exitProcess
 
+
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    try {
-        application {
+    var lastError: Throwable? by mutableStateOf(null)
+
+    // copied from https://github.com/JetBrains/compose-jb/issues/1764#issuecomment-1029805939
+    application(exitProcessOnExit = false) {
+        CompositionLocalProvider(
+            LocalWindowExceptionHandlerFactory provides object : WindowExceptionHandlerFactory {
+                override fun exceptionHandler(window: Window) = WindowExceptionHandler {
+                    lastError = it
+                    window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
+                }
+            }
+        ) {
             Window(
                 onCloseRequest = ::exitApplication,
                 title = "SaveDTF!",
@@ -34,31 +49,40 @@ fun main() {
                 }
             }
         }
-    } catch(ex: Exception) {
-        var show by mutableStateOf(true)
-        val log = getCrashLogReport(ex)
+    }
 
-        fun copyLogToClipboard() {
-            val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-            clipboard.setContents(StringSelection(log), null)
-        }
 
-        val actions = mutableListOf<Pair<String, () -> Unit>>().also {
-            it.add("Copy logs and report issue to GitHub" to {
-                copyLogToClipboard()
-                openUrl("https://github.com/DareFox/SaveDTF-Compose/issues/new?assignees=&labels=bug&template=bug_report.yml&title=%5BBUG%5D+%2ATitle+of+issue%2A%0A")
-            })
+    if (lastError != null) {
+        ComposeCrashMenu(lastError!!)
+        exitProcess(1)
+    } else {
+        exitProcess(0)
+    }
+}
+private fun ComposeCrashMenu(ex: Throwable) {
+    var show by mutableStateOf(true)
+    val log = getCrashLogReport(ex)
 
-            it.add("Copy logs" to ::copyLogToClipboard)
-        }
+    fun copyLogToClipboard() {
+        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        clipboard.setContents(StringSelection(log), null)
+    }
 
-        application {
-            SaveDtfTheme(true) {
-                if (show) {
-                    InfoPopupColumn("CRASH (⊙﹏⊙′)", "Program has been crashed. Would you like to report it?", {
-                        show = false
-                    }, actions)
-                }
+    val actions = mutableListOf<Pair<String, () -> Unit>>().also {
+        it.add(Lang.value.crashReportCopyLogsAndReport to {
+            copyLogToClipboard()
+            openUrl(Lang.value.crashReportURL)
+        })
+
+        it.add(Lang.value.crashReportCopyLogs to ::copyLogToClipboard)
+    }
+
+    application {
+        SaveDtfTheme(true) {
+            if (show) {
+                InfoPopupColumn(Lang.value.crashReportTitle, Lang.value.crashReportDescription, {
+                    show = false
+                }, actions)
             }
         }
     }

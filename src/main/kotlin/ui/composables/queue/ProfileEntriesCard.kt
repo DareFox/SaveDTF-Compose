@@ -5,20 +5,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import ui.i18n.Lang
 import ui.viewmodel.queue.IBookmarksElementViewModel
+import ui.viewmodel.queue.IProfileElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel
 
 @Composable
-fun BookmarksCard(viewModel: IBookmarksElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
+fun ProfileCard(viewModel: IProfileElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
     val lang by Lang.collectAsState()
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
-    val author = viewModel.site.name
+    val author by viewModel.user.collectAsState()
+    val immutableAuthor = author
+
+    val title = if (immutableAuthor != null) {
+        lang.profileElementVmCardTitleWithName.format(immutableAuthor.name)
+    } else {
+        lang.profileElementVmCardTitleWithID.format(viewModel.id)
+    }
 
     SimpleCard(
         viewModel = viewModel,
         actionBar = actionBar,
-        title = lang.bookmarksCard,
-        author = author,
+        title = title,
+        author = viewModel.site.name,
         status = status,
         error = if (status == IQueueElementViewModel.QueueElementStatus.ERROR) error else null,
         website = viewModel.site

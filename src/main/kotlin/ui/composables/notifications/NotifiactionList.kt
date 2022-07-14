@@ -70,10 +70,12 @@ inline fun NotificationList() {
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        VerticalScrollbar(
-            modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
-            adapter = rememberScrollbarAdapter(lazyListState)
-        )
+        if (notifications.isNotEmpty()) {
+            VerticalScrollbar(
+                modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
+                adapter = rememberScrollbarAdapter(lazyListState)
+            )
+        }
     }
 
     scope.launch { // scroll on top, when adding new elements
