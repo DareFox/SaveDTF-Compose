@@ -62,29 +62,35 @@ object ImageDownloadModule: IDownloadModule {
                             }
 
                             url?.let {
-                                elements += Element("img") to url
+                                elements += Element("div") to url
                             }
                         } catch (_: Exception) {}
                     }
 
-                    // Limit gallery size in class to maxium of 5 element
+                    // Limit gallery size in class to maximum of 5 elements
                     // Required by CSS/JS gallery module:
                     // https://github.com/sir-coffee-or-tea/darefox-dtf-saver-css
-                    val gallerySizeClass = "gall--${elements.size.coerceAtMost(5)}"
+                    val maxPreviewGallerySize = 5
+                    val gallerySizeClass = "gall--${elements.size.coerceAtMost(maxPreviewGallerySize)}"
 
                     // Replace old gallery elements with new elements
                     val newGallery = Element("div").addClass("gall").addClass(gallerySizeClass)
                     gallery.replaceWith(newGallery)
 
-                    elements.forEachIndexed { index, it ->
-                        val img = it.first.also {
-                            // Set css style to img
-                            it.attr("style", "object-fit: contain; width: 100%; height: 100%;")
-                        }
-
-                        val div = Element("div").also {
+                    elements.forEachIndexed { index, pair ->
+                        val div = pair.first.also {
                             it.attr("pos", index.toString())
-                            it.appendChild(img)
+
+                            // On fifth (based on maxPreviewGallerySize) preview element show +n of remaining images
+                            // Ignore if fifth element is the last element in array, to prevent "+0" text on preview
+                            if (index == maxPreviewGallerySize - 1 && elements.size > maxPreviewGallerySize) {
+                                val remainingSize = elements.size - maxPreviewGallerySize
+                                it.attr("data-more", "+$remainingSize")
+                            } else {
+                                // To remove black transparent overlay on last gallery preview element
+                                // data-more attribute should be empty like this: ""
+                                it.attr("data-more", "")
+                            }
                         }
 
                         newGallery.appendChild(div)
@@ -97,11 +103,29 @@ object ImageDownloadModule: IDownloadModule {
             }
         }.flatten()
     }
-
-
     override fun transform(element: Element, relativePath: String) {
-        element.attr("src", relativePath)
+        if (element.tagName() == "div") {
+            element.attr("style", createBackgroundImageStyleValue(relativePath))
+        } else {
+            // Assuming it's img element
+            element.attr("src", relativePath)
+        }
     }
 
     override val downloadingContentType: String = "Image"
+
+    /**
+     * Create background-image value for style tag
+     *
+     * Example:
+     * ```
+     * "background-image: url('[YOUR FILEPATH HERE]')"
+     * ```
+     */
+    private fun createBackgroundImageStyleValue(filePath: String): String {
+        val slashRegex = """\\""".toRegex()
+
+        // replace backslashes to forward slashes
+        return "background-image: url('${filePath.replace(slashRegex, "/")}')"
+    }
 }
