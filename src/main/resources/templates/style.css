@@ -1121,3 +1121,8 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
         display: none;
     }
 }
+
+.block-delimiter {
+    font-size: 3em;
+    text-align: center;
+}

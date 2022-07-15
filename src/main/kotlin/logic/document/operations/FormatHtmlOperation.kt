@@ -63,6 +63,12 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
                 })
         }
 
+        withProgressSuspend("Format separators") {
+            wrapper.getElementsByClass("block-delimiter").forEach {
+                it.text("***")
+            }
+        }
+
         return templateDocument
     }
 }
