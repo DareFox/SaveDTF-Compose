@@ -23,7 +23,7 @@ class SettingsBasedDocumentProcessor(
     val saveFolder: File,
     document: Document,
     val entry: Entry? = null
-    ): AbstractProgress() {
+): AbstractProgress() {
     private val necessaryFirstOperations = listOf(
         RemoveCssOperation,
         FormatHtmlOperation,
