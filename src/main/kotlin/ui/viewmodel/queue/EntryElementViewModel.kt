@@ -125,7 +125,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
             val path = pathToSave.errorOnNull("No path to save")
             val document = document.errorOnNull("Parsed document is null")
 
-            val processor = SettingsBasedDocumentProcessor(File(path), document)
+            val processor = SettingsBasedDocumentProcessor(File(path), document, entry.value)
             documentProcessor.value = processor
 
             yield()

@@ -1,5 +1,6 @@
 package logic.document
 
+import kmtt.models.entry.Entry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -20,12 +21,13 @@ import java.io.File
  */
 class SettingsBasedDocumentProcessor(
     val saveFolder: File,
-    document: Document
-): AbstractProgress() {
+    document: Document,
+    val entry: Entry? = null
+    ): AbstractProgress() {
     private val necessaryFirstOperations = listOf(
         RemoveCssOperation,
         FormatHtmlOperation,
-        ChangeTitleOperation
+        ChangeTitleOperation(entry)
     )
 
     private val necessaryLastOperations = listOf(

@@ -58,7 +58,7 @@ data class BookmarksElementViewModel(
                     .errorOnNull("Entry html is null")
                     .let { Jsoup.parse(it) } // parse document
 
-                val processor = SettingsBasedDocumentProcessor(entry.toDirectory(File(pathToSave, "bookmarks/${site.name}")), document)
+                val processor = SettingsBasedDocumentProcessor(entry.toDirectory(File(pathToSave, "bookmarks/${site.name}")), document, entry)
                 val newCounter = ++counter
 
                 processor
