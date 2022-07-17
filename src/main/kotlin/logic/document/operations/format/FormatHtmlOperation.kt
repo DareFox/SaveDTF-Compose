@@ -1,8 +1,9 @@
-package logic.document.operations.html
+package logic.document.operations.format
 
 import logic.document.AbstractProcessorOperation
-import logic.document.operations.html.modules.FixSeparatorModule
-import logic.document.operations.html.modules.IHtmlFormatModule
+import logic.document.operations.format.modules.FixPersonBlockModule
+import logic.document.operations.format.modules.FixSeparatorModule
+import logic.document.operations.format.modules.IHtmlFormatModule
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -19,24 +20,18 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
         get() = lang.value.htmlFormatOperation
 
     override suspend fun process(document: Document): Document {
-        val template = withProgressSuspend(lang.value.readingHtmlTemplate) {
-            readResource("templates/entry.html").readText()
-        }
-        val templateDocument = withProgressSuspend(lang.value.parsingHtmlTemplate) {
-            Jsoup.parse(template)
-        }
-
-        var baseDocument = combineWithTemplate(document, templateDocument)
+        var result = document
 
         val operations = listOf<IHtmlFormatModule>(
-            FixSeparatorModule
+            FixSeparatorModule,
+            FixPersonBlockModule
         )
 
         operations.forEach {
-            baseDocument = it.process(baseDocument)
+            result = it.process(result)
         }
 
-        return baseDocument
+        return result
     }
 
     private fun combineWithTemplate(kmttDocument: Document, templateDocument: Document): Document {

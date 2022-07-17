@@ -1,4 +1,4 @@
-package logic.document.operations.html.modules
+package logic.document.operations.format.modules
 
 import org.jsoup.nodes.Document
 
