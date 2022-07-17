@@ -4,10 +4,8 @@ package logic.document.operations
 import kmtt.models.entry.Entry
 
 import logic.document.AbstractProcessorOperation
-import logic.document.operations.FormatHtmlOperation
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
-import ui.viewmodel.SettingsViewModel
 
 /**
  * Change title to SaveDTF
