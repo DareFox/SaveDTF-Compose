@@ -33,42 +33,42 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
                 .first()
         }
 
-        val javascript = withProgressSuspend("Getting JS for wrapper") {
-            readResource("templates/index.js").readText()
-        }
-
-        val css = withProgressSuspend("Getting CSS for wrapper") {
-            readResource("templates/style.css").readText()
-        }
-
-        val galleryModal = withProgressSuspend("Getting gallery module") {
-            val code = readResource("templates/galleryModal.html").readText()
-            Jsoup.parse(code)
-        }
-
         requireNotNull(wrapper) {
             lang.value.noWrapperError
         }
 
         withProgressSuspend("Combining template with document") {
-            wrapper
-                .appendChild(document.body())
-                .appendChild(galleryModal.body())
-                .appendChild(Element("style").also {
-                    it.html(css)
-                })
-                // Important: Add JS as last element
-                .appendChild(Element("script").also {
-                    it.html(javascript)
-                })
+            connectJsAndCss(document, wrapper)
         }
 
         withProgressSuspend("Format separators") {
-            wrapper.getElementsByClass("block-delimiter").forEach {
-                it.text("***")
-            }
+            fixSeparators(wrapper)
         }
 
         return templateDocument
     }
+}
+
+private fun fixSeparators(wrapper: Element) {
+    wrapper.getElementsByClass("block-delimiter").forEach {
+        it.text("***")
+    }
+}
+private fun connectJsAndCss(kmttDocument: Document, wrapper: Element) {
+    val javascript = readResource("templates/index.js").readText()
+
+    val css = readResource("templates/style.css").readText()
+
+    val galleryModal = readResource("templates/galleryModal.html").readText().let { Jsoup.parse(it) }
+
+    wrapper
+        .appendChild(kmttDocument.body())
+        .appendChild(galleryModal.body())
+        .appendChild(Element("style").also {
+            it.html(css)
+        })
+        // Important: Add JS as last element
+        .appendChild(Element("script").also {
+            it.html(javascript)
+        })
 }
