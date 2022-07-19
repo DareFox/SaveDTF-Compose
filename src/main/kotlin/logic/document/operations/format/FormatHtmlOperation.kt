@@ -2,6 +2,7 @@ package logic.document.operations.format
 
 import logic.document.AbstractProcessorOperation
 import logic.document.operations.format.modules.FixPersonBlockModule
+import logic.document.operations.format.modules.FixQuizModule
 import logic.document.operations.format.modules.FixSeparatorModule
 import logic.document.operations.format.modules.IHtmlFormatModule
 import org.jsoup.Jsoup
@@ -24,7 +25,8 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
 
         val operations = listOf<IHtmlFormatModule>(
             FixSeparatorModule,
-            FixPersonBlockModule
+            FixPersonBlockModule,
+            FixQuizModule
         )
 
         operations.forEach {
