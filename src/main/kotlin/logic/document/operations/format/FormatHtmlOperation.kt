@@ -33,32 +33,5 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
 
         return result
     }
-
-    private fun combineWithTemplate(kmttDocument: Document, templateDocument: Document): Document {
-        val wrapper = templateDocument
-            .getElementsByClass("savedtf-insert-here")
-            .first()
-
-        requireNotNull(wrapper)
-
-        val javascript = readResource("templates/index.js").readText()
-
-        val css = readResource("templates/style.css").readText()
-
-        val galleryModal = readResource("templates/galleryModal.html").readText().let { Jsoup.parse(it) }
-
-        wrapper
-            .appendChild(kmttDocument.body())
-            .appendChild(galleryModal.body())
-            .appendChild(Element("style").also {
-                it.html(css)
-            })
-            // Important: Add JS as last element
-            .appendChild(Element("script").also {
-                it.html(javascript)
-            })
-
-        return templateDocument
-    }
 }
 
