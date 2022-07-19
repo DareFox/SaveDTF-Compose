@@ -1161,3 +1161,20 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
     display: flex;
     align-items: center;
 }
+
+.block-number {
+    padding: 2.2em 1em 2em;
+    background: #f5fcff;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+.block-number__digit {
+    font-size: 4em;
+    line-height: 1em;
+    font-weight: bold;
+}
