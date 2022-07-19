@@ -1178,3 +1178,10 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
     line-height: 1em;
     font-weight: bold;
 }
+
+.block-code {
+    font-family: Menlo, Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
+    background: #f5fcff;
+    padding: 1em;
+    border-radius: 0.4em;
+}
