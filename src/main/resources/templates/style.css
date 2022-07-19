@@ -1187,3 +1187,26 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
     padding: 1em;
     border-radius: 0.4em;
 }
+
+.block-quote {
+    display: flex;
+}
+
+.block-quote-icon {
+    font-size: 4em;
+    line-height: 1em;
+    margin-right: 0.2em;
+    color: #1693e5;
+}
+
+.block-quote__text {
+    font-size: 1.4em;
+}
+
+.block-quote__text > p {
+    margin-bottom: 0.3em;
+}
+
+.block-quote__author {
+    font-size: 0.9em;
+}
