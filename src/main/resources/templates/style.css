@@ -667,6 +667,8 @@ img {
     justify-content: center;
     padding-top: 24px;
     padding-bottom: 30px;
+    flex-direction: column;
+    width: 100%;
 }
 .content-info__item {
     font-size: 15px;
