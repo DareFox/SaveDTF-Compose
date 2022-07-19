@@ -5,7 +5,7 @@ import org.jsoup.nodes.Element
 import util.dom.recreateWithoutNodes
 
 object FixPersonBlockModule : IHtmlFormatModule {
-    override fun process(document: Document): Document {
+    override suspend fun process(document: Document): Document {
         val personBlocks = document.getElementsByClass("block-person")
         personBlocks.forEach {
             processBlock(it)
