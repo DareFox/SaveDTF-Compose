@@ -27,6 +27,7 @@ class SettingsBasedDocumentProcessor(
 ): AbstractProgress() {
     private val necessaryFirstOperations = listOf(
         RemoveCssOperation,
+        RemoveAdsOperation,
         CombineTemplateOperation,
         ChangeTitleOperation(entry)
     )
