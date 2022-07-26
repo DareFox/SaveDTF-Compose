@@ -112,8 +112,8 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
                 readyToUse()
             } catch (ex: QueueElementException) {
                 error(ex.errorMessage)
-            } catch (ex: Exception) {
-                error("[${ex.javaClass.name}]: ${ex.message}")
+            } catch (ex: Throwable) {
+                error(ex)
             }
         }
     }
@@ -140,8 +140,8 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
         } catch (ex: QueueElementException) {
             error(ex.errorMessage)
             return false
-        } catch (ex: Exception) {
-            error("[${ex.javaClass.simpleName}]: ${ex.message}")
+        } catch (ex: Throwable) {
+            error(ex)
             return false
         }
         finally {

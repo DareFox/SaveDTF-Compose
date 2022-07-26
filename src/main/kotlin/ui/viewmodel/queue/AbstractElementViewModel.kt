@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import logic.abstracts.AbstractProgress
+import mu.KotlinLogging
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 
@@ -56,6 +57,17 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
     protected fun error(message: String) {
         _lastErrorMessage.value = message
         _status.value = QueueElementStatus.ERROR
+    }
+
+    protected inline fun error(exception: Throwable) {
+        _lastErrorMessage.value = "[${exception.javaClass.simpleName}] ${exception.message ?: ""}"
+        _status.value = QueueElementStatus.ERROR
+
+        val klogger = KotlinLogging.logger {  }
+
+        klogger.error {
+            "Error() log:\n\n${exception.stackTraceToString()}"
+        }
     }
 
     protected fun saved() {
