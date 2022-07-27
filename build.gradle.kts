@@ -76,6 +76,7 @@ tasks.withType<KotlinCompile> {
 }
 
 // TODO: Separate tasks to other *.gradle.kts files if possible
+// TODO: Add typescript build task
 
 /**
  * Build number tasks
