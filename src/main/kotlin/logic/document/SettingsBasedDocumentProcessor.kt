@@ -29,11 +29,11 @@ class SettingsBasedDocumentProcessor(
         RemoveCssOperation,
         RemoveAdsOperation,
         CombineTemplateOperation,
+        FormatHtmlOperation,
         ChangeTitleOperation(entry)
     )
 
     private val necessaryLastOperations = listOf(
-        FormatHtmlOperation,
         JavascriptAndCssOperation,
         SaveHtmlFileOperation(saveFolder)
     )

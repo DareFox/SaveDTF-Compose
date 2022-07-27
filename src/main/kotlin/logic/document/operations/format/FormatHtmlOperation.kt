@@ -24,7 +24,8 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
             FixSeparatorModule,
             FixPersonBlockModule,
             FixQuizModule,
-            FixQuoteModule
+            FixQuoteModule,
+            FixGalleryModule
         )
 
         operations.forEach {
