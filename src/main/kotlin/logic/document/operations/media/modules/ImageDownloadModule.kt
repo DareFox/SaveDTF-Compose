@@ -39,69 +39,23 @@ object ImageDownloadModule: IDownloadModule {
     }
 
     private fun getGalleryImageContainers(document: Document): List<Pair<Element, String>> {
-        return document.getElementsByClass("gall").mapNotNull { gallery ->
-            val dataHolder = gallery.children().firstOrNull { child -> child.attr("name") == "gallery-data-holder" }
+        // Convert each gallery to list of pairs
+        return document.getElementsByClass("gall").mapNotNull {
+            println("gallery: $it")
 
-            // If gallery data exists
-            dataHolder?.let { holder ->
-                // Parse it
-                val data = Json.parseToJsonElement(holder.wholeText())
+            // And to do this, convert their children to list of pairs
+            it.children().mapNotNull childConvert@ { div ->
+                // If type or url is empty, then skip it by returning null
+                val type = div.attr("media-type").ifEmpty { return@childConvert null  }
+                val url = div.attr("media-url").ifEmpty { return@childConvert null  }
 
-                if (data is JsonArray) {
-                    val elements = mutableListOf<Pair<Element, String>>()
+                if (type != "image") return@childConvert null
 
-                    // Convert data object to images ID
-                    data.forEach { element ->
-                        try {
-                            val id = element.jsonObject["image"]?.jsonObject?.get("data")?.jsonObject?.get("uuid")
-                            val url = id?.jsonPrimitive?.toString()?.let {
-                                // toString returns ""112032103012"", so we need to remove this quotes
-                                val trimmed = """(^"|"${'$'})""".toRegex().replace(it, "")
-
-                                "https://leonardo.osnova.io/$trimmed"
-                            }
-
-                            url?.let {
-                                elements += Element("div") to url
-                            }
-                        } catch (_: Exception) {}
-                    }
-
-                    // Limit gallery size in class to maximum of 5 elements
-                    // Required by CSS/JS gallery module:
-                    // https://github.com/sir-coffee-or-tea/darefox-dtf-saver-css
-                    val maxPreviewGallerySize = 5
-                    val gallerySizeClass = "gall--${elements.size.coerceAtMost(maxPreviewGallerySize)}"
-
-                    // Replace old gallery elements with new elements
-                    val newGallery = Element("div").addClass("gall").addClass(gallerySizeClass)
-                    gallery.replaceWith(newGallery)
-
-                    elements.forEachIndexed { index, pair ->
-                        val div = pair.first.also {
-                            it.attr("pos", index.toString())
-
-                            // On fifth (based on maxPreviewGallerySize) preview element show +n of remaining images
-                            // Ignore if fifth element is the last element in array, to prevent "+0" text on preview
-                            if (index == maxPreviewGallerySize - 1 && elements.size > maxPreviewGallerySize) {
-                                val remainingSize = elements.size - maxPreviewGallerySize
-                                it.attr("data-more", "+$remainingSize")
-                            } else {
-                                // To remove black transparent overlay on last gallery preview element
-                                // data-more attribute should be empty like this: ""
-                                it.attr("data-more", "")
-                            }
-                        }
-
-                        newGallery.appendChild(div)
-                    }
-
-                    elements.toList() // make it immutable
-                } else {
-                    null
-                }
+                div to url
             }
-        }.flatten()
+
+
+        }.flatten().also {println(it)}// Then flat all list of galleries to have one big list
     }
     override fun transform(element: Element, relativePath: String) {
         if (element.tagName() == "div") {
