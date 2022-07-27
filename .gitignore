@@ -30,3 +30,9 @@ captures/
 
 # Allow workspace files
 !.idea/runConfigurations/
+
+# Ignore node_modules
+src/typescript/node_modules/
+
+# Ignore typescript generated code
+src/typescript/dist
