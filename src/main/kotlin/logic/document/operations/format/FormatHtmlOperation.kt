@@ -2,11 +2,8 @@ package logic.document.operations.format
 
 import logic.document.AbstractProcessorOperation
 import logic.document.operations.format.modules.*
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 import ui.viewmodel.SettingsViewModel
-import util.filesystem.readResource
 
 /**
  * Take given document with its content and place it in HTML template wrapper
@@ -21,11 +18,11 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
         var result = document
 
         val operations = listOf<IHtmlFormatModule>(
-            FixSeparatorModule,
-            FixPersonBlockModule,
-            FixQuizModule,
-            FixQuoteModule,
-            FixGalleryModule
+            FormatSeparatorModule,
+            FormatPersonBlockModule,
+            FormatQuizModule,
+            FormatQuoteModule,
+            FormatGalleryModule
         )
 
         operations.forEach {

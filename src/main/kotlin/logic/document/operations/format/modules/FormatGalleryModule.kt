@@ -6,7 +6,7 @@ import kotlinx.serialization.json.*
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
-object FixGalleryModule : IHtmlFormatModule {
+object FormatGalleryModule : IHtmlFormatModule {
     private val json = Json { ignoreUnknownKeys = true }
 
     private val imageFormats = listOf(

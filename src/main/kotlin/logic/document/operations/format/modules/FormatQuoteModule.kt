@@ -2,9 +2,8 @@ package logic.document.operations.format.modules
 
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import java.lang.IndexOutOfBoundsException
 
-object FixQuoteModule : IHtmlFormatModule {
+object FormatQuoteModule : IHtmlFormatModule {
     override suspend fun process(document: Document): Document {
         val quotes = document.getElementsByClass("block-quote")
         quotes.forEach {

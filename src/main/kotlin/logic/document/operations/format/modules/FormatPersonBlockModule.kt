@@ -4,7 +4,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import util.dom.recreateWithoutNodes
 
-object FixPersonBlockModule : IHtmlFormatModule {
+object FormatPersonBlockModule : IHtmlFormatModule {
     override suspend fun process(document: Document): Document {
         val personBlocks = document.getElementsByClass("block-person")
         personBlocks.forEach {

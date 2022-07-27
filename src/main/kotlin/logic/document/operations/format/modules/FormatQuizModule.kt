@@ -8,7 +8,7 @@ import util.dom.getWebsite
 import util.kmttapi.SharedRegex
 import util.kmttapi.betterPublicKmtt
 
-object FixQuizModule: IHtmlFormatModule {
+object FormatQuizModule: IHtmlFormatModule {
     override suspend fun process(document: Document): Document {
         val website = document.getWebsite()
         val quizes = document.getElementsByClass("quiz")
