@@ -1210,3 +1210,9 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
 .block-quote__author {
     font-size: 0.9em;
 }
+
+.gall-vid-preview {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
