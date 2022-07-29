@@ -21,64 +21,94 @@ object FormatGalleryModule : IHtmlFormatModule {
         document
             .getElementsByClass("gall")
             .forEach { gallery ->
-                // Get data holder. If there's no data holder, then skip gallery
-                val dataHolder = gallery.children().firstOrNull { child ->
-                    child.attr("name") == "gallery-data-holder"
-                } ?: return@forEach
-
-                // Parse it
-                val rawJsonData = Json.parseToJsonElement(dataHolder.wholeText())
-
-                // If data isn't JsonArray, then ignore it
-                if (rawJsonData !is JsonArray) return@forEach
-
-                val elements = rawJsonData.map {
-                    json.decodeFromJsonElement<GalleryElement>(it)
-                }.map {
-                    Element("div").also { div ->
-                        div.attr("json-data-about-element", json.encodeToString(it))
-                        div.attr("media-url", "https://leonardo.osnova.io/${it.image.data.uuid}")
-
-                        val type = it.image.data.type
-                        val attrType = when {
-                            imageFormats.contains(type) -> "image"
-                            videoFormats.contains(type) -> "video"
-                            else -> "null"
-                        }
-
-                        div.attr("media-type", attrType)
-                    }
-                }
-
-                // Limit gallery size in class to maximum of 5 elements
-                // Required by CSS/JS gallery module:
-                // https://github.com/sir-coffee-or-tea/darefox-dtf-saver-css
-                val maxPreviewGallerySize = 5
-                val gallerySizeClass = "gall--${elements.size.coerceAtMost(maxPreviewGallerySize)}"
-
-                // Replace old gallery elements with new elements
-                val newGallery = Element("div").addClass("gall").addClass(gallerySizeClass)
-                gallery.replaceWith(newGallery)
-
-                elements.forEachIndexed { index, div ->
-                    div.attr("pos", index.toString())
-
-                    // On fifth (based on maxPreviewGallerySize) preview element show +n of remaining images
-                    // Ignore if fifth element is the last element in array, to prevent "+0" text on preview
-                    if (index == maxPreviewGallerySize - 1 && elements.size > maxPreviewGallerySize) {
-                        val remainingSize = elements.size - maxPreviewGallerySize
-                        div.attr("data-more", "+$remainingSize")
-                    } else {
-                        // To remove black transparent overlay on last gallery preview element
-                        // data-more attribute should be empty like this: ""
-                        div.attr("data-more", "")
-                    }
-
-                    newGallery.appendChild(div)
-                }
+                processGallery(gallery)
             }
 
         return document
+    }
+
+    private fun processGallery(gallery: Element) {
+        // Get data holder. If there's no data holder, then skip gallery
+        val dataHolder = gallery.children().firstOrNull { child ->
+            child.attr("name") == "gallery-data-holder"
+        } ?: return
+
+        // Parse it
+        val rawJsonData = Json.parseToJsonElement(dataHolder.wholeText())
+
+        // If data isn't JsonArray, then ignore it
+        if (rawJsonData !is JsonArray) return
+
+        val elements = convertJsonToElements(rawJsonData)
+        val maxPreviewGallerySize = 5
+
+        // Replace old gallery elements with new elements
+        val newGallery = GalleryDOM(elements.size, maxPreviewGallerySize)
+        gallery.replaceWith(newGallery)
+
+        elements.forEachIndexed { index, div ->
+            div.attr("pos", index.toString())
+
+            // On fifth (based on maxPreviewGallerySize) preview element show +n of remaining images
+            // Ignore if fifth element is the last element in array, to prevent "+0" text on preview
+            if (index == maxPreviewGallerySize - 1 && elements.size > maxPreviewGallerySize) {
+                val remainingSize = elements.size - maxPreviewGallerySize
+                div.attr("data-more", "+$remainingSize")
+            } else {
+                // To remove black transparent overlay on last gallery preview element
+                // data-more attribute should be empty like this: ""
+                div.attr("data-more", "")
+            }
+
+            if (index == 0) {
+                newGallery.main.appendChild(div)
+            } else {
+                newGallery.sidebar.appendChild(div)
+            }
+        }
+    }
+
+    private fun convertJsonToElements(rawJsonData: JsonArray) = rawJsonData.map {
+        json.decodeFromJsonElement<GalleryElement>(it)
+    }.map {
+        Element("div").also { div ->
+            div.addClass("gall--item")
+            div.attr("json-data-about-element", json.encodeToString(it))
+            div.attr("media-url", "https://leonardo.osnova.io/${it.image.data.uuid}")
+
+            val type = it.image.data.type
+            val attrType = when {
+                imageFormats.contains(type) -> "image"
+                videoFormats.contains(type) -> "video"
+                else -> "null"
+            }
+
+            div.attr("media-type", attrType)
+        }
+    }
+}
+
+internal class GalleryDOM(
+    val size: Int,
+    val maxPreviewGallerySize: Int,
+): Element("div") {
+    val sidebar = Element("div").also {
+        it.addClass("gall--sidebar")
+    }
+
+    val main = Element("div").also {
+        it.addClass("gall--main")
+    }
+
+    init {
+        addClass("gall")
+
+        // Limit gallery size in class to maximum of 5 elements
+        // Required by CSS/JS gallery module:
+        // https://github.com/sir-coffee-or-tea/darefox-dtf-saver-css
+        addClass("gall--${size.coerceAtMost(maxPreviewGallerySize)}")
+
+        addChildren(main, sidebar)
     }
 }
 
