@@ -1,4 +1,5 @@
 "use strict";
+// TO SEE LOGS, SET THIS VARIABLE TO TRUE
 var isInDebugMode = true;
 const modalMenu = document.querySelector(".modal");
 const arrowLeft = document.querySelector(".modal-arrow-left");
@@ -22,7 +23,7 @@ function registerGallery(gallDiv) {
     if (!gallDiv)
         return;
     const galleryArray = [];
-    const galleryElements = gallDiv.children;
+    const galleryElements = gallDiv.querySelectorAll(".gall--item");
     for (let element of galleryElements) {
         const rawPosition = element.getAttribute("pos");
         const url = element.getAttribute("media-url");
@@ -47,8 +48,10 @@ function registerImage(image) {
     if (!image)
         return;
     var url;
+    // Maybe there's more simplier approach to this
     if (image instanceof HTMLDivElement) {
         var found = undefined;
+        // Get first img and use url from it
         for (let element of image.children) {
             if (element instanceof HTMLImageElement) {
                 found = element.src;
@@ -82,10 +85,11 @@ function switchTo(element) {
         closeModal();
         return;
     }
-    if (isGalleryElement(element)) {
+    if (isGalleryElement(element)) { // if GalleryElement
         openGalleryElement(element);
         return;
     }
+    // else it's ImageElement
     openImageElement(element);
 }
 function openGalleryElement(element) {
@@ -116,7 +120,7 @@ function openGalleryElement(element) {
     }
     showArrows();
     setFooter(`${element.position + 1} из ${element.parent.length}`);
-    setHtmlCurrentElement(newElement);
+    setHtmlCurrentElement(newElement); // open modal and show new element
     currentElement = element;
 }
 function openImageElement(element) {
@@ -124,13 +128,17 @@ function openImageElement(element) {
     const img = document.createElement("img");
     img.src = element.url;
     hideArrows();
-    setFooter(null);
-    setHtmlCurrentElement(img);
+    setFooter(null); // remove footer
+    setHtmlCurrentElement(img); // open modal and show new element
     currentElement = element;
 }
+/*
+    Modal menu functions
+*/
 function closeModal() {
     log("Closing modal");
     modalMenu === null || modalMenu === void 0 ? void 0 : modalMenu.classList.remove("modal--open");
+    // Remove all inner html, because hiding <video> element doesn't unload it
     if (divCurrentElement)
         divCurrentElement.innerHTML = "";
 }
@@ -173,6 +181,9 @@ function setHtmlCurrentElement(element) {
     }
     openModal();
 }
+/*
+    Keyboard events handler
+*/
 function keyboardListener(event) {
     log(`Got keyboard event w/ code ${event.code}`);
     if (event.key === "Escape")
@@ -227,6 +238,9 @@ function switchToPrevious() {
     }
 }
 document.onkeydown = keyboardListener;
+/*
+    On screen buttons event handlers
+ */
 arrowLeft === null || arrowLeft === void 0 ? void 0 : arrowLeft.addEventListener("click", (ev) => {
     log("Left arrow was pressed");
     switchToPrevious();
@@ -239,6 +253,9 @@ closeButton === null || closeButton === void 0 ? void 0 : closeButton.addEventLi
     log("Close button was pressed");
     closeModal();
 });
+/*
+    Utilitty functions
+ */
 function log(message) {
     const date = new Date, formatedDate = [date.getMonth() + 1,
         date.getDate(),
@@ -252,8 +269,8 @@ function log(message) {
             console.log(prefix + message);
         }
         else {
-            console.log(prefix);
-            console.log(message);
+            console.log(prefix); // don't convert message object to string
+            console.log(message); // for better output in console
         }
     }
 }
@@ -263,5 +280,7 @@ function isGalleryElement(element) {
     }
     return "position" in element && "url" in element;
 }
+/*
+    Script start
+*/
 registerAll();
-//# sourceMappingURL=newGallery.js.map

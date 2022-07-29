@@ -42,8 +42,8 @@ function registerGallery(gallDiv: Element) {
     if (!gallDiv) return 
     
     const galleryArray: GalleryElement[] = []
-    const galleryElements = gallDiv.children
-
+    const galleryElements = gallDiv.querySelectorAll(".gall--item")
+    
     for (let element of galleryElements) {
         const rawPosition = element.getAttribute("pos")
         const url = element.getAttribute("media-url")
