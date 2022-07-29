@@ -24,12 +24,11 @@ object VideoDownloadModule: IDownloadModule {
 
     private fun getGalleryVideoContainers(document: Document): List<Pair<Element, String>> {
         // Convert each gallery items to list of pairs
-        return document.getElementsByClass("gall--items").mapNotNull { div ->
+        return document.getElementsByClass("gall--item").mapNotNull { div ->
             // If type or url is empty, then skip it by returning null
             val type = div.attr("media-type").ifEmpty { return@mapNotNull null  }
             val url = div.attr("media-url").ifEmpty { return@mapNotNull null  }
             if (type != "video") return@mapNotNull null
-
             addVideoPreviewElement(div) to url
         }
     }
