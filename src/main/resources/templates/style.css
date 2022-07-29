@@ -16,7 +16,7 @@
     font: inherit;
     vertical-align: baseline;
 }
-.gall--4, .gall--3{
+/* .gall--4, .gall--3{
     display: block;
 }
 .gall > div {
@@ -110,7 +110,7 @@
     font-size: 40px;
     text-align: center;
     line-height: 260px;
-}
+} */
 .savedtf-wrapper{
     margin: 0 auto;
 }
@@ -871,7 +871,7 @@ img {
     }
 }
 @media (max-width: 859px){
-    .content-header-author--subsite .content-header-author__name {
+    /* .content-header-author--subsite .content-header-author__name {
         max-width: 112px;
     }
     .block-incut {
@@ -915,7 +915,7 @@ img {
     }
     .gall--5 > div[pos="4"]:not([data-more=""]):after {
         font-size: 34px;
-    }
+    } */
 }
 .content b, .content strong, .miniEditor .ce-redactor b, .miniEditor .ce-redactor strong, .subsite_head__description b, .user-option b, .writing .ce-redactor b, .writing .ce-redactor strong {
     font-weight: 700;
@@ -1215,4 +1215,87 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
     object-fit: cover;
     width: 100%;
     height: 100%;
+}
+
+.gall {
+    height: 33.25em;
+    display: flex;
+    flex-direction: row;
+    -webkit-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+    -moz-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+    box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+}
+
+.gall--item {
+    height: 100%;
+    width: 100%;
+    flex-grow: 1;
+    background-position: center;
+    background-size: cover;
+    /* Don't ALL show gall items, only first 5*/
+    display: none;
+}
+
+.gall--item:not(:last-child) {
+    margin-bottom: 0.2em;
+} 
+
+/* Only gallery with size of two items */
+.gall.gall--2 > .gall--main {
+    height: 100%;
+    width: 50%;
+}
+
+.gall.gall--2 > .gall--sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 50%;
+    padding-left: 0.2em;
+}
+
+/* Galleries from size 3 to 5 (not inclusive) */
+.gall:not(.gall--2):not(.gall--5) > .gall--main {
+    height: 100%;
+    width: 70%;
+}
+
+.gall:not(.gall--2):not(.gall--5) > .gall--sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 30%;
+    padding-left: 0.2em;
+}
+
+/* 
+    Gallery with size of 5 
+    Two Rows layout
+*/
+.gall.gall--5 > .gall--main {
+    display: flex;
+    flex-direction: row;
+    height: 65%;
+    width: 100%;
+}
+
+.gall.gall--5 {
+    flex-direction: column;
+}
+
+.gall.gall--5 > .gall--sidebar {
+    display: flex;
+    flex-direction: row;
+    height: 35%;
+    width: 100%;
+    padding-top: 0.2em;
+}
+
+.gall.gall--5 .gall--item:not(:last-child) {
+    margin-bottom: 0;
+    margin-left: 0.2em;
+} 
+
+.gall--item[pos="0"], .gall--item[pos="1"], .gall--item[pos="2"], .gall--item[pos="3"], .gall--item[pos="4"] {
+    display: block;
 }
