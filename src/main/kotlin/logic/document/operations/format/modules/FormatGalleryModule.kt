@@ -60,7 +60,8 @@ object FormatGalleryModule : IHtmlFormatModule {
                 div.attr("data-more", "")
             }
 
-            if (index == 0) {
+            val twoRowsLayout = elements.size >= 5
+            if (index == 0 || (index == 1 && twoRowsLayout)) {
                 newGallery.main.appendChild(div)
             } else {
                 newGallery.sidebar.appendChild(div)

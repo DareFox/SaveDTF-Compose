@@ -48,7 +48,6 @@ object ImageDownloadModule: IDownloadModule {
             if (type != "image") return@mapNotNull null
 
             div to url
-
         }
     }
     override fun transform(element: Element, relativePath: String) {
