@@ -39,23 +39,17 @@ object ImageDownloadModule: IDownloadModule {
     }
 
     private fun getGalleryImageContainers(document: Document): List<Pair<Element, String>> {
-        // Convert each gallery to list of pairs
-        return document.getElementsByClass("gall").mapNotNull {
-            println("gallery: $it")
+        // Convert each gallery items to list of pairs
+        return document.getElementsByClass("gall--item").mapNotNull { div ->
+            // If type or url is empty, then skip it by returning null
+            val type = div.attr("media-type").ifEmpty { return@mapNotNull null  }
+            val url = div.attr("media-url").ifEmpty { return@mapNotNull null  }
 
-            // And to do this, convert their children to list of pairs
-            it.children().mapNotNull childConvert@ { div ->
-                // If type or url is empty, then skip it by returning null
-                val type = div.attr("media-type").ifEmpty { return@childConvert null  }
-                val url = div.attr("media-url").ifEmpty { return@childConvert null  }
+            if (type != "image") return@mapNotNull null
 
-                if (type != "image") return@childConvert null
+            div to url
 
-                div to url
-            }
-
-
-        }.flatten().also {println(it)}// Then flat all list of galleries to have one big list
+        }
     }
     override fun transform(element: Element, relativePath: String) {
         if (element.tagName() == "div") {

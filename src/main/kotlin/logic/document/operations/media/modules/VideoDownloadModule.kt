@@ -23,21 +23,15 @@ object VideoDownloadModule: IDownloadModule {
     }
 
     private fun getGalleryVideoContainers(document: Document): List<Pair<Element, String>> {
-        // Convert each gallery to list of pairs
-        return document.getElementsByClass("gall").mapNotNull {
-            // And to do this, convert their children to list of pairs
-            it.children().mapNotNull childConvert@ { div ->
-                // If type or url is empty, then skip it by returning null
-                val type = div.attr("media-type").ifEmpty { return@childConvert null  }
-                val url = div.attr("media-url").ifEmpty { return@childConvert null  }
+        // Convert each gallery items to list of pairs
+        return document.getElementsByClass("gall--items).mapNotNull { div ->
+            // If type or url is empty, then skip it by returning null
+            val type = div.attr("media-type").ifEmpty { return@mapNotNull null  }
+            val url = div.attr("media-url").ifEmpty { return@mapNotNull null  }
+            if (type != "video") return@mapNotNull null
 
-                if (type != "video") return@childConvert null
-
-                addVideoPreviewElement(div) to url
-            }
-
-
-        }.flatten() // Then flat all list of galleries to have one big list
+            addVideoPreviewElement(div) to url
+        }
     }
 
     private fun addVideoPreviewElement(div: Element): Element {
