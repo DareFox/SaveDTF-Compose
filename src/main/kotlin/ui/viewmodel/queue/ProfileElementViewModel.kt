@@ -8,6 +8,7 @@ import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
 import kmtt.models.subsite.Subsite
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,36 +63,38 @@ data class ProfileElementViewModel(
         }
     }
 
-    override suspend fun save(): Boolean {
-        var result = true
-        val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
+    override suspend fun save(): Deferred<Boolean> {
+        return waitAndAsyncJob {
+            var result = true
+            val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
 
-        elementMutex.withLock {
-            inUse()
-            withProgressSuspend(allEntriesMessage) {
-                client.user.getAllUserEntries(id) {
-                    yield()
-                    if (!processDocument(it)) { // process document and if there is error, change final result to false
-                        result = false
+            elementMutex.withLock {
+                inUse()
+                withProgressSuspend(allEntriesMessage) {
+                    client.user.getAllUserEntries(id) {
+                        yield()
+                        if (!processDocument(it)) { // process document and if there is error, change final result to false
+                            result = false
+                        }
+                        progress(Lang.value.profileElementVmNextChunk)
                     }
-                    progress(Lang.value.profileElementVmNextChunk)
+                }
+
+                if (errorCounter > 0) {
+                    saved()
+                    progress(Lang.value.profileElementVmSomeErrors.format(counter, errorCounter))
+                } else if (errorCounter == counter) {
+                    error(Lang.value.profileElementVmAllErrors.format(errorCounter))
+                    clearProgress()
+                } else {
+                    saved()
+                    progress(Lang.value.profileElementVmNoErrors.format(counter))
                 }
             }
 
-            if (errorCounter > 0) {
-                saved()
-                progress(Lang.value.profileElementVmSomeErrors.format(counter, errorCounter))
-            } else if (errorCounter == counter) {
-                error(Lang.value.profileElementVmAllErrors.format(errorCounter))
-                clearProgress()
-            } else {
-                saved()
-                progress(Lang.value.profileElementVmNoErrors.format(counter))
-            }
+            counter = 0
+            result
         }
-
-        counter = 0
-        return result
     }
 
     // TODO: Remove code duplication
