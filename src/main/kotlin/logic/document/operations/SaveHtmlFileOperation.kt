@@ -11,14 +11,14 @@ import java.io.File
 /**
  * Save HTML file
  */
-class SaveHtmlFileOperation(val saveFolder: File): AbstractProcessorOperation() {
+class SaveHtmlFileOperation(val saveFolder: File, val filename: String = "index.html"): AbstractProcessorOperation() {
     override val name: String
         get() = Lang.value.saveHtmlOperation
 
     override suspend fun process(document: Document): Document {
         withProgressSuspend(Lang.value.savingIndexHtml) {
             // Create file and path of directories to it
-            val indexHTML = saveFolder.mkdirs().let { saveFolder.resolve("index.html") }
+            val indexHTML = saveFolder.mkdirs().let { saveFolder.resolve(filename) }
 
             yield()
 
