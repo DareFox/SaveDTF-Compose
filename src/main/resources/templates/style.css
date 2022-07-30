@@ -1232,6 +1232,8 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
     height: 100%;
     width: 100%;
     flex-grow: 1;
+    /* This line fixes (somehow) video size overflow */
+    min-height: 0;
     background-position: center;
     background-size: cover;
     /* Don't ALL show gall items, only first 5*/
