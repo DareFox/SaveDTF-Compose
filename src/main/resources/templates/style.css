@@ -1303,3 +1303,32 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
 .gall--item[pos="0"], .gall--item[pos="1"], .gall--item[pos="2"], .gall--item[pos="3"], .gall--item[pos="4"] {
     display: block;
 }
+
+/* Person block */
+.block-person__image {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 140px;
+}
+
+.block-person__image img {
+    object-fit: contain;
+    width: auto;
+    height: 100%;
+    border-radius: 100%;
+    display: block;
+}
+
+.block-person__title, .block-person__description {
+    text-align: center;
+}
+
+.block-person__title {
+    font-size: 1.2em;
+    padding-top: 0.4em;
+}
+
+.block-person__description {
+    font-size: 1em;
+}
