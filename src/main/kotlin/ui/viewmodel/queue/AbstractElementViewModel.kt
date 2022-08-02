@@ -94,6 +94,10 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         )
         _currentJob.value = job
 
+        job.invokeOnCompletion {
+            handleCancellation(it)
+        }
+
         return job
     }
 
@@ -109,6 +113,17 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         )
         _currentJob.value = job
 
+        job.invokeOnCompletion {
+            handleCancellation(it)
+        }
+
         return job
+    }
+
+    private fun handleCancellation(error: Throwable?) {
+        if (error?.cause is CancellationException) {
+            readyToUse()
+            progress("Job was cancelled")
+        }
     }
 }
