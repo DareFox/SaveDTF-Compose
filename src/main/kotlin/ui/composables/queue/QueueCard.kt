@@ -23,10 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.Download
-import compose.icons.feathericons.Folder
-import compose.icons.feathericons.RefreshCcw
-import compose.icons.feathericons.Trash2
+import compose.icons.feathericons.*
 import kmtt.models.enums.Website
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -272,6 +269,13 @@ fun QueueCard(
 
                     val buttons = actionBar.toMutableList()
                     val lang by Lang.collectAsState()
+                    val job by viewModel.currentJob.collectAsState()
+
+                    if (job?.isActive == true) {
+                        buttons.add(ActionBarElement(FeatherIcons.XOctagon, "STOP") {
+                            job?.cancel()
+                        })
+                    }
 
                     if (status == QueueElementStatus.SAVED) {
                         buttons.add(ActionBarElement(FeatherIcons.Folder, lang.queueCardOpen) {
