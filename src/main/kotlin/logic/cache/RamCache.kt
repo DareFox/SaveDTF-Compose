@@ -20,7 +20,7 @@ internal class RamCache(val id: String? = null) : BinaryCache {
         fileCache.setValue(key, value)
     }
 
-    /**
+    /*
      * If value exists in disk, but not in RAM, this method will:
      *  - read value from disk
      *  - save it to RAM cache
