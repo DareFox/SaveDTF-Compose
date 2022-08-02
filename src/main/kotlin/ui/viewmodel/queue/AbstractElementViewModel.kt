@@ -71,6 +71,7 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         _lastErrorMessage.value = "[${exception.javaClass.simpleName}] ${exception.message ?: ""}"
         _status.value = QueueElementStatus.ERROR
 
+        // TODO: Use child class in logger, not abstract
         val klogger = KotlinLogging.logger {  }
 
         klogger.error {
@@ -121,9 +122,9 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
     }
 
     private fun handleCancellation(error: Throwable?) {
-        if (error?.cause is CancellationException) {
+        if (error?.cause is CancellationException || error is CancellationException) {
             readyToUse()
-            progress("Job was cancelled")
+            clearProgress()
         }
     }
 }
