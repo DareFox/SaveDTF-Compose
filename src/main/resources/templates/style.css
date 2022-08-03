@@ -1244,3 +1244,16 @@ and (min-width : 1024px) {
 .block-person__description {
     font-size: 1em;
 }
+
+/* Audio block */
+.block-audio {
+    padding: 1.6em;
+    display: flex;
+    flex-direction: column;
+    background: #f5fcff;
+}
+
+.block-audio__cover {
+    margin: 0 auto 10px auto;
+    max-height: 450px;
+}
