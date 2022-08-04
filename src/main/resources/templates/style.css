@@ -1310,3 +1310,8 @@ and (min-width : 1024px) {
     object-fit: contain;
     width: 100%;
 }
+
+/* <i> ...tallic tag*/ 
+i {
+    font-style: italic;
+}
