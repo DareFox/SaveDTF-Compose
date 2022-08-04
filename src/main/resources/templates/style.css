@@ -1129,6 +1129,7 @@ and (min-width : 1024px) {
 
 
 .gall--item {
+    position: relative;
     height: 100%;
     width: 100%;
     flex-grow: 1;
@@ -1160,6 +1161,7 @@ and (min-width : 1024px) {
 
 /* Galleries from size 3 to 5 (not inclusive) */
 .gall:not(.gall--2):not(.gall--5) > .gall--main {
+    position: relative;
     height: 100%;
     width: 70%;
 }
@@ -1176,11 +1178,11 @@ and (min-width : 1024px) {
     Gallery with size of 5 
     Two Rows layout
 */
-.gall--5 div[pos="4"]:not([data-more=""]):after {
+.gall--5 div[pos="4"]:not([data-more=""]):before {
     content: attr(data-more);
     background: rgba(0,0,0,.5);
     color: #fff;
-    position: inherit;
+    position: absolute;
     font-size: 3em;
     text-align: center;
     display: block;
