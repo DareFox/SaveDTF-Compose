@@ -22,7 +22,8 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
             FormatPersonBlockModule,
             FormatQuizModule,
             FormatQuoteModule,
-            FormatGalleryModule
+            FormatGalleryModule,
+            FormatEmbedModule
         )
 
         operations.forEach {
