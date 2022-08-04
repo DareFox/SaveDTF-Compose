@@ -27,7 +27,7 @@ object ImageDownloadModule: IDownloadModule {
         }.map { div ->
             val img = Element("img").also {
                 // Set css style to img
-                it.attr("style", "object-fit: contain; width: auto; height: 100%;")
+                it.attr("style", "object-fit: contain; height: 100%; max-width: 100%")
             }
 
             val newDiv = div.recreateWithoutNodes()
