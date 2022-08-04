@@ -1274,3 +1274,39 @@ and (min-width : 1024px) {
     width: 100%;
     height: 100%;
 }
+
+/* Link */
+.andropov_link {
+    display: flex;
+    padding: 1em;
+    border: solid 1px lightgray;
+    border-radius: 0.4em;
+    flex-direction: row;
+}
+
+.andropov_link .andropov_link--text_column {
+    width: 90%;
+}
+
+.andropov_link__title {
+    font-size: 1.15em;
+    color: #3766a9;
+}
+
+.andropov_link__description {
+    font-size: 1em;
+}
+
+.andropov_link__host {
+    margin-top: 10px;
+    font-size: 0.94em
+}
+
+.andropov_link .andropov_link--ico_column {
+    width: 10%;
+}
+
+.andropov_link--ico_column img {
+    object-fit: contain;
+    width: 100%;
+}
