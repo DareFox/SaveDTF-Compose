@@ -23,7 +23,8 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
             FormatQuizModule,
             FormatQuoteModule,
             FormatGalleryModule,
-            FormatEmbedModule
+            FormatEmbedModule,
+            FormatLinkModule
         )
 
         operations.forEach {
