@@ -5,6 +5,7 @@ import kmtt.impl.authKmtt
 import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
 import logic.document.SettingsBasedDocumentProcessor
@@ -27,7 +28,6 @@ data class BookmarksElementViewModel(
     private val token: String
         get() = SettingsViewModel.tokens.getToken(site)
     private var client = authKmtt(site, token)
-    private val scope = CoroutineScope(Dispatchers.Default)
     private var counter = 0
     private var errorCounter = 0
 
@@ -58,11 +58,11 @@ data class BookmarksElementViewModel(
                     .errorOnNull("Entry html is null")
                     .let { Jsoup.parse(it) } // parse document
 
-                val processor = SettingsBasedDocumentProcessor(entry.toDirectory(File(pathToSave, "bookmarks/${site.name}")), document)
+                val processor = SettingsBasedDocumentProcessor(entry.toDirectory(File(pathToSave, "bookmarks/${site.name}")), document, entry)
                 val newCounter = ++counter
 
                 processor
-                    .redirectTo(mutableProgress, scope) {// redirect progress of processor to this VM progress
+                    .redirectTo(mutableProgress, ioScope) {// redirect progress of processor to this VM progress
                         "Entry #${newCounter}, $it" // show entry counter
                     }
                     .cancelOnSuspendEnd {
@@ -78,33 +78,35 @@ data class BookmarksElementViewModel(
         return result
     }
 
-    override suspend fun save(): Boolean {
-        var result = true
+    override suspend fun save(): Deferred<Boolean> {
+        return waitAndAsyncJob {
+            var result = true
 
-        elementMutex.withLock { // run only 1 function at a time
-            inUse()
-            withProgressSuspend(Lang.value.bookmarksElementVmAllEntriesMessage) { // show progress message at start
-                client.user.getAllMyFavoriteEntries { // save each chunk
-                    if (!processDocument(it)) { // process document and if there is error, change final result to false
-                        result = false
+            elementMutex.withLock { // run only 1 function at a time
+                inUse()
+                withProgressSuspend(Lang.value.bookmarksElementVmAllEntriesMessage) { // show progress message at start
+                    client.user.getAllMyFavoriteEntries { // save each chunk
+                        if (!processDocument(it)) { // process document and if there is error, change final result to false
+                            result = false
+                        }
+                        progress(Lang.value.bookmarksElementVmNextChunk)
                     }
-                    progress(Lang.value.bookmarksElementVmNextChunk)
+                }
+
+                if (errorCounter > 0) {
+                    saved()
+                    progress(Lang.value.bookmarksElementVmSomeErrors.format(counter, errorCounter))
+                } else if (errorCounter == counter) {
+                    error(Lang.value.bookmarksElementVmAllErrors.format(errorCounter))
+                    clearProgress()
+                } else {
+                    saved()
+                    progress(Lang.value.bookmarksElementVmNoErrors.format(counter))
                 }
             }
 
-            if (errorCounter > 0) {
-                saved()
-                progress(Lang.value.bookmarksElementVmSomeErrors.format(counter, errorCounter))
-            } else if (errorCounter == counter) {
-                error(Lang.value.bookmarksElementVmAllErrors.format(errorCounter))
-                clearProgress()
-            } else {
-                saved()
-                progress(Lang.value.bookmarksElementVmNoErrors.format(counter))
-            }
+            counter = 0
+            result
         }
-
-        counter = 0
-        return result
     }
 }

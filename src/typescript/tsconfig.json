@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "strict": true,
+    "noImplicitReturns": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "declaration": true,
+    "target": "ES6",
+    "lib": ["ES6","DOM", "DOM.Iterable"],
+    "outDir": "dist",
+    "rootDir": "./",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["types/*"]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules/*"
+  ]
+}

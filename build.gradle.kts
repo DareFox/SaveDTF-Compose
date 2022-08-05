@@ -41,7 +41,7 @@ dependencies {
     // ICONS
     implementation("br.com.devsrsouza.compose.icons.jetbrains:feather:1.0.0")
 
-    // Kotlin Serialization. For caching
+    // Kotlin Serialization. For caching and gallery formating
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
     // Http-client Ktor. For downloading media from servers
@@ -50,7 +50,7 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
 
     // API for cmtt websites
-    implementation("com.github.DareFox:kmttAPI:0.3.3")
+    implementation("com.github.DareFox:kmttAPI:0.3.4")
 
     // HTML Parser
     implementation("org.jsoup:jsoup:1.14.3")
@@ -76,6 +76,7 @@ tasks.withType<KotlinCompile> {
 }
 
 // TODO: Separate tasks to other *.gradle.kts files if possible
+// TODO: Add typescript build task
 
 /**
  * Build number tasks

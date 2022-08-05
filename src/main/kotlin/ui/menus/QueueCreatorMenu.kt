@@ -126,8 +126,6 @@ fun QueueCreatorMenu() {
             }
             Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
 
-
-
             val buttons = mutableListOf<@Composable () -> Unit>(
                 {
                     // Download all button

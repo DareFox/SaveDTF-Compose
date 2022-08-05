@@ -42,6 +42,20 @@ object SharedRegex {
     }
 
     /**
+     * Get quiz item hash
+     *
+     * Returns hash of quiz item
+     *
+     * @sample quizItemHashUsage
+     */
+    val quizItemHash = """(?<=quiz__item--)\S*""".toRegex(RegexOption.IGNORE_CASE)
+
+    private fun quizItemHashUsage() {
+        val attribute = "quiz__item--a16495916020"
+        quizItemHash.find(attribute)?.value // returns "a16495916020"
+    }
+
+    /**
      * Get website from URL
      *
      * Returns `"dtf"`, `"vc"`, `"tjournal"` or `null`

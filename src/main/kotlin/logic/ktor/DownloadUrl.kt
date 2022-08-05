@@ -60,6 +60,7 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
             }
         }
 
+        yield()
         val response = catched.getOrNull()
 
         if (response == null) {
@@ -74,6 +75,7 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
                 delay(30000L)
             }
         }
+        yield()
 
         if (response?.status == HttpStatusCode.OK) {
             val binary = response.content.toByteArray()
@@ -84,6 +86,7 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
             }
 
             val metadata = MediaMetadata(type.contentType, type.contentSubtype, mediaCacheID)
+            yield()
 
             // Save to cache
             cache.setValueWithMetadata(mediaCacheID, binary, metadata)
@@ -95,6 +98,7 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
         // On retryAmount = 0: repeat request infinitely until success
         if (retryAmount != 0 && attemptCounter >= retryAmount) {
             // On retry limit, return replaceOnError (if possible)
+            yield()
             replaceOnError?.let {
                 return it
             }
