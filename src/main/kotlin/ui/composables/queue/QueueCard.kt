@@ -33,6 +33,7 @@ import ui.animations.pulseColor
 import ui.i18n.Lang
 import ui.viewmodel.queue.*
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
+import util.desktop.openFileInDefaultApp
 import java.awt.Desktop
 import java.io.File
 
@@ -279,7 +280,7 @@ fun QueueCard(
 
                     if (status == QueueElementStatus.SAVED) {
                         buttons.add(ActionBarElement(FeatherIcons.Folder, lang.queueCardOpen) {
-                            Desktop.getDesktop().open(File(viewModel.pathToSave))
+                            File(viewModel.pathToSave).openFileInDefaultApp()
                         })
                     }
 
@@ -309,7 +310,7 @@ fun QueueCard(
                     }
                 }
 
-                // TODO: Add selection mode 
+                // TODO: Add selection mode
 //                val selected by viewModel.selected.collectAsState()
 //
 //                Checkbox(
