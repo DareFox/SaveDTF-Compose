@@ -9,6 +9,6 @@ import ui.viewmodel.queue.QueueViewModel
 
 object DebugQueueViewModel {
     val startQueue = listOf<IQueueElementViewModel>(
-        EntryQueueElementViewModel("https://dtf.ru/apitest/1154552-test")
+        EntryQueueElementViewModel("https://dtf.ru/apitest/1296731-sohranenie-stati-test-2")
     )
 }
