@@ -26,5 +26,5 @@ fun getCrashLogReport(ex: Throwable): String {
 }
 
 private fun StringBuilder.title(title: String) {
-    this.append("\n\n-=-=- $title -=-=-\n")
+    this.append("\n\n========= $title =========\n")
 }
