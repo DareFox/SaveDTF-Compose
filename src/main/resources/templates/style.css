@@ -1108,6 +1108,13 @@ and (max-width : 580px) {
     .gall {
         height: 50vh;
     }
+
+    /* Using min-height as backup               */
+    /* if browser doesn't support aspect-ratio  */ 
+    .andropov_video--iframe {
+        min-height: 225px;
+    }
+
 }
 
 /* Tablet (portrait and landscape) */
@@ -1116,6 +1123,9 @@ and (min-width : 580px)
 and (max-width : 1024px) {
     .gall {
         height: 60vh;
+    }
+    .andropov_video--iframe {
+        min-height: 326px;
     }
 }
 
@@ -1265,10 +1275,6 @@ and (min-width : 1024px) {
 .andropov_video--iframe {
     position: relative;
     width: 100%;
-
-    /* Using min-height as backup               */
-    /* if browser doesn't support aspect-ratio  */ 
-    min-height: 60vh;
     aspect-ratio: 16 / 9;
 }
 
