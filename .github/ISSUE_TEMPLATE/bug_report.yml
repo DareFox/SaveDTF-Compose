@@ -18,7 +18,7 @@ body:
     label: Error description
     description: A clear and concise description of what the bug is.
     placeholder: |
-      When pressing *this* button, program throws NullPointerReference.
+      When pressing *this* button, program crashes
     render: markdown
   validations:
     required: true
@@ -36,15 +36,6 @@ body:
   validations:
     required: true
 - type: textarea
-  id: expectation
-  attributes:
-    label: Expected behavior
-    description: |
-      A clear and concise description of what you expected to happen.
-    render: text
-  validations:
-    required: true
-- type: textarea
   id: screenshots
   attributes:
     label: Screenshots
@@ -54,9 +45,7 @@ body:
 - type: textarea
   id: deviceinfo
   attributes:
-    label: Information about the device
-    placeholder: |
-      OS: [e.g. Windows 10 21H2]
+    label: Logs 
   validations:
     required: false
 - type: textarea
