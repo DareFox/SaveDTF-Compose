@@ -1,3 +1,7 @@
+* {
+    word-wrap: anywhere;
+}
+
 .gall{
     display: -ms-flexbox;
     display: flex;
@@ -1048,12 +1052,12 @@ input[type=checkbox]:checked ~ label > .gl-current-image {
     align-items: center;
 }
 
-
-
 .block-number__digit {
     font-size: 4em;
     line-height: 1em;
     font-weight: bold;
+    word-wrap: anywhere;
+    text-align: center;
 }
 
 .block-code {
