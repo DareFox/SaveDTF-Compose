@@ -19,6 +19,18 @@ fun getCrashLogReport(ex: Throwable): String {
         java.version = ${System.getProperty("java.version")}
     """.trimIndent())
 
+    stringBuilder.title("LOGS")
+    val log = getCurrentLogFile()
+    if (log == null) {
+        stringBuilder.append("Can't find log file")
+    } else {
+        val linesNum = 150
+        stringBuilder.append("Last 150 lines\n")
+        log.readLines().takeLast(linesNum).forEach {
+            stringBuilder.append(it + "\n")
+        }
+    }
+
     stringBuilder.title("STACKTRACE")
     stringBuilder.append(ex.stackTraceToString())
 
