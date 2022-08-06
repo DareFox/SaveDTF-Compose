@@ -7,6 +7,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
+import mu.KotlinLogging
 import ui.AppUI
 import ui.SaveDtfTheme
 import ui.composables.CheckVersion
@@ -24,6 +25,7 @@ import kotlin.system.exitProcess
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
+    val logger = KotlinLogging.logger {  }
     var lastError: Throwable? by mutableStateOf(null)
 
     // copied from https://github.com/JetBrains/compose-jb/issues/1764#issuecomment-1029805939
@@ -54,8 +56,10 @@ fun main() {
 
     if (lastError != null) {
         ComposeCrashMenu(lastError!!)
+        logger.error { "Process exited with code 1" }
         exitProcess(1)
     } else {
+        logger.info { "Process exited with code 0" }
         exitProcess(0)
     }
 }
