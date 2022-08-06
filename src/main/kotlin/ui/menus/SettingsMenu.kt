@@ -31,6 +31,7 @@ import ui.i18n.Lang
 import ui.theme.CustomPallet
 import ui.viewmodel.SettingsViewModel
 import util.desktop.openUrl
+import util.logs.openLogsFolder
 
 @Composable
 fun SettingsMenu() {
@@ -111,6 +112,17 @@ fun SettingsMenu() {
                 if (showWindow) {
                     CheckVersion(true)
                 }
+            }
+
+            fields += {
+                FancyButton(
+                    enabled = true,
+                    onClick = {
+                        openLogsFolder()
+                    },
+                    buttonColors = ButtonDefaults.buttonColors(),
+                    placeholderButton = "Open logs"
+                )
             }
 
             fields += {
