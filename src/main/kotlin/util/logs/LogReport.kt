@@ -1,23 +1,55 @@
 package util
 
+import kmtt.models.enums.Website
 import me.darefox.saveDTF_compose.BuildConfig
+import mu.KotlinLogging
+import ui.viewmodel.SettingsViewModel
+import util.logs.getCurrentLogFile
 
+val logger = KotlinLogging.logger { }
 fun getCrashLogReport(ex: Throwable): String {
-    val stringBuilder = StringBuilder()
-    
+    val stringBuilder = StringBuilder(10000)
+
     stringBuilder.title("PROGRAM VERSION")
-    stringBuilder.append("""
+    stringBuilder.append(
+        """
         SaveDTF_Version = ${BuildConfig.APP_FULL_VERSION}
         SaveDTF_SemanticVersion = ${BuildConfig.APP_SEMANTIC_VERSION}
         SaveDTF_BuildNumber = ${BuildConfig.APP_BUILD_NUMBER}
         SaveDTF_Is_Dev_Version = ${BuildConfig.IS_DEV_VERSION}
-    """.trimIndent())
+    """.trimIndent()
+    )
+
+    stringBuilder.title("PROGRAM SETTINGS")
+    stringBuilder.append(
+        """
+        Replace error media = ${SettingsViewModel.replaceErrorMedia.value} 
+        Retry amount = ${SettingsViewModel.retryAmount.value} 
+        Media timeout in seconds = ${SettingsViewModel.mediaTimeoutInSeconds.value} 
+        Entry timeout in seconds = ${SettingsViewModel.entryTimeoutInSeconds.value} 
+        Save folder is set? = ${!SettingsViewModel.folderToSave.value.isNullOrEmpty()} 
+        Download video = ${SettingsViewModel.downloadVideo.value} 
+        Download image = ${SettingsViewModel.downloadImage.value} 
+        Ignore updates = ${SettingsViewModel.ignoreUpdate.value} 
+        Language = ${SettingsViewModel.proxyLocale.value.localeName} (${SettingsViewModel.proxyLocale.value.localeTag}) 
+    
+        Tokens:
+    """.trimIndent()
+    )
+
+    // DON'T SHOW TOKEN VALUES IN LOGS!!!
+    val tokens = Website.values().joinToString(separator = "") {
+        "\n\t$it - ${!SettingsViewModel.tokens.value[it].isNullOrBlank()}"
+    }
+    stringBuilder.append(tokens)
 
     stringBuilder.title("SYSTEM INFO")
-    stringBuilder.append("""
+    stringBuilder.append(
+        """
         os.name = ${System.getProperty("os.name")}
         java.version = ${System.getProperty("java.version")}
-    """.trimIndent())
+    """.trimIndent()
+    )
 
     stringBuilder.title("LOGS")
     val log = getCurrentLogFile()
@@ -30,6 +62,7 @@ fun getCrashLogReport(ex: Throwable): String {
             stringBuilder.append(it + "\n")
         }
     }
+
 
     stringBuilder.title("STACKTRACE")
     stringBuilder.append(ex.stackTraceToString())
