@@ -46,6 +46,7 @@ body:
   id: deviceinfo
   attributes:
     label: Logs 
+    description: You can get them in the crash window of the program or you can open the folder in the settings and copy the logs from there
     render: markdown
   validations:
     required: false
