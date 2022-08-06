@@ -44,6 +44,75 @@ fun SettingsMenu() {
 
             val folderInput by SettingsViewModel.folderToSave.collectAsState()
 
+            // language
+            fields += {
+                val currentLanguage by SettingsViewModel.proxyLocale.collectAsState()
+
+                SettingsDropdown("${currentLanguage.localeName} (${currentLanguage.localeTag})",
+                    AvailableLanguages.map {
+                        "${it.localeName} (${it.localeTag})" to it
+                    }) {
+                    SettingsViewModel.setLocale(it)
+                }
+            }
+
+            // save folder path
+            fields += {
+                SettingsTextField(
+                    name = lang.settingsAppSaveFolder,
+                    input = folderInput ?: "",
+                    textPlaceholder = lang.settingsAppSaveFolderPlaceholder,
+                    onFieldClick = {
+                        directoryDialog(lang.settingsAppNativeMenuDialog) {
+                            if (it != null) {
+                                SettingsViewModel.setFolderToSave(it)
+                            }
+                        }
+                    }
+                ) {}
+            }
+
+            // open logs
+            fields+= {
+                FancyButton(
+                    enabled = true,
+                    onClick = {
+                        openLogsFolder()
+                    },
+                    buttonColors = ButtonDefaults.buttonColors(),
+                    placeholderButton = lang.settingsAppOpenLogs
+                )
+            }
+
+            // check update toggle
+            fields += {
+                val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()
+
+                SettingsBoolField(lang.settingsAppIgnoreUpdatesQuestion, ignoreUpdates) {
+                    SettingsViewModel.setIgnoreUpdate(it)
+                }
+            }
+
+            // check update bttn
+            fields += {
+                var showWindow by remember { mutableStateOf(false) }
+
+                FancyButton(
+                    enabled = true,
+                    onClick = {
+                        showWindow = !showWindow
+                    },
+                    buttonColors = ButtonDefaults.buttonColors(),
+                    placeholderButton = lang.settingsAppCheckUpdates
+                )
+
+                if (showWindow) {
+                    CheckVersion(true)
+                }
+            }
+
+
+            // reset settings
             fields += {
                 var clicks by remember { mutableStateOf(0) }
                 var success by remember { mutableStateOf<Boolean?>(null) }
@@ -72,68 +141,6 @@ fun SettingsMenu() {
                         isCleared = true // make reset button available only once
                     }
                 }, placeholderButton = text, buttonColors = colors)
-            }
-
-            fields += {
-                SettingsTextField(
-                    name = lang.settingsAppSaveFolder,
-                    input = folderInput ?: "",
-                    textPlaceholder = lang.settingsAppSaveFolderPlaceholder,
-                    onFieldClick = {
-                        directoryDialog(lang.settingsAppNativeMenuDialog) {
-                            if (it != null) {
-                                SettingsViewModel.setFolderToSave(it)
-                            }
-                        }
-                    }
-                ) {}
-            }
-
-            fields += {
-                val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()
-
-                SettingsBoolField(lang.settingsAppIgnoreUpdatesQuestion, ignoreUpdates) {
-                    SettingsViewModel.setIgnoreUpdate(it)
-                }
-            }
-
-            fields += {
-                var showWindow by remember { mutableStateOf(false) }
-
-                FancyButton(
-                    enabled = true,
-                    onClick = {
-                        showWindow = !showWindow
-                    },
-                    buttonColors = ButtonDefaults.buttonColors(),
-                    placeholderButton = lang.settingsAppCheckUpdates
-                )
-
-                if (showWindow) {
-                    CheckVersion(true)
-                }
-            }
-
-            fields += {
-                FancyButton(
-                    enabled = true,
-                    onClick = {
-                        openLogsFolder()
-                    },
-                    buttonColors = ButtonDefaults.buttonColors(),
-                    placeholderButton = "Open logs"
-                )
-            }
-
-            fields += {
-                val currentLanguage by SettingsViewModel.proxyLocale.collectAsState()
-
-                SettingsDropdown("${currentLanguage.localeName} (${currentLanguage.localeTag})",
-                    AvailableLanguages.map {
-                    "${it.localeName} (${it.localeTag})" to it
-                }) {
-                    SettingsViewModel.setLocale(it)
-                }
             }
 
             SettingsFields(fields)
