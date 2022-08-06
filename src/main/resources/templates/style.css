@@ -24,6 +24,7 @@ body {
 
 .savedtf-wrapper{
     margin: 0 auto;
+    max-width: 1020px;
 }
 .content-title{
     font-size: 22px;
@@ -727,6 +728,9 @@ img {
     .content-header-author__avatar+.content-header-author__name {
         margin-left: 30px;
     }
+    .savedtf-wrapper{
+        width: 100%;
+    }
     .content-image--b990b40e-e1ad-5ff5-80df-e190c871315c {
         --offset: 0px;
     }
@@ -761,9 +765,6 @@ img {
         width: 640px;
         margin-left: auto;
         margin-right: auto;
-    }
-    .savedtf-wrapper{
-        max-width: 1020px;
     }
     .l-island-a, .l-island-b{
         width: 640px;
