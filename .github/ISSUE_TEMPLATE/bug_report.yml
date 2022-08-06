@@ -46,6 +46,7 @@ body:
   id: deviceinfo
   attributes:
     label: Logs 
+    render: markdown
   validations:
     required: false
 - type: textarea
@@ -53,6 +54,5 @@ body:
   attributes:
     label: Additional context
     description: Add any other information about the problem here.
-    render: markdown
   validations:
     required: false
