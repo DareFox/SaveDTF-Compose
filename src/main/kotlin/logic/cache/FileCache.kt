@@ -15,8 +15,8 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
 
     override fun setValue(key: String, value: ByteArray) {
         if (tempFolder.freeSpace < value.size) {
-            logger.error {
-                "No free space in tmp folder to cache a file"
+            logger.warn {
+                "Can't save to file cache because disk ran out of space"
             }
         } else {
             tempFolder.resolve(convertToValidName(key)).writeBytes(value)
