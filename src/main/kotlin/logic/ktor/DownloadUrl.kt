@@ -36,7 +36,7 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
     // If url isn't cached -> download it
     do {
         timeout?.join() // Wait if there is too many requests
-        val catched = kotlin.runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
+        val caught = kotlin.runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
             val shouldUseTimeoutRestriction = timeoutInSeconds > 0
             val downloadJob: suspend () -> HttpResponse = {
                 client.rateRequest<HttpResponse> {
@@ -61,11 +61,11 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
         }
 
         yield()
-        val response = catched.getOrNull()
+        val response = caught.getOrNull()
 
         if (response == null) {
             logger.error { "Response is null" }
-            logger.error { "Caught exception: ${catched.exceptionOrNull()} " }
+            logger.error { "Caught exception: ${caught.exceptionOrNull()} " }
         }
 
         // Suspend all requests for 30 seconds on too many requests error
@@ -105,7 +105,7 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
 
             // If no replaceOnError media, throw exception
             if (response == null) {
-                throw catched.exceptionOrNull() ?: RuntimeException(Lang.value.ktorServerNoResponse)
+                throw caught.exceptionOrNull() ?: RuntimeException(Lang.value.ktorServerNoResponse)
             } else {
                 throw IllegalArgumentException(Lang.value.ktorErrorResponseStatus.format(response.status))
             }
