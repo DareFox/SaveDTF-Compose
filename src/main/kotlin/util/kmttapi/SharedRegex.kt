@@ -2,7 +2,7 @@ package util.kmttapi
 
 object SharedRegex {
     // ${'$'} is needed to escape $ symbol in kotlin
-    val entryUrlRegex = """(dtf|vc|tjournal)\.ru\/(u\/|).+?\/.+?(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)
+    val entryUrlRegex = """(dtf|vc|tjournal)\.ru\/((u\/|).+?\/.+?|\d+.*)(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)
 
     /**
      * Get user id from url
