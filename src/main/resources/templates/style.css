@@ -916,7 +916,9 @@ body {
     cursor: zoom-in;
 }
 .gl-footer{
-    padding: 15px 25px 35px 15px;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 25px 15px 25px;
     line-height: 1.5em;
 }
 .gl-counter{
