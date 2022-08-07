@@ -6,15 +6,11 @@ import java.nio.file.InvalidPathException
 import java.nio.file.Paths
 
 fun convertToValidName(name: String, default: String = "null"): String {
-    val file = File(name)
-    val newName = if (isValid(file)) {
-        name
-    } else {
-        SharedRegex.filenameValidationRegex.replace(name, "")
-    }
+    val newName = SharedRegex.filenameValidationRegex.replace(name, "")
+    val file = File(newName)
 
     // Check if new name is valid, if not, return default
-    return if(isValid(File(newName))) {
+    return if (isValid(file)) {
         newName
     } else {
         default
