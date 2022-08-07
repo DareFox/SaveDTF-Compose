@@ -77,6 +77,12 @@ object FormatGalleryModule : IHtmlFormatModule {
             div.attr("json-data-about-element", json.encodeToString(it))
             div.attr("media-url", "https://leonardo.osnova.io/${it.image.data.uuid}")
 
+            // <br> || <br/> regex
+            val breakLineRegex = """<\s*br\s*(/|)>""".toRegex()
+            val cleanTitle = it.title.replace(breakLineRegex,"")
+
+            div.attr("title", cleanTitle)
+
             val type = it.image.data.type
             val attrType = when {
                 imageFormats.contains(type) -> "image"
