@@ -34,9 +34,10 @@ internal class RamCache(val id: String? = null) : BinaryCache {
             val value = cache[key]?.get()
 
             // This value can be collected by GC, so we check it on null
-            if (value != null)
-                logger.debug { "$key wasn't collected by GC. Returning ByteArray with size of ${value.size}" }
-            return value
+            if (value != null) {
+                logger.debug { "$key wasn't collected by GC. Returning saved cache" }
+                return value
+            }
         }
 
         // If no cached value in memory, load it from file.
