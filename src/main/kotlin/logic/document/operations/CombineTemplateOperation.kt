@@ -8,7 +8,7 @@ import util.filesystem.readResource
 
 object CombineTemplateOperation: AbstractProcessorOperation() {
     override val name: String
-        get() = "Template"
+        get() = Lang.value.templateHtmlOperation
 
     override suspend fun process(document: Document): Document {
         val template = withProgressSuspend(Lang.value.readingHtmlTemplate) {
