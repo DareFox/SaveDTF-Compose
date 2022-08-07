@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import mu.KotlinLogging
 import ui.viewmodel.DebugQueueViewModel
 import ui.viewmodel.SettingsViewModel
+import util.kmttapi.SharedRegex
 import util.kmttapi.UrlUtil
 import kotlin.math.log
 
@@ -28,8 +29,11 @@ object QueueViewModel {
                 UrlUtil.getProfileID(it)
             ))
         },
-        UrlChecker(UrlUtil::isEntry) {
-            add(EntryQueueElementViewModel(it))
+        UrlChecker(UrlUtil::isEntry) check@ {
+            // url should start from https to get entry from API
+            // todo: maybe don't call same regex twice?
+            val url = "https://" + (SharedRegex.entryUrlRegex.find(it)?.value ?: return@check)
+            add(EntryQueueElementViewModel(url))
         },
         UrlChecker(UrlUtil::isBookmarkLink) {
             add(createBookmarks(UrlUtil.getWebsiteType(it)!!)) // we do a little bit of trolling !!
