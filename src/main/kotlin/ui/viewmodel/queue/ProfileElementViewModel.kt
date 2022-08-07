@@ -1,7 +1,5 @@
 package ui.viewmodel.queue
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import exception.errorOnNull
 import kmtt.exception.OsnovaRequestException
 import kmtt.models.entry.Entry
@@ -10,7 +8,6 @@ import kmtt.models.subsite.Subsite
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.withLock
@@ -116,7 +113,7 @@ data class ProfileElementViewModel(
 
                 processor
                     .redirectTo(mutableProgress, scope) {// redirect progress of processor to this VM progress
-                        "Entry #${newCounter}, $it" // show entry counter
+                        "${Lang.value.queueVmEntry} #${newCounter}, $it" // show entry counter
                     }
                     .cancelOnSuspendEnd {
                         processor.process() // save document

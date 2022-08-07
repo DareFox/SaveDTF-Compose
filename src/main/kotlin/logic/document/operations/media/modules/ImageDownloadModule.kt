@@ -8,6 +8,7 @@ import logic.document.operations.media.BinaryMedia
 import logic.document.operations.media.Resources
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import ui.i18n.Lang
 import util.dom.recreateWithoutNodes
 
 object ImageDownloadModule: IDownloadModule {
@@ -59,7 +60,8 @@ object ImageDownloadModule: IDownloadModule {
         }
     }
 
-    override val downloadingContentType: String = "Image"
+    override val downloadingContentType: String
+        get() = Lang.value.downloadImageType
 
     /**
      * Create background-image value for style tag

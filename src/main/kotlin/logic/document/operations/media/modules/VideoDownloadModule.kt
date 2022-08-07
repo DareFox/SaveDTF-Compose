@@ -4,6 +4,7 @@ import logic.document.operations.media.BinaryMedia
 import logic.document.operations.media.Resources
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import ui.i18n.Lang
 import util.dom.recreateWithoutNodes
 
 object VideoDownloadModule: IDownloadModule {
@@ -65,5 +66,5 @@ object VideoDownloadModule: IDownloadModule {
     }
 
     override val downloadingContentType: String
-        get() = "Video"
+        get() = Lang.value.downloadVideoType
 }
