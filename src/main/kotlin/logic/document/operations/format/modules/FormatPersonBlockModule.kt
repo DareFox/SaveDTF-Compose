@@ -1,8 +1,6 @@
 package logic.document.operations.format.modules
 
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import util.dom.recreateWithoutNodes
 
 object FormatPersonBlockModule : IHtmlFormatModule {
     override suspend fun process(document: Document): Document {

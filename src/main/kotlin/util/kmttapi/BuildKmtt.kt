@@ -1,7 +1,10 @@
 package util.kmttapi
 
+import kmtt.impl.IAuthKmtt
+import kmtt.impl.IPublicKmtt
+import kmtt.impl.authKmtt
+import kmtt.impl.publicKmtt
 import kmtt.models.enums.Website
-import kmtt.impl.*
 import ui.viewmodel.SettingsViewModel
 import ui.viewmodel.SettingsViewModel.getToken
 

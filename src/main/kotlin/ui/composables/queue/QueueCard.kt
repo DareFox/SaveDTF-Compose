@@ -1,7 +1,6 @@
 package ui.composables.queue
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,18 +22,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.*
+import compose.icons.feathericons.Download
+import compose.icons.feathericons.Folder
+import compose.icons.feathericons.RefreshCcw
+import compose.icons.feathericons.XOctagon
 import kmtt.models.enums.Website
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ui.SaveDtfTheme
 import ui.animations.pulseColor
 import ui.i18n.Lang
-import ui.viewmodel.queue.*
+import ui.viewmodel.queue.IBookmarksElementViewModel
+import ui.viewmodel.queue.IEntryQueueElementViewModel
+import ui.viewmodel.queue.IProfileElementViewModel
+import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import util.desktop.openFileInDefaultApp
-import java.awt.Desktop
 import java.io.File
 
 data class ActionBarElement(

@@ -2,7 +2,9 @@ package logic.document.operations.format.modules
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.decodeFromJsonElement
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 

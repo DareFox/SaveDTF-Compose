@@ -19,9 +19,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
 import ui.viewmodel.SettingsViewModel
-import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus.*
-import util.kmttapi.UrlUtil
 import util.filesystem.convertToValidName
+import util.kmttapi.UrlUtil
 import util.progress.redirectTo
 import java.io.File
 import java.util.*

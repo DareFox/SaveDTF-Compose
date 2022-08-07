@@ -1,9 +1,9 @@
 package logic.document
 
 import kotlinx.coroutines.flow.StateFlow
-import logic.document.operations.*
 import logic.abstracts.AbstractProgress
 import logic.abstracts.IProgress
+import logic.document.operations.*
 import org.jsoup.nodes.Document
 
 /**
@@ -31,4 +31,4 @@ sealed interface IProcessorOperation: IProgress {
 /**
  * Abstract interface that implements some [IProcessorOperation] functionality
  */
-abstract class AbstractProcessorOperation : IProcessorOperation, AbstractProgress() {}
+abstract class AbstractProcessorOperation : IProcessorOperation, AbstractProgress()

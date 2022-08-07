@@ -1,9 +1,5 @@
 package logic.document.operations.media.modules
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.*
 import logic.document.operations.media.BinaryMedia
 import logic.document.operations.media.Resources
 import org.jsoup.nodes.Document
@@ -13,7 +9,7 @@ import util.dom.recreateWithoutNodes
 
 object ImageDownloadModule: IDownloadModule {
     override val folder: String = "img"
-    override val onErrorMedia: BinaryMedia? = Resources.imageLoadFail
+    override val onErrorMedia: BinaryMedia = Resources.imageLoadFail
 
     override fun filter(document: Document): List<Pair<Element, String>> {
         return getImageContainers(document) + getGalleryImageContainers(document)

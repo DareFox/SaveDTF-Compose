@@ -45,7 +45,7 @@ fun AppUI() {
     }
 }
 
-private enum class NavBar() {
+private enum class NavBar {
     DOWNLOAD_MENU,
     SETTINGS_MENU
 }

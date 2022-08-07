@@ -9,7 +9,7 @@ import util.dom.recreateWithoutNodes
 
 object VideoDownloadModule: IDownloadModule {
     override val folder: String = "vid"
-    override val onErrorMedia: BinaryMedia? = Resources.videoLoadFail
+    override val onErrorMedia: BinaryMedia = Resources.videoLoadFail
 
     override fun filter(document: Document): List<Pair<Element, String>> {
         return getGalleryVideoContainers(document) + getRegularVideoContainers(document)

@@ -25,7 +25,6 @@ import ui.i18n.Lang
 import ui.theme.CustomPallet
 import ui.viewmodel.NotificationData
 import ui.viewmodel.NotificationType
-import javax.management.Notification
 
 @Composable
 fun SimpleNotification(notificationData: NotificationData, onClose: () -> Unit) {

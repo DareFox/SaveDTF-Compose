@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import ui.i18n.Lang
-import ui.viewmodel.SettingsViewModel
 
 @Composable
 fun EmptyQueueList() {

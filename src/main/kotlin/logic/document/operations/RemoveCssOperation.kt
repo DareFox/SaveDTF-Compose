@@ -3,7 +3,6 @@ package logic.document.operations
 import logic.document.AbstractProcessorOperation
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
-import ui.viewmodel.SettingsViewModel
 
 /**
  * Remove all CSS style tags from document

@@ -2,10 +2,8 @@ package logic.document.operations
 
 import kotlinx.coroutines.yield
 import logic.document.AbstractProcessorOperation
-import logic.document.IProcessorOperation
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
-import ui.viewmodel.SettingsViewModel
 import java.io.File
 
 /**

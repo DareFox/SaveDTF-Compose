@@ -64,9 +64,9 @@ object SettingsViewModel {
 
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
     val tokens: StateFlow<Map<Website, String>> = _tokens
-    val retryAmount: StateFlow<Int> = _retryAmount;
-    val mediaTimeoutInSeconds: StateFlow<Int> = _mediaTimeoutInSeconds;
-    val entryTimeoutInSeconds: StateFlow<Int> = _entryTimeoutInSeconds;
+    val retryAmount: StateFlow<Int> = _retryAmount
+    val mediaTimeoutInSeconds: StateFlow<Int> = _mediaTimeoutInSeconds
+    val entryTimeoutInSeconds: StateFlow<Int> = _entryTimeoutInSeconds
     val folderToSave: StateFlow<String?> = _folderToSave
     val downloadVideo: StateFlow<Boolean> = _downloadVideo
     val downloadImage: StateFlow<Boolean> = _downloadImage

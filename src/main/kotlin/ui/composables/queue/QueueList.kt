@@ -35,7 +35,7 @@ fun QueueList() {
             val scope = rememberCoroutineScope()
             val lazyListState = rememberLazyListState()
 
-            Column() {
+            Column {
                 Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
 
                 LazyColumn(state = lazyListState) {

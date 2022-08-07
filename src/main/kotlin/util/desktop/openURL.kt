@@ -1,6 +1,5 @@
 package util.desktop
 
-import ui.viewmodel.AppViewModel
 import java.awt.Desktop
 import java.net.URI
 

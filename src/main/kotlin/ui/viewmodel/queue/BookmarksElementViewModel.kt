@@ -4,9 +4,7 @@ import exception.errorOnNull
 import kmtt.impl.authKmtt
 import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
 import logic.document.SettingsBasedDocumentProcessor
 import org.jsoup.Jsoup

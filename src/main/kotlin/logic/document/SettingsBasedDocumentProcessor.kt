@@ -5,9 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import logic.abstracts.AbstractProgress
 import logic.document.operations.*
-import logic.document.operations.CombineTemplateOperation
 import logic.document.operations.format.FormatHtmlOperation
-import logic.document.operations.JavascriptAndCssOperation
 import logic.document.operations.media.SaveMediaOperation
 import logic.document.operations.media.modules.IDownloadModule
 import logic.document.operations.media.modules.ImageDownloadModule

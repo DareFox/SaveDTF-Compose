@@ -11,7 +11,6 @@ import ui.viewmodel.DebugQueueViewModel
 import ui.viewmodel.SettingsViewModel
 import util.kmttapi.SharedRegex
 import util.kmttapi.UrlUtil
-import kotlin.math.log
 
 private val logger = KotlinLogging.logger { }
 

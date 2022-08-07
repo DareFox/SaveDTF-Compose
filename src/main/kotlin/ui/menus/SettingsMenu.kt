@@ -1,11 +1,14 @@
 package ui.menus
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.*
+import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -22,7 +25,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.*
+import compose.icons.feathericons.ChevronDown
+import compose.icons.feathericons.ChevronUp
+import compose.icons.feathericons.Eye
+import compose.icons.feathericons.EyeOff
 import ui.composables.CheckVersion
 import ui.composables.FancyButton
 import ui.composables.directoryDialog
@@ -166,7 +172,7 @@ fun SettingsMenu() {
 
             tokens.forEach {
                 fields += {
-                    val token = it.value ?: ""
+                    val token = it.value
 
                     SettingsTextField(
                         name = it.key.name,
