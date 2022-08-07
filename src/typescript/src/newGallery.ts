@@ -4,6 +4,7 @@ var isInDebugMode = true;
 interface GalleryElement {
     position: number,
     url: string | null,
+    title: string | null,
     type: string | null,
     parent: GalleryElement[],
     element: Element
@@ -24,7 +25,8 @@ const divGalleries = document.querySelectorAll(".gall");
 const divCurrentElement = document.querySelector(".gl-current-element");
 
 const galleryFooter = document.querySelector<HTMLElement>(".gl-footer");
-const galleryFooterText = document.querySelector(".gl-counter");
+const galleryFooterTitle = document.querySelector<HTMLElement>(".gl-title");
+const galleryFooterCounter = document.querySelector(".gl-counter");
 
 var currentElement: GalleryElement | ImageElement | null
 
@@ -48,6 +50,7 @@ function registerGallery(gallDiv: Element) {
         const rawPosition = element.getAttribute("pos")
         const url = element.getAttribute("media-url")
         const type = element.getAttribute("media-type")
+        const title = element.getAttribute("title")
 
         if (rawPosition != null && rawPosition.length > 0) {
             const numPosition = parseInt(rawPosition)
@@ -56,6 +59,7 @@ function registerGallery(gallDiv: Element) {
                 position: numPosition,
                 url: url,
                 type: type, 
+                title: title,
                 parent: galleryArray,
                 element: element
             }
@@ -158,7 +162,8 @@ function openGalleryElement(element: GalleryElement) {
     }
 
     showArrows()
-    setFooter(`${element.position + 1} из ${element.parent.length}`)
+    setFooterDescription(element.title)
+    setFooterCounter(`${element.position + 1} из ${element.parent.length}`)
     setHtmlCurrentElement(newElement) // open modal and show new element
     currentElement = element
 }
@@ -169,10 +174,15 @@ function openImageElement(element: ImageElement) {
     img.src = element.url
 
     hideArrows()
-    setFooter(null) // remove footer
+    setFooterCounter(null) // remove footer counter
     setHtmlCurrentElement(img) // open modal and show new element
     currentElement = element
 
+}
+
+function setFooterDescription(desc: string | null) {
+    log(`Setting "${desc}" description`)
+    if (galleryFooterTitle) galleryFooterTitle.textContent = desc
 }
 
 /*
@@ -206,12 +216,12 @@ function showArrows() {
     if (arrowRight) arrowRight.style.display = "block"
 }
 
-function setFooter(text: string | null) {
+function setFooterCounter(text: string | null) {
     if (text === null) {
         if (galleryFooter) galleryFooter.style.display = "none"
     } else {
-        if (galleryFooter) galleryFooter.style.display = "block"
-        if (galleryFooterText) galleryFooterText.innerHTML = text
+        if (galleryFooter) galleryFooter.style.display = "flex"
+        if (galleryFooterCounter) galleryFooterCounter.innerHTML = text
     }
 }
 

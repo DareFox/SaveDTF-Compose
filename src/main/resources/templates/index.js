@@ -9,7 +9,8 @@ const divImages = document.querySelectorAll(".andropov_image");
 const divGalleries = document.querySelectorAll(".gall");
 const divCurrentElement = document.querySelector(".gl-current-element");
 const galleryFooter = document.querySelector(".gl-footer");
-const galleryFooterText = document.querySelector(".gl-counter");
+const galleryFooterTitle = document.querySelector(".gl-title");
+const galleryFooterCounter = document.querySelector(".gl-counter");
 var currentElement;
 function registerAll() {
     divGalleries.forEach(gall => {
@@ -28,12 +29,14 @@ function registerGallery(gallDiv) {
         const rawPosition = element.getAttribute("pos");
         const url = element.getAttribute("media-url");
         const type = element.getAttribute("media-type");
+        const title = element.getAttribute("title");
         if (rawPosition != null && rawPosition.length > 0) {
             const numPosition = parseInt(rawPosition);
             const galleryElement = {
                 position: numPosition,
                 url: url,
                 type: type,
+                title: title,
                 parent: galleryArray,
                 element: element
             };
@@ -51,7 +54,7 @@ function registerImage(image) {
     // Maybe there's more simplier approach to this
     if (image instanceof HTMLDivElement) {
         var found = undefined;
-        // Get first img and use url from it
+        // Get first img and use url from it 
         for (let element of image.children) {
             if (element instanceof HTMLImageElement) {
                 found = element.src;
@@ -119,7 +122,8 @@ function openGalleryElement(element) {
         newElement = img;
     }
     showArrows();
-    setFooter(`${element.position + 1} из ${element.parent.length}`);
+    setFooterDescription(element.title);
+    setFooterCounter(`${element.position + 1} из ${element.parent.length}`);
     setHtmlCurrentElement(newElement); // open modal and show new element
     currentElement = element;
 }
@@ -128,9 +132,14 @@ function openImageElement(element) {
     const img = document.createElement("img");
     img.src = element.url;
     hideArrows();
-    setFooter(null); // remove footer
+    setFooterCounter(null); // remove footer counter
     setHtmlCurrentElement(img); // open modal and show new element
     currentElement = element;
+}
+function setFooterDescription(desc) {
+    log(`Setting "${desc}" description`);
+    if (galleryFooterTitle)
+        galleryFooterTitle.textContent = desc;
 }
 /*
     Modal menu functions
@@ -160,16 +169,16 @@ function showArrows() {
     if (arrowRight)
         arrowRight.style.display = "block";
 }
-function setFooter(text) {
+function setFooterCounter(text) {
     if (text === null) {
         if (galleryFooter)
             galleryFooter.style.display = "none";
     }
     else {
         if (galleryFooter)
-            galleryFooter.style.display = "block";
-        if (galleryFooterText)
-            galleryFooterText.innerHTML = text;
+            galleryFooter.style.display = "flex";
+        if (galleryFooterCounter)
+            galleryFooterCounter.innerHTML = text;
     }
 }
 function setHtmlCurrentElement(element) {
