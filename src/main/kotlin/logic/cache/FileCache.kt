@@ -3,6 +3,10 @@ package logic.cache
 import mu.KotlinLogging
 import util.filesystem.convertToValidName
 import util.filesystem.getTempCacheFolder
+import util.filesystem.recursiveFileList
+import util.filesystem.recursiveForEach
+import java.io.File
+import java.io.IOException
 
 /**
  * Represents cache on hard drive level.
@@ -34,6 +38,36 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
         }
     }
 
+    private fun makeRoomForFile(data: ByteArray) {
+        val freeSpaceReservationInMb = 2048
+        val freeSpaceReservationInBytes = freeSpaceReservationInMb * 1048576L
+        val isEnoughSpaceForData = tempFolder.freeSpace - data.size >= freeSpaceReservationInBytes
+
+        if (isEnoughSpaceForData) return
+
+        val excessSize = (freeSpaceReservationInBytes - tempFolder.freeSpace) + data.size
+        var releasedSpace = 0L
+
+        for (file in tempFolder.recursiveFileList().sortedBy(File::lastModified)) {
+            if (releasedSpace >= excessSize) {
+                break;
+            }
+
+            try {
+                val expectedReleasedSpaceBytes = file.length()
+
+                if (file.delete()) {
+                    releasedSpace += expectedReleasedSpaceBytes
+                }
+            } catch (ex: IOException) {
+                logger.debug {
+                    "Error during file deletion: [${ex.javaClass.simpleName}]  ${ex.message}\n" +
+                            ex.stackTraceToString()
+                }
+            }
+        }
+    }
+
     override fun remove(key: String): Boolean {
         return tempFolder.resolve(convertToValidName(key)).deleteRecursively()
     }
@@ -47,4 +81,3 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
         logger.info { "Clearing all file cache" }
         return tempFolder.deleteRecursively()
     }
-}
