@@ -575,15 +575,8 @@ img {
 .savedtf-wrapper {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -ms-flex-pack: center;
-    justify-content: center;
     padding-top: 24px;
     padding-bottom: 30px;
-    flex-direction: column;
     width: 100%;
 }
 .content-info__item {
