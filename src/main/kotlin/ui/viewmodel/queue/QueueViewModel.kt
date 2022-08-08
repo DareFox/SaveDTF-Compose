@@ -3,6 +3,7 @@ package ui.viewmodel.queue
 import androidx.compose.animation.core.MutableTransitionState
 import exception.errorOnNull
 import kmtt.models.enums.Website
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -54,6 +55,7 @@ object QueueViewModel {
     fun remove(element: IQueueElementViewModel) {
         _queue.update {
             logger.info { "Removing $element from queue" }
+            element.currentJob.value?.cancel()
             it - element
         }
 
@@ -66,7 +68,8 @@ object QueueViewModel {
 
     fun clear() {
         logger.info { "Clearing queue" }
-        _queue.update {
+        _queue.update { queueList ->
+            queueList.forEach { it.currentJob.value?.cancel() }
             setOf()
         }
     }
