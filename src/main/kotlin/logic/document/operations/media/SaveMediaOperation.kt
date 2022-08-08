@@ -1,6 +1,8 @@
 package logic.document.operations.media
 
-import kotlinx.coroutines.yield
+import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import logic.document.AbstractProcessorOperation
 import logic.document.operations.media.modules.IDownloadModule
 import logic.ktor.Client
@@ -8,6 +10,7 @@ import logic.ktor.downloadUrl
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 
 class SaveMediaOperation(
     val downloaderModules: List<IDownloadModule>,
@@ -15,30 +18,43 @@ class SaveMediaOperation(
     val replaceErrorMedia: Boolean,
     val saveFolder: File,
     val timeoutInSeconds: Int
-): AbstractProcessorOperation() {
+) : AbstractProcessorOperation() {
     override val name: String = Lang.value.saveMediaOperation
     override suspend fun process(document: Document): Document {
-        downloaderModules.forEach {downloader ->
+        for (downloader in downloaderModules) {
             val toDownload = downloader.filter(document)
+            val counter = MutableStateFlow(0)
+            val scope = CoroutineScope(Dispatchers.Default)
 
-            toDownload.mapIndexed { index, url ->
-                val prefix = "${downloader.downloadingContentType} ${index + 1}/${toDownload.size}"
-                val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
-                val media = withProgressSuspend(
-                    Lang.value.saveMediaDownloading.format(prefix, url.second)
-                ) {
-                    Client.downloadUrl(url.second, retryAmount, errMedia, timeoutInSeconds)
-                }
+            val counterJob = counter.onEach {
+                progress(
+                    Lang.value.saveMediaDownloading.format(
+                        downloader.downloadingContentType,
+                        "$it/${toDownload.size}"
+                    )
+                )
+            }.launchIn(scope)
 
-                val file = withProgressSuspend(Lang.value.savingFile.format(prefix)) {
-                    saveTo(media, downloader.folder ?: "")
-                }
+            toDownload.mapIndexed { _, url ->
+                val job = scope.async(context = CoroutineName("Media operation")) {
+                    val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
+                    val media = Client.downloadUrl(url.second, retryAmount, errMedia, timeoutInSeconds) ?: return@async
+                    val file = saveTo(media, downloader.folder ?: "")
+                    val relativePath = file.relativeTo(saveFolder).path
 
-                val relativePath = file.relativeTo(saveFolder).path
-                withProgress(Lang.value.transformingDocument.format(prefix)) {
+                    yield()
+
                     downloader.transform(url.first, relativePath)
                 }
-            }
+
+                job.invokeOnCompletion {
+                    counter.update { it + 1 }
+                }
+
+                job
+            }.awaitAll()
+
+            counterJob.cancel()
         }
 
         withProgressSuspend(Lang.value.savingIndexHtml) {
