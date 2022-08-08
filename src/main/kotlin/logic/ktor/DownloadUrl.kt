@@ -21,7 +21,12 @@ private val cache = buildCache()
 private var timeout: Job? = null
 private val scope = CoroutineScope(Dispatchers.IO)
 
-suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: BinaryMedia? = null, timeoutInSeconds: Int): BinaryMedia {
+suspend fun Client.downloadUrl(
+    url: String,
+    retryAmount: Int,
+    replaceOnError: BinaryMedia? = null,
+    timeoutInSeconds: Int
+): BinaryMedia? {
     val mediaCacheID = convertToValidName(url.getMediaIdOrNull() ?: url)
     val cachedMedia = cache.getValueWithMetadata<MediaMetadata>(mediaCacheID)
     val client = this
@@ -40,6 +45,9 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
             val shouldUseTimeoutRestriction = timeoutInSeconds > 0
             val downloadJob: suspend () -> HttpResponse = {
                 client.rateRequest<HttpResponse> {
+                    logger.debug {
+                        "Sending rate request to $url"
+                    }
                     attemptCounter++
                     method = HttpMethod.Get
                     url(url)
@@ -97,18 +105,13 @@ suspend fun Client.downloadUrl(url: String, retryAmount: Int, replaceOnError: Bi
         // If retryAmount is bigger than 0, then try until reaching retryAmount
         // On retryAmount = 0: repeat request infinitely until success
         if (retryAmount != 0 && attemptCounter >= retryAmount) {
-            // On retry limit, return replaceOnError (if possible)
-            yield()
-            replaceOnError?.let {
-                return it
+            if (response == null) {
+                logger.error(caught.exceptionOrNull() ?: RuntimeException(Lang.value.ktorServerNoResponse))
+            } else {
+                logger.error(IllegalArgumentException(Lang.value.ktorErrorResponseStatus.format(response.status)))
             }
 
-            // If no replaceOnError media, throw exception
-            if (response == null) {
-                throw caught.exceptionOrNull() ?: RuntimeException(Lang.value.ktorServerNoResponse)
-            } else {
-                throw IllegalArgumentException(Lang.value.ktorErrorResponseStatus.format(response.status))
-            }
+            return replaceOnError
         }
 
     } while(true)
