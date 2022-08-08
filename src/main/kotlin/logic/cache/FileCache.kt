@@ -52,12 +52,13 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
         }
     }
 
-    private val freeSpaceReservationInMb: Long = 2048
+    private val minFreeSpaceInMb: Long = 2048
     private val maxSizeOfFileCacheInMb: Long = 4098
 
     private fun makeRoomForFile(data: ByteArray) {
-        val freeSpaceReservationInBytes = freeSpaceReservationInMb * 1048576L
+        val minFreeSpaceInBytes = minFreeSpaceInMb * 1048576L
         val maxSizeOfFileCacheInBytes = maxSizeOfFileCacheInMb * 1048576L
+        val freeSpace = tempFolder.freeSpace
 
         val files = tempFolder.recursiveFileList()
 
@@ -65,18 +66,18 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
         // So we need to sum files length
         val folderLength: Long = files.sumOf { it.length() }
 
-        val isNotEnoughSpace = tempFolder.freeSpace - data.size < freeSpaceReservationInBytes
+        val isNotEnoughSpace = freeSpace - data.size < minFreeSpaceInBytes
         val fileCacheMaxedOut = folderLength >= maxSizeOfFileCacheInBytes
 
-        val excessReservedSpace = freeSpaceReservationInBytes - tempFolder.freeSpace + data.size
+        val excessReservedSpace = minFreeSpaceInBytes - freeSpace + data.size
         val excessCachedMaxedOutSpace = (folderLength + data.size) - maxSizeOfFileCacheInBytes
 
         if (isNotEnoughSpace) {
-            logger.info { "Not enough space for data. Trying to make room for file" }
+            logger.info { "Free space is lower (${sizeToString(freeSpace)}) than minimal requirement (${sizeToString(minFreeSpaceInBytes)}). Trying to make room for file" }
         }
 
         if (fileCacheMaxedOut) {
-            logger.info { "File cached maxed out. Trying to make room for file" }
+            logger.info { "File cached maxed out (Limit: ${sizeToString(maxSizeOfFileCacheInBytes)}). Trying to make room for file" }
         }
 
         if (!isNotEnoughSpace && !fileCacheMaxedOut) return
@@ -86,7 +87,7 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
 
         logger.info { "Excess size = (${sizeToString(toRelease)})" }
         logger.info { "File size = (${sizeToString(data.size.toLong())})" }
-        logger.info { "Temp folder free space = (${sizeToString(tempFolder.freeSpace)})" }
+        logger.info { "Temp folder free space = (${sizeToString(freeSpace)})" }
         logger.info { "Temp folder size = (${sizeToString(folderLength)})" }
 
         freeBytes(toRelease, files)
