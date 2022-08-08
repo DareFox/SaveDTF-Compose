@@ -52,23 +52,53 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
         }
     }
 
+    private val freeSpaceReservationInMb: Long = 2048
+    private val maxSizeOfFileCacheInMb: Long = 4098
+
     private fun makeRoomForFile(data: ByteArray) {
-        val freeSpaceReservationInMb = 2048
         val freeSpaceReservationInBytes = freeSpaceReservationInMb * 1048576L
-        val isEnoughSpaceForData = tempFolder.freeSpace - data.size >= freeSpaceReservationInBytes
+        val maxSizeOfFileCacheInBytes = maxSizeOfFileCacheInMb * 1048576L
 
-        if (isEnoughSpaceForData) return
-        logger.info { "Not enough space for data. Trying to make room for file" }
+        val files = tempFolder.recursiveFileList()
 
-        val excessSize = (freeSpaceReservationInBytes - tempFolder.freeSpace) + data.size
-        var releasedSpace = 0L
+        // File.length() on directory returns unspecified value
+        // So we need to sum files length
+        val folderLength: Long = files.sumOf { it.length() }
 
-        logger.info { "Excess size = (${sizeToString(excessSize)})" }
+        val isNotEnoughSpace = tempFolder.freeSpace - data.size < freeSpaceReservationInBytes
+        val fileCacheMaxedOut = folderLength >= maxSizeOfFileCacheInBytes
+
+        val excessReservedSpace = freeSpaceReservationInBytes - tempFolder.freeSpace + data.size
+        val excessCachedMaxedOutSpace = (folderLength + data.size) - maxSizeOfFileCacheInBytes
+
+        if (isNotEnoughSpace) {
+            logger.info { "Not enough space for data. Trying to make room for file" }
+        }
+
+        if (fileCacheMaxedOut) {
+            logger.info { "File cached maxed out. Trying to make room for file" }
+        }
+
+        if (!isNotEnoughSpace && !fileCacheMaxedOut) return
+
+        // Math.max(), but Kotlin way
+        val toRelease = excessReservedSpace.coerceAtLeast(excessCachedMaxedOutSpace)
+
+        logger.info { "Excess size = (${sizeToString(toRelease)})" }
         logger.info { "File size = (${sizeToString(data.size.toLong())})" }
-        logger.info { "Temp folder space = (${sizeToString(tempFolder.freeSpace)})" }
-        for (file in tempFolder.recursiveFileList().sortedBy(File::lastModified)) {
-            if (releasedSpace >= excessSize) {
-                logger.info { "Released space (${sizeToString(releasedSpace)}) is bigger than excess size. Abort cleaning" }
+        logger.info { "Temp folder free space = (${sizeToString(tempFolder.freeSpace)})" }
+        logger.info { "Temp folder size = (${sizeToString(folderLength)})" }
+
+        freeBytes(toRelease, files)
+    }
+
+    private fun freeBytes(bytes: Long, files: List<File>) {
+        var releasedSpace = 0L
+        for (file in files.sortedBy(File::lastModified)) {
+            if (releasedSpace >= bytes) {
+                logger.info {
+                    "Released space (${sizeToString(releasedSpace)}) is bigger than given (${sizeToString(bytes)}) size. Abort cleaning"
+                }
                 break;
             }
 
