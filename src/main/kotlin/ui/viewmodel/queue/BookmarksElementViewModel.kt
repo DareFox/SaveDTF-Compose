@@ -61,7 +61,12 @@ data class BookmarksElementViewModel(
 
                 processor
                     .redirectTo(mutableProgress, ioScope) {// redirect progress of processor to this VM progress
-                        "Entry #${newCounter}, $it" // show entry counter
+                        val progressValue = it?.run { ", $this" } ?: ""
+
+                        // show entry counter
+                        if (currentJob.value?.isCancelled != true) "${Lang.value.queueVmEntry} #${newCounter}$progressValue"
+                        // show nothing on cancellation
+                        else null
                     }
                     .cancelOnSuspendEnd {
                         processor.process() // save document

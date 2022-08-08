@@ -113,7 +113,12 @@ data class ProfileElementViewModel(
 
                 processor
                     .redirectTo(mutableProgress, scope) {// redirect progress of processor to this VM progress
-                        "${Lang.value.queueVmEntry} #${newCounter}, $it" // show entry counter
+                        val progressValue = it?.run { ", $this" } ?: ""
+
+                        // show entry counter
+                        if (currentJob.value?.isCancelled != true) "${Lang.value.queueVmEntry} #${newCounter}$progressValue"
+                        // show nothing on cancellation
+                        else null
                     }
                     .cancelOnSuspendEnd {
                         processor.process() // save document
