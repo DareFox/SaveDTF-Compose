@@ -33,6 +33,7 @@ suspend fun Client.downloadUrl(
     
     // Return cached version
     cachedMedia?.second?.let { meta ->
+        yield()
         return BinaryMedia(meta, cachedMedia.first)
     }
 
@@ -44,6 +45,7 @@ suspend fun Client.downloadUrl(
         val caught = kotlin.runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
             val shouldUseTimeoutRestriction = timeoutInSeconds > 0
             val downloadJob: suspend () -> HttpResponse = {
+                yield()
                 client.rateRequest<HttpResponse> {
                     logger.debug {
                         "Sending rate request to $url"
@@ -89,8 +91,9 @@ suspend fun Client.downloadUrl(
             val binary = response.content.toByteArray()
             val type = response.contentType()
 
-            requireNotNull(type) {
-                "Content-type of response is null. Can't create BinaryMedia metadata"
+            if (type == null) {
+                logger.error { "Content-type of $url response is null. Can't create BinaryMedia metadata" }
+                return null
             }
 
             val metadata = MediaMetadata(type.contentType, type.contentSubtype, mediaCacheID)
