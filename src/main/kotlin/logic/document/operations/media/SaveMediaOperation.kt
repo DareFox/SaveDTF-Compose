@@ -24,37 +24,40 @@ class SaveMediaOperation(
         for (downloader in downloaderModules) {
             val toDownload = downloader.filter(document)
             val counter = MutableStateFlow(0)
-            val scope = CoroutineScope(Dispatchers.Default)
 
-            val counterJob = counter.onEach {
-                progress(
-                    Lang.value.saveMediaDownloading.format(
-                        downloader.downloadingContentType,
-                        "$it/${toDownload.size}"
+            val counterJob = withContext(Dispatchers.Default) {
+                launch { counter.onEach {
+                    progress(
+                        Lang.value.saveMediaDownloading.format(
+                            downloader.downloadingContentType,
+                            "$it/${toDownload.size}"
+                        )
                     )
-                )
-            }.launchIn(scope)
+                }.collect() }
+            }
 
-            toDownload.mapIndexed { _, url ->
-                val job = scope.async(context = CoroutineName("Media operation")) {
-                    val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
-                    val media = Client.downloadUrl(url.second, retryAmount, errMedia, timeoutInSeconds) ?: return@async
-                    val file = saveTo(media, downloader.folder ?: "")
-                    val relativePath = file.relativeTo(saveFolder).path
+            withContext(Dispatchers.IO) {
+                toDownload.map { url ->
+                    val job = async(context = CoroutineName("Media operation")) {
+                        val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
+                        val media = Client.downloadUrl(url.second, retryAmount, errMedia, timeoutInSeconds) ?: return@async
+                        val file = saveTo(media, downloader.folder ?: "")
+                        val relativePath = file.relativeTo(saveFolder).path
 
-                    yield()
+                        yield()
 
-                    downloader.transform(url.first, relativePath)
-                }
+                        downloader.transform(url.first, relativePath)
+                    }
 
-                job.invokeOnCompletion {
-                    counter.update { it + 1 }
-                }
+                    job.invokeOnCompletion {
+                        counter.update { it + 1 }
+                    }
 
-                job
-            }.awaitAll()
+                    job
+                }.awaitAll()
 
-            counterJob.cancel()
+                counterJob.cancel()
+            }
         }
 
         withProgressSuspend(Lang.value.savingIndexHtml) {
