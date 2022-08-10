@@ -6,7 +6,7 @@ import mu.KotlinLogging
 import ui.viewmodel.SettingsViewModel
 import util.logs.getCurrentLogFile
 
-val logger = KotlinLogging.logger { }
+private val logger = KotlinLogging.logger { }
 fun getCrashLogReport(ex: Throwable): String {
     val stringBuilder = StringBuilder(10000)
 
