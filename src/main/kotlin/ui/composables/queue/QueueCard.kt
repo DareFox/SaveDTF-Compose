@@ -277,7 +277,13 @@ fun QueueCard(
 
                     if (job?.isActive == true) {
                         buttons.add(ActionBarElement(FeatherIcons.XOctagon, "STOP") {
-                            job?.cancel()
+                            scope.launch {
+                                job?.cancel()
+
+                                // re-initialize to get original document
+                                // TODO: In abstract class, undo document changes on cancellation without reinitialization
+                                viewModel.initialize()
+                            }
                         })
                     }
 
