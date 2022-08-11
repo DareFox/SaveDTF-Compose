@@ -288,7 +288,7 @@ fun SettingsMenu() {
     }
 
     categories += {
-        SettingsCategory("Logs") {
+        SettingsCategory(lang.settingsCategoryLogs) {
             val fields = mutableListOf<@Composable () -> Unit>()
 
             fields += {
@@ -308,7 +308,7 @@ fun SettingsMenu() {
                         openLogsFolder()
                     },
                     buttonColors = ButtonDefaults.buttonColors(),
-                    placeholderButton = lang.settingsAppOpenLogs
+                    placeholderButton = lang.settingsLogsOpenLogFolder
                 )
             }
 
