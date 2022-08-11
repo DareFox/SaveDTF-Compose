@@ -56,8 +56,14 @@ fun getCrashLogReport(ex: Throwable): String {
     if (log == null) {
         stringBuilder.append("Can't find log file")
     } else {
-        val linesNum = 150
-        stringBuilder.append("Last 150 lines\n")
+        val level = SettingsViewModel.loggerLevel.value
+        val linesNum = if (level != SettingsViewModel.LoggerLevel.DEBUG) {
+            200
+        } else {
+            500
+        }
+        stringBuilder.append("Level: ${level.name}")
+        stringBuilder.append("Last $linesNum lines\n")
         log.readLines().takeLast(linesNum).forEach {
             stringBuilder.append(it + "\n")
         }
