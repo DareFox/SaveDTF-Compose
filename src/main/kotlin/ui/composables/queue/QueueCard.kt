@@ -303,7 +303,7 @@ fun QueueCard(
                         }
                     }
 
-                    if (status != QueueElementStatus.INITIALIZING) {
+                    if (status != QueueElementStatus.INITIALIZING && job?.isActive != true) {
                         buttons += ActionBarElement(FeatherIcons.RefreshCcw, lang.queueCardRefresh) {
                             scope.launch(CoroutineName("Init operation coroutine")) {
                                 it.initialize()
