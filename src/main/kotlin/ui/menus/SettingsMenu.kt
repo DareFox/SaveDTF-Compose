@@ -78,18 +78,6 @@ fun SettingsMenu() {
                 ) {}
             }
 
-            // open logs
-            fields+= {
-                FancyButton(
-                    enabled = true,
-                    onClick = {
-                        openLogsFolder()
-                    },
-                    buttonColors = ButtonDefaults.buttonColors(),
-                    placeholderButton = lang.settingsAppOpenLogs
-                )
-            }
-
             // check update toggle
             fields += {
                 val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()
