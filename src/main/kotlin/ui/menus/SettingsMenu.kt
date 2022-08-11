@@ -300,6 +300,35 @@ fun SettingsMenu() {
     }
 
     categories += {
+        SettingsCategory("Logs") {
+            val fields = mutableListOf<@Composable () -> Unit>()
+
+            fields += {
+                val currentLog by SettingsViewModel.loggerLevel.collectAsState()
+                val levels = SettingsViewModel.LoggerLevel.values().map {
+                    it.name to it
+                }
+                SettingsDropdown(currentLog.name, levels) {
+                    SettingsViewModel.setLoggerLevel(it)
+                }
+            }
+
+            fields += {
+                FancyButton(
+                    enabled = true,
+                    onClick = {
+                        openLogsFolder()
+                    },
+                    buttonColors = ButtonDefaults.buttonColors(),
+                    placeholderButton = lang.settingsAppOpenLogs
+                )
+            }
+
+            SettingsFields(fields)
+        }
+    }
+
+    categories += {
         SettingsCategory(lang.settingsCategoryCache) {
             var result by remember { mutableStateOf<Boolean?>(null) }
             val backgroundColor = animateColorAsState(
