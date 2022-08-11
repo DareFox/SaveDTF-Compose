@@ -1,19 +1,25 @@
 package ui.viewmodel
 
+import ch.qos.logback.classic.Logger
 import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import logic.cache.buildCache
+import org.slf4j.LoggerFactory
 import ui.i18n.AvailableLanguages
 import ui.i18n.DefaultLanguageResource
 import ui.i18n.LanguageResource
 import ui.i18n.ProxyLanguageResource
 import java.util.prefs.Preferences
+import ch.qos.logback.classic.Level
 
 object SettingsViewModel {
     private val preferences = Preferences.userRoot().node("savedtf-prefs")
     private val eventListeners = mutableListOf<() -> Unit>()
+    enum class LoggerLevel {
+        INFO, DEBUG
+    }
 
     private const val ERROR_MEDIA_BOOL_KEY = "replace_error_media"
     private const val MEDIA_RETRY_AMOUNT_KEY = "retry_amount"
@@ -23,6 +29,7 @@ object SettingsViewModel {
     private const val DOWNLOAD_VIDEO_BOOL_KEY = "download_video"
     private const val DOWNLOAD_IMAGE_BOOL_KEY = "download_image"
     private const val PROGRAM_LOCALE_KEY = "program_locale"
+    private const val LOGGER_LEVEL = "logger_level"
 
     /**
     ———————————No Updates?———————————
@@ -61,6 +68,7 @@ object SettingsViewModel {
     private val _downloadImage = createUpdatableState { getPrefDownloadImage() }
     private val _ignoreUpdate = createUpdatableState { getPrefIgnoreUpdates() }
     private val _proxyLocale = createUpdatableState { getProxyLocale() }
+    private val _loggerLevel = createUpdatableState { getLoggerLevel() }
 
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
     val tokens: StateFlow<Map<Website, String>> = _tokens
@@ -72,6 +80,7 @@ object SettingsViewModel {
     val downloadImage: StateFlow<Boolean> = _downloadImage
     val ignoreUpdate: StateFlow<Boolean> = _ignoreUpdate
     val proxyLocale: StateFlow<LanguageResource> = _proxyLocale
+    val loggerLevel: StateFlow<LoggerLevel> = _loggerLevel
 
     private fun getPrefAllTokens() = mapOf(
         Website.DTF to getPrefToken(Website.DTF),
@@ -94,6 +103,18 @@ object SettingsViewModel {
     private fun getProxyLocale(default: LanguageResource = DefaultLanguageResource): LanguageResource {
         val tag = getPrefLocalTag()
         return ProxyLanguageResource(AvailableLanguages.firstOrNull { tag == it.localeTag} ?: default, default)
+    }
+
+    private fun getLoggerLevel(): LoggerLevel {
+        val level = preferences.get(LOGGER_LEVEL, "INFO")
+
+        val enum = LoggerLevel.values().first {
+            it.name.uppercase() == level.uppercase()
+        }
+
+        setLogbackLevel(enum)
+
+        return enum
     }
 
     fun setToken(token: String?, website: Website) {
@@ -156,6 +177,11 @@ object SettingsViewModel {
         _proxyLocale.value = getProxyLocale()
     }
 
+    fun setLoggerLevel(level: LoggerLevel) {
+        preferences.put(LOGGER_LEVEL, level.name)
+        _loggerLevel.value = getLoggerLevel()
+    }
+
     fun clearCache(): Boolean {
         return buildCache().clearAll()
     }
@@ -204,5 +230,16 @@ object SettingsViewModel {
         preferences.childrenNames().forEach {
             recursivePreferencesReset(preferences.node(it))
         }
+    }
+
+    private fun setLogbackLevel(enum: LoggerLevel) {
+        val toSet = when (enum) {
+            LoggerLevel.INFO -> Level.INFO
+            LoggerLevel.DEBUG -> Level.DEBUG
+        }
+
+        val logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
+
+        logger.level = toSet
     }
 }
