@@ -41,14 +41,27 @@ class SaveMediaOperation(
                 toDownload.map { url ->
                     val job = async(context = CoroutineName("Media operation")) {
                         val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
-                        val media = Client.downloadUrl(url.second, retryAmount, errMedia, timeoutInSeconds) ?: return@async
-                        val file = saveTo(media, downloader.folder ?: "")
-                        val relativePath = file.relativeTo(saveFolder).path
+                        val downloaderFolder = downloader.folder
+
+                        val folder = if (downloaderFolder == null) {
+                            saveFolder
+                        } else {
+                            saveFolder.resolve(downloaderFolder)
+                        }
+
+                        val media = Client.downloadUrl(
+                            url = url.second,
+                            retryAmount = retryAmount,
+                            replaceOnError = errMedia,
+                            timeoutInSeconds = timeoutInSeconds,
+                            directory = folder
+                        ) ?: return@async
+
+                        val relativePath = media.relativeTo(saveFolder).path
 
                         yield()
 
                         downloader.transform(url.first, relativePath)
-
                         logger.info { "Saved ${url.second} (${downloader.downloadingContentType})" }
                     }
 
@@ -72,21 +85,5 @@ class SaveMediaOperation(
         }
 
         return document
-    }
-
-    private suspend fun saveTo(media: BinaryMedia, folder: String): File {
-        saveFolder.mkdirs()
-        require(saveFolder.isDirectory) {
-            "Parameter saveFolder is not a directory"
-        }
-
-        val filename = media.getFileName()
-        val relativeFolder = saveFolder.resolve(folder).also { it.mkdirs() }
-
-        val file = relativeFolder.resolve(filename)
-        yield()
-        file.writeBytes(media.binary)
-
-        return file
     }
 }
