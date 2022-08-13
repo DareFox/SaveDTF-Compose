@@ -6,6 +6,7 @@ import util.cache.prefix
 import util.filesystem.convertToValidName
 import util.filesystem.getTempCacheFolder
 import util.filesystem.recursiveFileList
+import util.filesystem.sizeToString
 import java.io.File
 import java.io.IOException
 import java.text.DecimalFormat
@@ -149,31 +150,6 @@ internal class FileCache(val subdirName: String? = null) : BinaryCache {
                 }
             }
         }
-    }
-
-     private fun sizeToString(size: Long): String {
-        val kilobyte = 1024
-        val megabyte = kilobyte * 1024
-
-        var result = 0f
-        var type = ""
-
-        when {
-            size >= megabyte -> {
-                result = size / megabyte.toFloat()
-                type = "MB"
-            }
-            size >= kilobyte -> {
-                result = size / kilobyte.toFloat()
-                type = "KB"
-            }
-            else -> {
-                return "$size B"
-            }
-        }
-
-        val decimalFormat = DecimalFormat("#.##")
-        return "${decimalFormat.format(result)} $type"
     }
 
     override fun remove(key: String): Boolean {
