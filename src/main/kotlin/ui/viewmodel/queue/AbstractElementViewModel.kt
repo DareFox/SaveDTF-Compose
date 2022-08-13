@@ -126,5 +126,9 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
             readyToUse()
             clearProgress()
         }
+
+        if (error != null) {
+            error(error)
+        }
     }
 }
