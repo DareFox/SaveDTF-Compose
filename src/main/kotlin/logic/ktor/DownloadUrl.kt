@@ -5,16 +5,15 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
+import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import logic.cache.buildCache
 import logic.document.operations.media.BinaryMedia
-import logic.document.operations.media.MediaMetadata
 import mu.KotlinLogging
 import ui.i18n.Lang
-import util.cache.getValueWithMetadata
-import util.cache.setValueWithMetadata
-import util.filesystem.convertToValidName
-import util.kmttapi.getMediaIdOrNull
+import util.string.sha256
+import java.io.File
+import java.io.InputStream
 
 private val logger = KotlinLogging.logger { }
 private val cache = buildCache()
@@ -25,28 +24,46 @@ suspend fun Client.downloadUrl(
     url: String,
     retryAmount: Int,
     replaceOnError: BinaryMedia? = null,
-    timeoutInSeconds: Int
-): BinaryMedia? {
-    val mediaCacheID = convertToValidName(url.getMediaIdOrNull() ?: url)
-    val cachedMedia = cache.getValueWithMetadata<MediaMetadata>(mediaCacheID)
-    val client = this
-    
-    // Return cached version
-    cachedMedia?.second?.let { meta ->
-        yield()
-        return BinaryMedia(meta, cachedMedia.first)
+    timeoutInSeconds: Int,
+    directory: File
+): File? {
+    val inputStream = cache.getValueOrNull(url) ?: download(
+        timeoutInSeconds = timeoutInSeconds,
+        url = url,
+        retryAmount = retryAmount,
+        replaceOnError = replaceOnError
+    ) ?: return null
+
+    val file: File = directory.resolve(url.sha256())
+
+    withContext(Dispatchers.IO) {
+        file.parentFile.mkdirs()
+        file.createNewFile()
     }
 
-    var attemptCounter = 0
+    if (cache.containsKey(url)) {
+        inputStream.copyTo(file.outputStream())
+    } else {
+        cache.setValue(url, inputStream, file.outputStream())
+    }
 
-    // If url isn't cached -> download it
+    return file
+}
+
+private suspend fun download(
+    url: String,
+    retryAmount: Int,
+    replaceOnError: BinaryMedia?,
+    timeoutInSeconds: Int,
+): InputStream? {
+    var attemptCounter = 0
     do {
         timeout?.join() // Wait if there is too many requests
-        val caught = kotlin.runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
+        val caught = runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
             val shouldUseTimeoutRestriction = timeoutInSeconds > 0
             val downloadJob: suspend () -> HttpResponse = {
                 yield()
-                client.rateRequest<HttpResponse> {
+                Client.rateRequest<HttpResponse> {
                     logger.debug {
                         "Sending rate request to $url"
                     }
@@ -79,7 +96,7 @@ suspend fun Client.downloadUrl(
         }
 
         // Suspend all requests for 30 seconds on too many requests error
-        if (response?.status ==  HttpStatusCode.TooManyRequests) {
+        if (response?.status == HttpStatusCode.TooManyRequests) {
             logger.info { "Too many requests. Delaying next requests to 30 seconds" }
             timeout = scope.launch {
                 delay(30000L)
@@ -88,7 +105,6 @@ suspend fun Client.downloadUrl(
         yield()
 
         if (response?.status == HttpStatusCode.OK) {
-            val binary = response.content.toByteArray()
             val type = response.contentType()
 
             if (type == null) {
@@ -96,13 +112,7 @@ suspend fun Client.downloadUrl(
                 return null
             }
 
-            val metadata = MediaMetadata(type.contentType, type.contentSubtype, mediaCacheID)
-            yield()
-
-            // Save to cache
-            cache.setValueWithMetadata(mediaCacheID, binary, metadata)
-
-            return BinaryMedia(metadata, binary)
+            return response.content.toInputStream()
         }
 
         // If retryAmount is bigger than 0, then try until reaching retryAmount
@@ -114,8 +124,9 @@ suspend fun Client.downloadUrl(
                 logger.error(IllegalArgumentException(Lang.value.ktorErrorResponseStatus.format(response.status)))
             }
 
-            return replaceOnError
+            return replaceOnError?.binary?.inputStream()
         }
 
-    } while(true)
+    } while (true)
 }
+
