@@ -62,7 +62,7 @@ fun getCrashLogReport(ex: Throwable): String {
         } else {
             500
         }
-        stringBuilder.append("Level: ${level.name}")
+        stringBuilder.append("Level: ${level.name}\n")
         stringBuilder.append("Last $linesNum lines\n")
         log.readLines().takeLast(linesNum).forEach {
             stringBuilder.append(it + "\n")
