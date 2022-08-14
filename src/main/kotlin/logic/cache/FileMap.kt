@@ -1,12 +1,10 @@
 package logic.cache
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import logic.io.WaitingMutex
 import mu.KotlinLogging
 import java.io.File
 
@@ -20,16 +18,14 @@ import java.io.File
  */
 class FileMap private constructor(
     private val directory: File,
-    private val map: MutableMap<String, File>,
+    private val _map: MutableMap<String, File>,
     private val metadataFile: File
 ) {
-    private val mutex = Mutex()
+    val map: Map<String, File>
+        get() = _map
+
     private val logger = KotlinLogging.logger { }
-
-    // LIMIT TO ONLY 1 WAITING COROUTINE AND 1 RUNNING COROUTINE
-    private val waitingSemaphore = Semaphore(2, 0)
-
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val waitMutex = WaitingMutex(CoroutineScope(Dispatchers.IO + SupervisorJob()))
 
     /**
      * Create key to file association
@@ -49,13 +45,15 @@ class FileMap private constructor(
      */
     fun addKey(key: String, file: File) {
         if (file.exists()) {
-            val previous = map[key]
-            map[key] = file
+            val previous = _map[key]
+            _map[key] = file
 
             // this function runs on another thread and will not block this
             // so don't delay save by deleting previous file
             trySave()
 
+            // File can be used two times or more
+            // TODO: Add check if another key uses file
             if (previous?.exists() == true) {
                 previous.delete()
             }
@@ -78,12 +76,12 @@ class FileMap private constructor(
      * and function will return null
      */
     fun getKey(key: String): File? {
-        val file = map[key] ?: return null
+        val file = _map[key] ?: return null
 
         return if (file.exists() && file.isFile) {
             file
         } else {
-            map.remove(key)
+            _map.remove(key)
             trySave()
             null
         }
@@ -101,14 +99,8 @@ class FileMap private constructor(
     // All this function calls could be done with observable map, but im lazy to implement it
     // And I don't want to use another 3rd party lib for this
     private fun trySave() {
-        if (waitingSemaphore.tryAcquire()) {
-            scope.launch {
-                saveMetadata()
-            }.also {
-                it.invokeOnCompletion {
-                    waitingSemaphore.release()
-                }
-            }
+        waitMutex.tryToRun {
+            saveMetadata()
         }
     }
 
@@ -116,25 +108,23 @@ class FileMap private constructor(
      * Save map to JSON file with buffer delay of 500ms
      */
     private suspend fun saveMetadata() {
-        mutex.withLock {
-            logger.debug { "saveMetadata - Trying to save map to ${metadataFile.absolutePath}" }
-            val json = json.encodeToString(map.mapValues {
-                it.value.absolutePath
-            })
-            metadataFile.createNewFile()
-            metadataFile.writeText(json)
-            logger.debug { "saveMetadata - Finished saving, delaying next call" }
+        logger.debug { "saveMetadata - Trying to save map to ${metadataFile.absolutePath}" }
+        val json = json.encodeToString(_map.mapValues {
+            it.value.absolutePath
+        })
+        metadataFile.createNewFile()
+        metadataFile.writeText(json)
+        logger.debug { "saveMetadata - Finished saving, delaying next call" }
 
-            // Buffer changes
-            delay(500L)
-        }
+        // Buffer changes
+        delay(500L)
     }
 
     /**
      * Remove key-file pair from map
      */
     fun removeKey(key: String) {
-        if (map.remove(key) != null) {
+        _map.remove(key)?.let {
             trySave()
         }
     }
@@ -143,7 +133,7 @@ class FileMap private constructor(
      * Remove **all** key-file pairs from map
      */
     fun clearAll() {
-        map.clear()
+        _map.clear()
         trySave()
     }
 
@@ -153,7 +143,7 @@ class FileMap private constructor(
      * If file is no longer present, it will return false and remove key from map
      */
     fun containsKey(key: String): Boolean {
-        return map[key]?.exists()?.also {
+        return _map[key]?.exists()?.also {
             if (!it) removeKey(key)
         } ?: false
     }
