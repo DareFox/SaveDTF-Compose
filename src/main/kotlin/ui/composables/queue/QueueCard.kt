@@ -293,7 +293,7 @@ fun QueueCard(
                         })
                     }
 
-                    if (status in listOf(QueueElementStatus.READY_TO_USE, QueueElementStatus.SAVED)) {
+                    if (status in listOf(QueueElementStatus.READY_TO_USE)) {
                         buttons += ActionBarElement(FeatherIcons.Download, lang.queueCardSave) {
                             scope.launch(CoroutineName("Save operation coroutine")) {
                                 if (status != QueueElementStatus.IN_USE) { // Double check
