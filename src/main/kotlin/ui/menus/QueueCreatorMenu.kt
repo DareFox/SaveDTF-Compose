@@ -132,7 +132,7 @@ fun QueueCreatorMenu() {
                     FancyButton(isQueueNotEmpty, onClick = {
                         queue.forEach {
                             scope.launch {
-                                if (it.status.value != QueueElementStatus.IN_USE) {
+                                if (QueueElementStatus.READY_TO_USE == it.status.value) {
                                     it.save()
                                 }
                             }
