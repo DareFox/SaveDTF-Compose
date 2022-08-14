@@ -112,7 +112,10 @@ class FileMap private constructor(
         val json = json.encodeToString(_map.mapValues {
             it.value.absolutePath
         })
-        metadataFile.createNewFile()
+        withContext(Dispatchers.IO) {
+            metadataFile.parentFile.mkdirs()
+            metadataFile.createNewFile()
+        }
         metadataFile.writeText(json)
         logger.debug { "saveMetadata - Finished saving, delaying next call" }
 
