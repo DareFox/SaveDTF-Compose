@@ -18,7 +18,7 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
     protected val _status = MutableStateFlow(QueueElementStatus.INITIALIZING)
     override val status: StateFlow<QueueElementStatus> = _status
 
-    protected val ioScope = CoroutineScope(Dispatchers.IO)
+    protected val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     protected val _currentJob = MutableStateFlow<Job?>(null)
     override val currentJob: StateFlow<Job?> = _currentJob
