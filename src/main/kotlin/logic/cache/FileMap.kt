@@ -79,6 +79,7 @@ class FileMap private constructor(
         val file = _map[key] ?: return null
 
         return if (file.exists() && file.isFile) {
+            logger.debug { "Returning ${file.absolutePath} for $key" }
             file
         } else {
             _map.remove(key)
