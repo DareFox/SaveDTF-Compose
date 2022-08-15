@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # This workflow contains a single job called "build"
   buildDeb:
     # Only if pre-release version
     if: "github.event.release.prerelease"
@@ -20,7 +19,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      
+    
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
@@ -73,6 +72,39 @@ jobs:
         run: |
           echo "FILEPATH=$(find . -iname "savedtf*.exe")" >> $GITHUB_ENV
         shell: bash
+        
+      - name: Upload package to Github release page
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.FILEPATH }}
+          tag: ${{ github.ref }}
+          overwrite: true
+
+  buildDmg:
+    # Only if pre-release version
+    if: "!github.event.release.prerelease"
+  
+    # The type of runner that the job will run on
+    runs-on: macos-latest
+
+    name: Build MacOS .dmg package
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build package
+        run: ./gradlew packageDmg
+      
+      - name: Find and save package path
+        run: |
+          echo "FILEPATH=$(find . -name "*.dmg")" >> $GITHUB_ENV
         
       - name: Upload package to Github release page
         uses: svenstaro/upload-release-action@v2
