@@ -117,15 +117,13 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
 
             packageName = "SaveDTF"
-            description = "SaveDTF"
+            description = "Save pages from DTF, VC and TJournal"
             vendor = "DareFox"
-
-
 
             windows {
                 shortcut = true
                 iconFile.set(iconsRoot.resolve("DTF_logo.ico"))
-                packageVersion = currentVersion.convertToSemanticVersion()
+                packageVersion = "${currentVersion.major}.${currentVersion.minor}.${currentVersion.build}"
                 dirChooser = true
                 upgradeUuid = DO_NOT_CHANGE_THIS_UUID
                 menuGroup = "Programs" // Make it searchable in Start menu
