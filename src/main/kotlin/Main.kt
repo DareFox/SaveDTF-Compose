@@ -20,47 +20,55 @@ import java.awt.Toolkit
 import java.awt.Window
 import java.awt.datatransfer.StringSelection
 import java.awt.event.WindowEvent
+import java.io.File
 import kotlin.system.exitProcess
 
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     val logger = KotlinLogging.logger {  }
-    var lastError: Throwable? by mutableStateOf(null)
 
-    // copied from https://github.com/JetBrains/compose-jb/issues/1764#issuecomment-1029805939
-    application(exitProcessOnExit = false) {
-        CompositionLocalProvider(
-            LocalWindowExceptionHandlerFactory provides object : WindowExceptionHandlerFactory {
-                override fun exceptionHandler(window: Window) = WindowExceptionHandler {
-                    lastError = it
-                    window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
+    try {
+        var lastError: Throwable? by mutableStateOf(null)
+
+        // copied from https://github.com/JetBrains/compose-jb/issues/1764#issuecomment-1029805939
+        application(exitProcessOnExit = false) {
+            CompositionLocalProvider(
+                LocalWindowExceptionHandlerFactory provides object : WindowExceptionHandlerFactory {
+                    override fun exceptionHandler(window: Window) = WindowExceptionHandler {
+                        lastError = it
+                        window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
+                    }
                 }
-            }
-        ) {
-            Window(
-                onCloseRequest = ::exitApplication,
-                title = "SaveDTF!",
-                state = rememberWindowState(size = DpSize(820.dp, 740.dp)),
-                icon = painterResource("img/DTF_logo.png"),
             ) {
-                SaveDtfTheme(true) {
-                    AppUI()
-                    NotificationsUI()
-                    CheckVersion()
+                Window(
+                    onCloseRequest = ::exitApplication,
+                    title = "SaveDTF!",
+                    state = rememberWindowState(size = DpSize(820.dp, 740.dp)),
+                    icon = painterResource("img/DTF_logo.png"),
+                ) {
+                    SaveDtfTheme(true) {
+                        AppUI()
+                        NotificationsUI()
+                        CheckVersion()
+                    }
                 }
             }
         }
-    }
 
 
-    if (lastError != null) {
-        ComposeCrashMenu(lastError!!)
-        logger.error { "Process exited with code 1" }
-        exitProcess(1)
-    } else {
-        logger.info { "Process exited with code 0" }
-        exitProcess(0)
+        if (lastError != null) {
+            ComposeCrashMenu(lastError!!)
+            logger.error { "Process exited with code 1" }
+            exitProcess(1)
+        } else {
+            logger.info { "Process exited with code 0" }
+            exitProcess(0)
+        }
+    } catch (ex: Exception) {
+        logger.error(ex) {
+            "Caught exception related ComposeCrashMenu"
+        }
     }
 }
 private fun ComposeCrashMenu(ex: Throwable) {
