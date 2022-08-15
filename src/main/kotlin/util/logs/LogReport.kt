@@ -56,16 +56,21 @@ fun getCrashLogReport(ex: Throwable): String {
     if (log == null) {
         stringBuilder.append("Can't find log file")
     } else {
-        val level = SettingsViewModel.loggerLevel.value
-        val linesNum = if (level != SettingsViewModel.LoggerLevel.DEBUG) {
-            200
-        } else {
-            500
-        }
-        stringBuilder.append("Level: ${level.name}\n")
-        stringBuilder.append("Last $linesNum lines\n")
-        log.readLines().takeLast(linesNum).forEach {
-            stringBuilder.append(it + "\n")
+        try {
+            val level = SettingsViewModel.loggerLevel.value
+            val linesNum = if (level != SettingsViewModel.LoggerLevel.DEBUG) {
+                200
+            } else {
+                500
+            }
+            stringBuilder.append("Level: ${level.name}\n")
+            stringBuilder.append("Last $linesNum lines\n")
+            log.readLines().takeLast(linesNum).forEach {
+                stringBuilder.append(it + "\n")
+            }
+        } catch(ex: Exception) {
+            stringBuilder.append("Caught exception during log reading")
+            stringBuilder.append("${ex.javaClass.name}: ${ex.message}\n${ex.stackTraceToString()}")
         }
     }
 
