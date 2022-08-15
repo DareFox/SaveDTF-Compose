@@ -3,11 +3,20 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
+allprojects {
+    configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            substitute(module("org.jetbrains.compose.compiler:compiler")).apply {
+                using(module("androidx.compose.compiler:compiler:1.2.1-dev-k1.7.10-27cf0868d10"))
+            }
+        }
+    }
+}
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
-    id("org.jetbrains.compose") version "1.1.1"
+    kotlin("jvm") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
+    id("org.jetbrains.compose") version "1.2.0-alpha01-dev755"
     id("org.openjfx.javafxplugin") version "0.0.10"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
 }
@@ -17,6 +26,7 @@ repositories {
     mavenCentral()
     maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://androidx.dev/storage/compose-compiler/repository/")
 }
 
 

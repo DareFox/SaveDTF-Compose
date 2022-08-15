@@ -52,6 +52,7 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
         is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
         is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
         is IProfileElementViewModel -> ProfileCard(viewModel, actionBar)
+        else -> {}
     }
 }
 
