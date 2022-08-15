@@ -10,7 +10,7 @@ on:
 jobs:
   buildDeb:
     # Only if pre-release version
-    if: "!github.event.release.prerelease"
+    if: "github.event.release.prerelease"
   
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
         
   buildExe: 
     # Only if pre-release version
-    if: "!github.event.release.prerelease"
+    if: "github.event.release.prerelease"
   
     runs-on: windows-latest
     
@@ -71,7 +71,7 @@ jobs:
 
   buildDmg:
     # Only if pre-release version
-    if: "!github.event.release.prerelease"
+    if: "github.event.release.prerelease"
   
     # The type of runner that the job will run on
     runs-on: macos-latest
