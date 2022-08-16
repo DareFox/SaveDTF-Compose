@@ -27,22 +27,22 @@ save pages from [DTF](https://dtf.ru "DTF"), [VC](https://vc.ru "VC") and [TJour
 - Windows 7 or later
 - [Visual C++ Redistributable for Visual Studio 2015 ](https://www.microsoft.com/en-us/download/details.aspx?id=48145 "Visual C++ Redistributable for Visual Studio 2015 ")
 
-#### [Download .exe file](https://github.com/DareFox/SaveDTF-compose/releases/latest) 
+#### [Download .exe file](https://github.com/DareFox/SaveDTF-compose/releases) 
 
 ### Linux 
 
 #### Debian, Ubuntu, Mint and etc (.deb)
 
-- #### [Download .deb file](https://github.com/DareFox/SaveDTF-compose/releases/latest) 
+- #### [Download .deb file](https://github.com/DareFox/SaveDTF-compose/releases) 
 
 #### Red Hat based distros (.rpm) 
 
-- #### [Build from sources](#build-from-sources)
+- #### [Build from sources](#build-from-sources-)
 
 ### MacOS
 
 #### Instructions:
-- [Download .pkg file](https://github.com/DareFox/SaveDTF-compose/releases/latest) 
+- [Download .pkg file](https://github.com/DareFox/SaveDTF-compose/releases) 
 - Mount file
 - Move SaveDTF to **Applications** folder
 - Open Terminal and enter this command
@@ -55,7 +55,7 @@ Without this, macOS will prevent launching app because it's unsigned. Command ab
 
 ![macOS Error Message](https://github.com/DareFox/SaveDTF-Compose/blob/main/.github/resources/macOS-savedtf-damaged.jpg "macOS Error Message")
 
-If you don't wan't to remove safety checks for the app, then [build app from source code](#build-from-sources)
+If you don't wan't to remove safety checks for the app, then [build app from source code](#build-from-sources-)
 
 ## Build from sources 🔨
 Requirements: 
