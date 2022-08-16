@@ -66,13 +66,13 @@ Instructions:
 - Clone the repo via `git clone https://github.com/DareFox/SaveDTF-Compose.git` or [download it ](https://github.com/DareFox/SaveDTF-Compose/archive/refs/heads/main.zip "download it ") 
 - Open cloned repo
 - Make gradlew file executable with command `chmod +x ./gradlew`
-- Build installation package via `./gradlew package` **OR** run `./gradlew runDistributable` to run a prepackaged application image
+- Build installation package via `./gradlew package` **OR** run `./gradlew runDistributable` to run the app without installation
 
 ### Windows 
 Instructions: 
 - Clone the repo via `git clone https://github.com/DareFox/SaveDTF-Compose.git` or [download it ](https://github.com/DareFox/SaveDTF-Compose/archive/refs/heads/main.zip "download it ") 
 - Open cloned repo
-- Build installation package via `./gradlew.bat package` **OR** run `./gradlew.bat runDistributable` to run a prepackaged application image
+- Build installation package via `./gradlew.bat package` **OR** run `./gradlew.bat runDistributable` to run the app without installation
 
 ## License 📃
 
