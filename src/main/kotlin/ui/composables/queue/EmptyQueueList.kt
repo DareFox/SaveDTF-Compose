@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import ui.i18n.Lang
 
 @Composable
 fun EmptyQueueList() {
@@ -19,8 +22,10 @@ fun EmptyQueueList() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxHeight()
     ) {
+        val lang by Lang.collectAsState()
+
         Text(
-            text = "\"Пусто... Должно быть это ветер\"",
+            text = lang.emptyQueueList,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.subtitle2,
             modifier = Modifier.fillMaxWidth(),

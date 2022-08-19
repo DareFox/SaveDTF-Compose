@@ -6,24 +6,21 @@ import kmtt.impl.authKmtt
 import kmtt.impl.publicKmtt
 import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.yield
 import logic.document.SettingsBasedDocumentProcessor
 import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import ui.i18n.Lang
 import ui.viewmodel.SettingsViewModel
-import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus.*
-import util.kmttapi.UrlUtil
 import util.filesystem.convertToValidName
+import util.kmttapi.UrlUtil
 import util.progress.redirectTo
 import java.io.File
 import java.util.*
@@ -91,7 +88,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
                 documentProcessor.value = null
 
                 logger.info { "Parsing website" }
-                val website = UrlUtil.getWebsiteType(url).errorOnNull("Website $url is not supported")
+                val website = UrlUtil.getWebsiteType(url).errorOnNull(Lang.value.entryQueueElementVmUrlNotSupported.format(url))
                 _website.value = website
 
                 val token = SettingsViewModel.tokens.value[website]
@@ -111,40 +108,42 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
                 readyToUse()
             } catch (ex: QueueElementException) {
                 error(ex.errorMessage)
-            } catch (ex: Exception) {
-                error("[${ex.javaClass.name}]: ${ex.message}")
+            } catch (ex: Throwable) {
+                error(ex)
             }
         }
     }
 
-    override suspend fun save(): Boolean {
-        mutex.lock()
-        try {
-            inUse()
-            val path = pathToSave.errorOnNull("No path to save")
-            val document = document.errorOnNull("Parsed document is null")
+    override suspend fun save(): Deferred<Boolean> {
+       return waitAndAsyncJob {
+           mutex.lock()
+           try {
+               inUse()
+               val path = pathToSave.errorOnNull("No path to save")
+               val document = document.errorOnNull("Parsed document is null")
 
-            val processor = SettingsBasedDocumentProcessor(File(path), document)
-            documentProcessor.value = processor
+               val processor = SettingsBasedDocumentProcessor(File(path), document, entry.value)
+               documentProcessor.value = processor
 
-            yield()
-            processor.process()
+               yield()
+               processor.process()
 
-            saved()
-            clearProgress()
-            return true
-        } catch (_: CancellationException) {
-            error("Operation cancelled")
-            return false
-        } catch (ex: QueueElementException) {
-            error(ex.errorMessage)
-            return false
-        } catch (ex: Exception) {
-            error("[${ex.javaClass.simpleName}]: ${ex.message}")
-            return false
-        }
-        finally {
-            mutex.unlock()
-        }
+               saved()
+               clearProgress()
+               true
+           } catch (_: CancellationException) {
+               error(Lang.value.entryQueueElementVmOperationCancelled)
+               false
+           } catch (ex: QueueElementException) {
+               error(ex.errorMessage)
+               false
+           } catch (ex: Throwable) {
+               error(ex)
+               false
+           }
+           finally {
+               mutex.unlock()
+           }
+       }
     }
 }

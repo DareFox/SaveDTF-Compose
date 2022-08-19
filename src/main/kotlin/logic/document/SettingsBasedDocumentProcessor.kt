@@ -1,11 +1,11 @@
 package logic.document
 
+import kmtt.models.entry.Entry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import logic.abstracts.AbstractProgress
 import logic.document.operations.*
+import logic.document.operations.format.FormatHtmlOperation
 import logic.document.operations.media.SaveMediaOperation
 import logic.document.operations.media.modules.IDownloadModule
 import logic.document.operations.media.modules.ImageDownloadModule
@@ -20,15 +20,19 @@ import java.io.File
  */
 class SettingsBasedDocumentProcessor(
     val saveFolder: File,
-    document: Document
+    document: Document,
+    val entry: Entry? = null
 ): AbstractProgress() {
     private val necessaryFirstOperations = listOf(
         RemoveCssOperation,
+        RemoveAdsOperation,
+        CombineTemplateOperation,
         FormatHtmlOperation,
-        ChangeTitleOperation
+        ChangeTitleOperation(entry)
     )
 
     private val necessaryLastOperations = listOf(
+        JavascriptAndCssOperation,
         SaveHtmlFileOperation(saveFolder)
     )
 

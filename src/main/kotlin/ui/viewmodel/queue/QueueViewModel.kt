@@ -3,14 +3,15 @@ package ui.viewmodel.queue
 import androidx.compose.animation.core.MutableTransitionState
 import exception.errorOnNull
 import kmtt.models.enums.Website
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import mu.KotlinLogging
 import ui.viewmodel.DebugQueueViewModel
 import ui.viewmodel.SettingsViewModel
+import util.kmttapi.SharedRegex
 import util.kmttapi.UrlUtil
-import kotlin.math.log
 
 private val logger = KotlinLogging.logger { }
 
@@ -22,8 +23,17 @@ object QueueViewModel {
     val creationStateMap: StateFlow<Map<IQueueElementViewModel, MutableTransitionState<Boolean>>> = _creationStateMap
 
     private val urlChecks: List<UrlChecker> = listOf(
-        UrlChecker(UrlUtil::isEntry) {
-            add(EntryQueueElementViewModel(it))
+        UrlChecker(UrlUtil::isUserProfile) {
+            add(ProfileElementViewModel(
+                UrlUtil.getWebsiteType(it)!!,
+                UrlUtil.getProfileID(it)
+            ))
+        },
+        UrlChecker(UrlUtil::isEntry) check@ {
+            // url should start from https to get entry from API
+            // todo: maybe don't call same regex twice?
+            val url = "https://" + (SharedRegex.entryUrlRegex.find(it)?.value ?: return@check)
+            add(EntryQueueElementViewModel(url))
         },
         UrlChecker(UrlUtil::isBookmarkLink) {
             add(createBookmarks(UrlUtil.getWebsiteType(it)!!)) // we do a little bit of trolling !!
@@ -45,6 +55,7 @@ object QueueViewModel {
     fun remove(element: IQueueElementViewModel) {
         _queue.update {
             logger.info { "Removing $element from queue" }
+            element.currentJob.value?.cancel()
             it - element
         }
 
@@ -57,7 +68,8 @@ object QueueViewModel {
 
     fun clear() {
         logger.info { "Clearing queue" }
-        _queue.update {
+        _queue.update { queueList ->
+            queueList.forEach { it.currentJob.value?.cancel() }
             setOf()
         }
     }

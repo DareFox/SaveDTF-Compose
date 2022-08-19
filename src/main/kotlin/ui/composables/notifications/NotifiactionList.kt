@@ -1,12 +1,10 @@
 package ui.composables.notifications
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,7 +13,6 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ui.viewmodel.NotificationsViewModel
@@ -70,10 +67,12 @@ inline fun NotificationList() {
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        VerticalScrollbar(
-            modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
-            adapter = rememberScrollbarAdapter(lazyListState)
-        )
+        if (notifications.isNotEmpty()) {
+            VerticalScrollbar(
+                modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
+                adapter = rememberScrollbarAdapter(lazyListState)
+            )
+        }
     }
 
     scope.launch { // scroll on top, when adding new elements

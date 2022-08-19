@@ -10,12 +10,14 @@ import androidx.compose.ui.Modifier
 import ui.composables.InfoBanner
 import ui.composables.TextBarElement
 import ui.composables.TextNavBar
+import ui.i18n.Lang
 import ui.menus.QueueCreatorMenu
 import ui.menus.SettingsMenu
 
 @Composable
 fun AppUI() {
     Surface(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
+        val lang by Lang.collectAsState()
         var navbarElement by remember { mutableStateOf(NavBar.DOWNLOAD_MENU) }
         var navbarIndex by remember { mutableStateOf(0) }
 
@@ -29,11 +31,11 @@ fun AppUI() {
             }
             Box {
                 TextNavBar(listOf(
-                    TextBarElement("Скачать") {
+                    TextBarElement(lang.navBarMenuDownload) {
                         navbarIndex = it
                         navbarElement = NavBar.DOWNLOAD_MENU
                     },
-                    TextBarElement("Настройки") {
+                    TextBarElement(lang.navBarMenuSettings) {
                         navbarIndex = it
                         navbarElement = NavBar.SETTINGS_MENU
                     },
@@ -43,7 +45,7 @@ fun AppUI() {
     }
 }
 
-private enum class NavBar() {
+private enum class NavBar {
     DOWNLOAD_MENU,
     SETTINGS_MENU
 }

@@ -1,7 +1,7 @@
 package ui.composables
 
 import javafx.application.Platform
-import javafx.embed.swing.JFXPanel;
+import javafx.embed.swing.JFXPanel
 import javafx.scene.Scene
 import javafx.scene.layout.AnchorPane
 import javafx.stage.DirectoryChooser

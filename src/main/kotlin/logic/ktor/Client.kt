@@ -26,7 +26,7 @@ object Client {
     )
 
     val rateLimiter: RateLimiter = rateLimiterRegistry.rateLimiter(rateLimitID)
-    val httpClient: HttpClient = HttpClient() {
+    val httpClient: HttpClient = HttpClient {
         install(HttpTimeout)
         install(JsonFeature) {
             serializer = KotlinxSerializer(kotlinx.serialization.json.Json {

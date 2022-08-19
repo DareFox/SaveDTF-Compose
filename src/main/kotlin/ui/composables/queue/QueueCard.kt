@@ -1,7 +1,6 @@
 package ui.composables.queue
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,19 +25,19 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Download
 import compose.icons.feathericons.Folder
 import compose.icons.feathericons.RefreshCcw
-import compose.icons.feathericons.Trash2
+import compose.icons.feathericons.XOctagon
 import kmtt.models.enums.Website
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ui.SaveDtfTheme
 import ui.animations.pulseColor
-import ui.viewmodel.queue.EntryQueueElementViewModel
+import ui.i18n.Lang
 import ui.viewmodel.queue.IBookmarksElementViewModel
 import ui.viewmodel.queue.IEntryQueueElementViewModel
+import ui.viewmodel.queue.IProfileElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel
 import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
-import java.awt.Desktop
+import util.desktop.openFileInDefaultApp
 import java.io.File
 
 data class ActionBarElement(
@@ -52,6 +51,8 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
     when (viewModel) {
         is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
         is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
+        is IProfileElementViewModel -> ProfileCard(viewModel, actionBar)
+        else -> {}
     }
 }
 
@@ -192,9 +193,10 @@ fun QueueCard(
             Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp, bottom = 12.dp)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.h2,
+                    style = MaterialTheme.typography.h3,
                     maxLines = 1,
-                    color = onColor
+                    color = onColor,
+                    modifier = Modifier.padding(top = 10.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -271,15 +273,29 @@ fun QueueCard(
                     }
 
                     val buttons = actionBar.toMutableList()
+                    val lang by Lang.collectAsState()
+                    val job by viewModel.currentJob.collectAsState()
 
-                    if (status == QueueElementStatus.SAVED) {
-                        buttons.add(ActionBarElement(FeatherIcons.Folder, "Открыть папку") {
-                            Desktop.getDesktop().open(File(viewModel.pathToSave))
+                    if (job?.isActive == true) {
+                        buttons.add(ActionBarElement(FeatherIcons.XOctagon, "STOP") {
+                            scope.launch {
+                                job?.cancel()
+
+                                // re-initialize to get original document
+                                // TODO: In abstract class, undo document changes on cancellation without reinitialization
+                                viewModel.initialize()
+                            }
                         })
                     }
 
-                    if (status in listOf(QueueElementStatus.READY_TO_USE, QueueElementStatus.SAVED)) {
-                        buttons += ActionBarElement(FeatherIcons.Download, "Сохранить") {
+                    if (status == QueueElementStatus.SAVED) {
+                        buttons.add(ActionBarElement(FeatherIcons.Folder, lang.queueCardOpen) {
+                            File(viewModel.pathToSave).openFileInDefaultApp()
+                        })
+                    }
+
+                    if (status in listOf(QueueElementStatus.READY_TO_USE)) {
+                        buttons += ActionBarElement(FeatherIcons.Download, lang.queueCardSave) {
                             scope.launch(CoroutineName("Save operation coroutine")) {
                                 if (status != QueueElementStatus.IN_USE) { // Double check
                                     it.save()
@@ -288,8 +304,8 @@ fun QueueCard(
                         }
                     }
 
-                    if (status != QueueElementStatus.INITIALIZING) {
-                        buttons += ActionBarElement(FeatherIcons.RefreshCcw, "Обновить информацию") {
+                    if (status != QueueElementStatus.INITIALIZING && job?.isActive != true) {
+                        buttons += ActionBarElement(FeatherIcons.RefreshCcw, lang.queueCardRefresh) {
                             scope.launch(CoroutineName("Init operation coroutine")) {
                                 it.initialize()
                             }
@@ -304,6 +320,7 @@ fun QueueCard(
                     }
                 }
 
+                // TODO: Add selection mode
 //                val selected by viewModel.selected.collectAsState()
 //
 //                Checkbox(

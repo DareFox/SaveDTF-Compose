@@ -2,7 +2,7 @@ package util.kmttapi
 
 object SharedRegex {
     // ${'$'} is needed to escape $ symbol in kotlin
-    val entryUrlRegex = """(dtf|vc|tjournal)\.ru\/(u\/|).+?\/.+?(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)
+    val entryUrlRegex = """(dtf|vc|tjournal)\.ru\/((u\/|).+?\/.+?|\d+.*)(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)
 
     /**
      * Get user id from url
@@ -39,6 +39,20 @@ object SharedRegex {
 
         val postInSubsite = "https://dtf.ru/music/1161771-c418-the-end"
         userProfileLinkRegex.find(postInUserBlog)?.value // returns null
+    }
+
+    /**
+     * Get quiz item hash
+     *
+     * Returns hash of quiz item
+     *
+     * @sample quizItemHashUsage
+     */
+    val quizItemHash = """(?<=quiz__item--)\S*""".toRegex(RegexOption.IGNORE_CASE)
+
+    private fun quizItemHashUsage() {
+        val attribute = "quiz__item--a16495916020"
+        quizItemHash.find(attribute)?.value // returns "a16495916020"
     }
 
     /**

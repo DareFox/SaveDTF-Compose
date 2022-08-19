@@ -1,12 +1,17 @@
 package logic.document.operations.media
 
-import kotlinx.coroutines.yield
+import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import logic.document.AbstractProcessorOperation
 import logic.document.operations.media.modules.IDownloadModule
 import logic.ktor.Client
 import logic.ktor.downloadUrl
+import mu.KotlinLogging
 import org.jsoup.nodes.Document
+import ui.i18n.Lang
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 
 class SaveMediaOperation(
     val downloaderModules: List<IDownloadModule>,
@@ -14,55 +19,71 @@ class SaveMediaOperation(
     val replaceErrorMedia: Boolean,
     val saveFolder: File,
     val timeoutInSeconds: Int
-): AbstractProcessorOperation() {
-    override val name: String = "Media saver"
-
+) : AbstractProcessorOperation() {
+    override val name: String = Lang.value.saveMediaOperation
+    private val logger = KotlinLogging.logger {  }
     override suspend fun process(document: Document): Document {
-        downloaderModules.forEach {downloader ->
+        for (downloader in downloaderModules) {
             val toDownload = downloader.filter(document)
+            val counter = MutableStateFlow(0)
 
-            toDownload.mapIndexed { index, url ->
-                val prefix = "${downloader.downloadingContentType} ${index + 1}/${toDownload.size}"
-                val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
-                val media = withProgressSuspend(
-                    "$prefix: Downloading ${url.second}..."
-                ) {
-                    Client.downloadUrl(url.second, retryAmount, errMedia, timeoutInSeconds)
+            withContext(Dispatchers.IO) {
+                val counterJob = launch { counter.onEach {
+                        progress(
+                            Lang.value.saveMediaDownloading.format(
+                                downloader.downloadingContentType,
+                                "$it/${toDownload.size}"
+                            )
+                        )
+                    }.collect()
                 }
 
-                val file = withProgressSuspend("$prefix: Saving file...") {
-                    saveTo(media, downloader.folder ?: "")
-                }
+                toDownload.map { url ->
+                    val job = async(context = CoroutineName("Media operation")) {
+                        val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
+                        val downloaderFolder = downloader.folder
 
-                val relativePath = file.relativeTo(saveFolder).path
-                withProgress("$prefix: Transforming document...") {
-                    downloader.transform(url.first, relativePath)
-                }
+                        val folder = if (downloaderFolder == null) {
+                            saveFolder
+                        } else {
+                            saveFolder.resolve(downloaderFolder)
+                        }
+
+                        val media = Client.downloadUrl(
+                            url = url.second,
+                            retryAmount = retryAmount,
+                            replaceOnError = errMedia,
+                            timeoutInSeconds = timeoutInSeconds,
+                            directory = folder
+                        ) ?: return@async
+
+                        val relativePath = media.relativeTo(saveFolder).path
+
+                        yield()
+
+                        downloader.transform(url.first, relativePath)
+                        logger.info { "Saved ${url.second} (${downloader.downloadingContentType})" }
+                    }
+
+                    job.invokeOnCompletion {
+                        counter.update { it + 1 }
+                    }
+
+                    job
+                }.awaitAll()
+
+                logger.info { "Finished downloading all ${downloader.downloadingContentType} media" }
+
+                counterJob.cancel()
             }
         }
 
-        withProgressSuspend("Saving index.html...") {
+        withProgressSuspend(Lang.value.savingIndexHtml) {
             val indexHTML = saveFolder.mkdirs().let { saveFolder.resolve("index.html") }
             yield()
             indexHTML.writeBytes(document.toString().toByteArray())
         }
 
         return document
-    }
-
-    private suspend fun saveTo(media: BinaryMedia, folder: String): File {
-        saveFolder.mkdirs()
-        require(saveFolder.isDirectory) {
-            "Parameter saveFolder is not a directory"
-        }
-
-        val filename = media.getFileName()
-        val relativeFolder = saveFolder.resolve(folder).also { it.mkdirs() }
-
-        val file = relativeFolder.resolve(filename)
-        yield()
-        file.writeBytes(media.binary)
-
-        return file
     }
 }
