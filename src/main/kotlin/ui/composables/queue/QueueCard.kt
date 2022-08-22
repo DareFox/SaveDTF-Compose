@@ -32,11 +32,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.animations.pulseColor
 import ui.i18n.Lang
-import ui.viewmodel.queue.IBookmarksElementViewModel
-import ui.viewmodel.queue.IEntryQueueElementViewModel
-import ui.viewmodel.queue.IProfileElementViewModel
-import ui.viewmodel.queue.IQueueElementViewModel
-import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
+import viewmodel.queue.IBookmarksElementViewModel
+import viewmodel.queue.IEntryQueueElementViewModel
+import viewmodel.queue.IProfileElementViewModel
+import viewmodel.queue.IQueueElementViewModel
+import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import util.desktop.openFileInDefaultApp
 import java.io.File
 

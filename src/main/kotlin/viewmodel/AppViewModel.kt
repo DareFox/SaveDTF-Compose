@@ -1,4 +1,4 @@
-package ui.viewmodel
+package viewmodel
 
 import io.ktor.client.request.*
 import io.ktor.http.*

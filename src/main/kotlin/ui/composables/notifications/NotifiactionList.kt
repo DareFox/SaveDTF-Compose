@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import ui.viewmodel.NotificationsViewModel
+import viewmodel.NotificationsViewModel
 
 @Composable
 inline fun NotificationList() {

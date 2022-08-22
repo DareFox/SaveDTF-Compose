@@ -1,4 +1,4 @@
-package ui.viewmodel.queue
+package viewmodel.queue
 
 import exception.QueueElementException
 import exception.errorOnNull
@@ -18,7 +18,7 @@ import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
-import ui.viewmodel.SettingsViewModel
+import viewmodel.SettingsViewModel
 import util.filesystem.convertToValidName
 import util.kmttapi.UrlUtil
 import util.progress.redirectTo
@@ -33,7 +33,8 @@ interface IEntryQueueElementViewModel : IQueueElementViewModel {
 
 private val logger = KotlinLogging.logger { }
 
-data class EntryQueueElementViewModel(override val url: String) : AbstractElementViewModel(), IEntryQueueElementViewModel {
+data class EntryQueueElementViewModel(override val url: String) : AbstractElementViewModel(),
+    IEntryQueueElementViewModel {
     private val scope = CoroutineScope(Dispatchers.Default)
     private var document: Document? = null
     private val documentProcessor = MutableStateFlow<SettingsBasedDocumentProcessor?>(null)

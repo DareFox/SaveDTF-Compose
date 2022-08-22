@@ -3,7 +3,7 @@ package logic.document.operations.format
 import logic.document.AbstractProcessorOperation
 import logic.document.operations.format.modules.*
 import org.jsoup.nodes.Document
-import ui.viewmodel.SettingsViewModel
+import viewmodel.SettingsViewModel
 
 /**
  * Take given document with its content and place it in HTML template wrapper

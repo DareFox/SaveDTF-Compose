@@ -21,11 +21,11 @@ import ui.composables.FancyButton
 import ui.composables.FancyInputField
 import ui.composables.queue.QueueList
 import ui.i18n.Lang
-import ui.viewmodel.NotificationData
-import ui.viewmodel.NotificationType
-import ui.viewmodel.NotificationsViewModel
-import ui.viewmodel.SettingsViewModel
-import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
+import viewmodel.NotificationData
+import viewmodel.NotificationType
+import viewmodel.NotificationsViewModel
+import viewmodel.SettingsViewModel
+import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import ui.viewmodel.queue.QueueViewModel
 
 @Composable
@@ -99,11 +99,13 @@ fun QueueCreatorMenu() {
                             FancyButton(canCreateBookmark, onClick = {
                                 QueueViewModel.createBookmarks(website).let { QueueViewModel.add(it) }
                             }, onDisabledClick = {
-                                NotificationsViewModel.add(NotificationData(
+                                NotificationsViewModel.add(
+                                    NotificationData(
                                     text = lang.queueCreatorNoTokenError.format(website),
                                     type = NotificationType.ERROR,
                                     onScreenDuration = 5
-                                ))
+                                )
+                                )
                             }) {
                                 Image(getPainterByWebsite(website), null)
                             }

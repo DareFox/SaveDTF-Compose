@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 import logic.Version
 import mu.KotlinLogging
 import ui.i18n.Lang
-import ui.viewmodel.AppViewModel
-import ui.viewmodel.SettingsViewModel
+import viewmodel.AppViewModel
+import viewmodel.SettingsViewModel
 import java.awt.Desktop
 import java.net.URI
 

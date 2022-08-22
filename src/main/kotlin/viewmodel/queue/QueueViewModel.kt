@@ -1,4 +1,4 @@
-package ui.viewmodel.queue
+package viewmodel.queue
 
 import androidx.compose.animation.core.MutableTransitionState
 import exception.errorOnNull
@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import mu.KotlinLogging
-import ui.viewmodel.DebugQueueViewModel
-import ui.viewmodel.SettingsViewModel
+import viewmodel.DebugQueueViewModel
+import viewmodel.SettingsViewModel
 import util.kmttapi.SharedRegex
 import util.kmttapi.UrlUtil
 
@@ -24,10 +24,12 @@ object QueueViewModel {
 
     private val urlChecks: List<UrlChecker> = listOf(
         UrlChecker(UrlUtil::isUserProfile) {
-            add(ProfileElementViewModel(
+            add(
+                ProfileElementViewModel(
                 UrlUtil.getWebsiteType(it)!!,
                 UrlUtil.getProfileID(it)
-            ))
+            )
+            )
         },
         UrlChecker(UrlUtil::isEntry) check@ {
             // url should start from https to get entry from API

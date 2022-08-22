@@ -11,7 +11,7 @@ import logic.document.operations.media.modules.IDownloadModule
 import logic.document.operations.media.modules.ImageDownloadModule
 import logic.document.operations.media.modules.VideoDownloadModule
 import org.jsoup.nodes.Document
-import ui.viewmodel.SettingsViewModel
+import viewmodel.SettingsViewModel
 import util.progress.redirectTo
 import java.io.File
 
