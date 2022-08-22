@@ -110,7 +110,7 @@ object SettingsViewModel {
     }
 
     private fun getLoggerLevel(): LoggerLevel {
-        val level = preferences.get(LOGGER_LEVEL, "INFO")
+        val level = preferences.get(LOGGER_LEVEL, "DEBUG")
 
         val enum = LoggerLevel.values().first {
             it.name.uppercase() == level.uppercase()
