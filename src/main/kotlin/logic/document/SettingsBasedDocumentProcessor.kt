@@ -57,17 +57,16 @@ class SettingsBasedDocumentProcessor(
         val shouldReplaceErrorMedia = SettingsViewModel.replaceErrorMedia.value
         val retryAmount = SettingsViewModel.retryAmount.value
 
-        if (shouldAddMediaOperation) {
-            val saveMediaModules = mutableListOf<IDownloadModule>()
 
-            if (shouldDownloadImage) saveMediaModules.add(ImageDownloadModule)
-            if (shouldDownloadVideo) saveMediaModules.add(VideoDownloadModule)
+        val saveMediaModules = mutableListOf<Pair<IDownloadModule, Boolean>>()
 
-            val timeoutMedia = SettingsViewModel.mediaTimeoutInSeconds.value
-            val mediaOperation = SaveMediaOperation(saveMediaModules, retryAmount, shouldReplaceErrorMedia, saveFolder, timeoutMedia)
+        saveMediaModules += ImageDownloadModule to shouldDownloadImage
+        saveMediaModules += VideoDownloadModule to shouldDownloadVideo
 
-            variableOperations.add(mediaOperation)
-        }
+        val timeoutMedia = SettingsViewModel.mediaTimeoutInSeconds.value
+        val mediaOperation = SaveMediaOperation(saveMediaModules, retryAmount, shouldReplaceErrorMedia, saveFolder, timeoutMedia)
+
+        variableOperations.add(mediaOperation)
 
         val queue = necessaryFirstOperations + variableOperations + necessaryLastOperations
 
