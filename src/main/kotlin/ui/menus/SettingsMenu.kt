@@ -286,7 +286,7 @@ fun SettingsMenu() {
             val downloadMetadata by SettingsViewModel.saveMetadata.collectAsState()
 
             fields += {
-                SettingsBoolField("Save metadata?", downloadMetadata) {
+                SettingsBoolField(lang.settingsSaveMetadataQuestion, downloadMetadata) {
                     SettingsViewModel.setSaveMetadataMode(it)
                 }
             }
