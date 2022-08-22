@@ -23,17 +23,21 @@ class SettingsBasedDocumentProcessor(
     document: Document,
     val entry: Entry? = null
 ): AbstractProgress() {
-    private val necessaryFirstOperations = listOf(
+    private val necessaryFirstOperations = mutableListOf(
         RemoveCssOperation,
         RemoveAdsOperation,
         CombineTemplateOperation,
         FormatHtmlOperation,
         ChangeTitleOperation(entry)
-    )
+    ).apply {
+        if (entry != null && SettingsViewModel.saveMetadata.value) {
+            add(SaveMetadata(entry, saveFolder))
+        }
+    }
 
-    private val necessaryLastOperations = listOf(
+    private val necessaryLastOperations = mutableListOf(
         JavascriptAndCssOperation,
-        SaveHtmlFileOperation(saveFolder)
+        SaveHtmlFileOperation(saveFolder),
     )
 
     private val processor = DocumentProcessor(document, saveFolder)
