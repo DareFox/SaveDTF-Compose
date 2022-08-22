@@ -283,6 +283,15 @@ fun SettingsMenu() {
                 }
             }
 
+            val downloadMetadata by SettingsViewModel.saveMetadata.collectAsState()
+
+            fields += {
+                SettingsBoolField("Save metadata?", downloadMetadata) {
+                    SettingsViewModel.setSaveMetadataMode(it)
+                }
+            }
+
+
             SettingsFields(fields)
         }
     }
