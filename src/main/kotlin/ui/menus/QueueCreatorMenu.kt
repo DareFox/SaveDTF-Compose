@@ -26,7 +26,7 @@ import viewmodel.NotificationType
 import viewmodel.NotificationsViewModel
 import viewmodel.SettingsViewModel
 import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
-import ui.viewmodel.queue.QueueViewModel
+import viewmodel.queue.QueueViewModel
 
 @Composable
 @Preview
