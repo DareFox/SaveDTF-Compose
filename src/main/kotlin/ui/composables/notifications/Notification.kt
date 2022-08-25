@@ -23,8 +23,8 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.X
 import ui.i18n.Lang
 import ui.theme.CustomPallet
-import ui.viewmodel.NotificationData
-import ui.viewmodel.NotificationType
+import viewmodel.NotificationData
+import viewmodel.NotificationType
 
 @Composable
 fun SimpleNotification(notificationData: NotificationData, onClose: () -> Unit) {

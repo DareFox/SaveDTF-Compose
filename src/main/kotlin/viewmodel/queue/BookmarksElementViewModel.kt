@@ -1,4 +1,4 @@
-package ui.viewmodel.queue
+package viewmodel.queue
 
 import exception.errorOnNull
 import kmtt.impl.authKmtt
@@ -9,8 +9,8 @@ import kotlinx.coroutines.sync.withLock
 import logic.document.SettingsBasedDocumentProcessor
 import org.jsoup.Jsoup
 import ui.i18n.Lang
-import ui.viewmodel.SettingsViewModel
-import ui.viewmodel.SettingsViewModel.getToken
+import viewmodel.SettingsViewModel
+import viewmodel.SettingsViewModel.getToken
 import util.coroutine.cancelOnSuspendEnd
 import util.filesystem.toDirectory
 import util.progress.redirectTo

@@ -1,4 +1,4 @@
-package ui.viewmodel
+package viewmodel
 
 import ch.qos.logback.classic.Logger
 import kmtt.models.enums.Website
@@ -30,9 +30,10 @@ object SettingsViewModel {
     private const val DOWNLOAD_IMAGE_BOOL_KEY = "download_image"
     private const val PROGRAM_LOCALE_KEY = "program_locale"
     private const val LOGGER_LEVEL = "logger_level"
+    private const val SAVE_METADATA_KEY = "save_metadata"
 
     /**
-    ———————————No Updates?———————————
+    ———————————No Updates?——————————————
     ⠀⣞⢽⢪⢣⢣⢣⢫⡺⡵⣝⡮⣗⢷⢽⢽⢽⣮⡷⡽⣜⣜⢮⢺⣜⢷⢽⢝⡽⣝
     ⠸⡸⠜⠕⠕⠁⢁⢇⢏⢽⢺⣪⡳⡝⣎⣏⢯⢞⡿⣟⣷⣳⢯⡷⣽⢽⢯⣳⣫⠇
     ⠀⠀⢀⢀⢄⢬⢪⡪⡎⣆⡈⠚⠜⠕⠇⠗⠝⢕⢯⢫⣞⣯⣿⣻⡽⣏⢗⣗⠏⠀
@@ -46,7 +47,7 @@ object SettingsViewModel {
     ⠀⠀⠀⣴⣿⣾⣿⣿⣿⡿⡽⡑⢌⠪⡢⡣⣣⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠀⠀⡟⡾⣿⢿⢿⢵⣽⣾⣼⣘⢸⢸⣞⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠀⠀⠀⠁⠇⠡⠩⡫⢿⣝⡻⡮⣒⢽⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ——————————————————————————————————
+    —————————————————————————————————
      */
     private const val MUTE_UPDATES_NOTIFICATION_KEY = "no_updates_${AppViewModel.VERSION}"
 
@@ -69,6 +70,7 @@ object SettingsViewModel {
     private val _ignoreUpdate = createUpdatableState { getPrefIgnoreUpdates() }
     private val _proxyLocale = createUpdatableState { getProxyLocale() }
     private val _loggerLevel = createUpdatableState { getLoggerLevel() }
+    private val _saveMetadta = createUpdatableState { getSaveMetadata() }
 
     val replaceErrorMedia: StateFlow<Boolean> = _replaceErrorMedia
     val tokens: StateFlow<Map<Website, String>> = _tokens
@@ -81,6 +83,7 @@ object SettingsViewModel {
     val ignoreUpdate: StateFlow<Boolean> = _ignoreUpdate
     val proxyLocale: StateFlow<LanguageResource> = _proxyLocale
     val loggerLevel: StateFlow<LoggerLevel> = _loggerLevel
+    val saveMetadata: StateFlow<Boolean> = _saveMetadta
 
     private fun getPrefAllTokens() = mapOf(
         Website.DTF to getPrefToken(Website.DTF),
@@ -95,6 +98,7 @@ object SettingsViewModel {
         return preferences.node("tkn").get(website.name, "")
     }
     private fun getPrefDownloadVideo() = preferences.getBoolean(DOWNLOAD_VIDEO_BOOL_KEY, true)
+    private fun getSaveMetadata() = preferences.getBoolean(SAVE_METADATA_KEY, false)
     private fun getPrefDownloadImage() = preferences.getBoolean(DOWNLOAD_IMAGE_BOOL_KEY, true)
     private fun getPrefIgnoreUpdates() = preferences.getBoolean(MUTE_UPDATES_NOTIFICATION_KEY, false)
     private fun getPrefMediaTimeout() = preferences.getInt(MEDIA_TIMEOUT_TIME_KEY, 300)
@@ -106,7 +110,7 @@ object SettingsViewModel {
     }
 
     private fun getLoggerLevel(): LoggerLevel {
-        val level = preferences.get(LOGGER_LEVEL, "INFO")
+        val level = preferences.get(LOGGER_LEVEL, "DEBUG")
 
         val enum = LoggerLevel.values().first {
             it.name.uppercase() == level.uppercase()
@@ -180,6 +184,11 @@ object SettingsViewModel {
     fun setLoggerLevel(level: LoggerLevel) {
         preferences.put(LOGGER_LEVEL, level.name)
         _loggerLevel.value = getLoggerLevel()
+    }
+
+    fun setSaveMetadataMode(shouldDownload: Boolean) {
+        preferences.putBoolean(SAVE_METADATA_KEY, shouldDownload)
+        _saveMetadta.value = getSaveMetadata()
     }
 
     fun clearCache(): Boolean {

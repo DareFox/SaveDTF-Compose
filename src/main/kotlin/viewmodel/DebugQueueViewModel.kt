@@ -1,7 +1,7 @@
-package ui.viewmodel
+package viewmodel
 
-import ui.viewmodel.queue.EntryQueueElementViewModel
-import ui.viewmodel.queue.IQueueElementViewModel
+import viewmodel.queue.EntryQueueElementViewModel
+import viewmodel.queue.IQueueElementViewModel
 
 object DebugQueueViewModel {
     val startQueue = listOf<IQueueElementViewModel>(

@@ -21,7 +21,7 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
 import ui.i18n.Lang
-import ui.viewmodel.queue.QueueViewModel
+import viewmodel.queue.QueueViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

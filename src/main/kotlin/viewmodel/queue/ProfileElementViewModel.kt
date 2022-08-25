@@ -1,4 +1,4 @@
-package ui.viewmodel.queue
+package viewmodel.queue
 
 import exception.errorOnNull
 import kmtt.exception.OsnovaRequestException

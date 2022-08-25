@@ -1,4 +1,4 @@
-package ui.viewmodel
+package viewmodel
 
 import androidx.compose.animation.core.MutableTransitionState
 import kotlinx.coroutines.*

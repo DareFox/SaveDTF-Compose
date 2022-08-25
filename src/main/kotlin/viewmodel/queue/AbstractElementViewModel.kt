@@ -1,4 +1,4 @@
-package ui.viewmodel.queue
+package viewmodel.queue
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import logic.abstracts.AbstractProgress
 import mu.KotlinLogging
-import ui.viewmodel.SettingsViewModel
-import ui.viewmodel.queue.IQueueElementViewModel.QueueElementStatus
+import viewmodel.SettingsViewModel
+import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 

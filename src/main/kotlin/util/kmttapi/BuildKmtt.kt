@@ -5,8 +5,8 @@ import kmtt.impl.IPublicKmtt
 import kmtt.impl.authKmtt
 import kmtt.impl.publicKmtt
 import kmtt.models.enums.Website
-import ui.viewmodel.SettingsViewModel
-import ui.viewmodel.SettingsViewModel.getToken
+import viewmodel.SettingsViewModel
+import viewmodel.SettingsViewModel.getToken
 
 /**
  * Creating kmttAPI client based on settings.

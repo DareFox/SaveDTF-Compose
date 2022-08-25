@@ -1,5 +1,5 @@
 package ui.i18n
 
-import ui.viewmodel.SettingsViewModel
+import viewmodel.SettingsViewModel
 
 val Lang = SettingsViewModel.proxyLocale

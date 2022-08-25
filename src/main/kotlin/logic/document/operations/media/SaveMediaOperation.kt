@@ -1,6 +1,5 @@
 package logic.document.operations.media
 
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import logic.document.AbstractProcessorOperation
@@ -11,10 +10,12 @@ import mu.KotlinLogging
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
 import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
 
 class SaveMediaOperation(
-    val downloaderModules: List<IDownloadModule>,
+    /**
+     * List of download modules pairs. On true, will download media from (given by downloader) URLs, on false - won't
+     */
+    val downloaderModules: List<Pair<IDownloadModule, Boolean>>,
     val retryAmount: Int,
     val replaceErrorMedia: Boolean,
     val saveFolder: File,
@@ -23,7 +24,10 @@ class SaveMediaOperation(
     override val name: String = Lang.value.saveMediaOperation
     private val logger = KotlinLogging.logger {  }
     override suspend fun process(document: Document): Document {
-        for (downloader in downloaderModules) {
+        for (moduleIgnorePair in downloaderModules) {
+            val downloader = moduleIgnorePair.first
+            val doNotDownloadURL = !moduleIgnorePair.second
+
             val toDownload = downloader.filter(document)
             val counter = MutableStateFlow(0)
 
@@ -38,31 +42,41 @@ class SaveMediaOperation(
                     }.collect()
                 }
 
+                if (doNotDownloadURL) {
+                    logger.info { "Ignoring download ${downloader.downloadingContentType} operation. All media will be linked to original URL" }
+                }
+
                 toDownload.map { url ->
                     val job = async(context = CoroutineName("Media operation")) {
-                        val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
-                        val downloaderFolder = downloader.folder
-
-                        val folder = if (downloaderFolder == null) {
-                            saveFolder
+                        val relativePath = if (doNotDownloadURL) {
+                            url.second
                         } else {
-                            saveFolder.resolve(downloaderFolder)
+                            val errMedia = if (replaceErrorMedia) downloader.onErrorMedia else null
+                            val downloaderFolder = downloader.folder
+
+                            val folder = if (downloaderFolder == null) {
+                                saveFolder
+                            } else {
+                                saveFolder.resolve(downloaderFolder)
+                            }
+
+                            val media = Client.downloadUrl(
+                                url = url.second,
+                                retryAmount = retryAmount,
+                                replaceOnError = errMedia,
+                                timeoutInSeconds = timeoutInSeconds,
+                                directory = folder
+                            ) ?: return@async
+
+                            media.relativeTo(saveFolder).path
                         }
-
-                        val media = Client.downloadUrl(
-                            url = url.second,
-                            retryAmount = retryAmount,
-                            replaceOnError = errMedia,
-                            timeoutInSeconds = timeoutInSeconds,
-                            directory = folder
-                        ) ?: return@async
-
-                        val relativePath = media.relativeTo(saveFolder).path
 
                         yield()
 
                         downloader.transform(url.first, relativePath)
-                        logger.info { "Saved ${url.second} (${downloader.downloadingContentType})" }
+                        if (!doNotDownloadURL) {
+                            logger.info { "Saved ${url.second} (${downloader.downloadingContentType})" }
+                        }
                     }
 
                     job.invokeOnCompletion {

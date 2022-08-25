@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import ui.i18n.Lang
-import ui.viewmodel.queue.IProfileElementViewModel
-import ui.viewmodel.queue.IQueueElementViewModel
+import viewmodel.queue.IProfileElementViewModel
+import viewmodel.queue.IQueueElementViewModel
 
 @Composable
 fun ProfileCard(viewModel: IProfileElementViewModel, actionBar: List<ActionBarElement> = listOf()) {

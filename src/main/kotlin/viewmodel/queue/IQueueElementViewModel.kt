@@ -1,4 +1,4 @@
-package ui.viewmodel.queue
+package viewmodel.queue
 
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job

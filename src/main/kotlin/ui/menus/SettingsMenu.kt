@@ -35,7 +35,7 @@ import ui.composables.directoryDialog
 import ui.i18n.AvailableLanguages
 import ui.i18n.Lang
 import ui.theme.CustomPallet
-import ui.viewmodel.SettingsViewModel
+import viewmodel.SettingsViewModel
 import util.desktop.openUrl
 import util.logs.openLogsFolder
 
@@ -282,6 +282,15 @@ fun SettingsMenu() {
                     SettingsViewModel.setDownloadImageMode(it)
                 }
             }
+
+            val downloadMetadata by SettingsViewModel.saveMetadata.collectAsState()
+
+            fields += {
+                SettingsBoolField(lang.settingsSaveMetadataQuestion, downloadMetadata) {
+                    SettingsViewModel.setSaveMetadataMode(it)
+                }
+            }
+
 
             SettingsFields(fields)
         }
