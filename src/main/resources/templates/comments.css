@@ -1,0 +1,100 @@
+.comment-list {
+  width: 100%;
+  max-width: 550px;
+}
+
+.nodes-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.hide {
+  width: 2%;
+  min-width: 3px;
+  max-width: 10px;
+  background: green;
+}
+
+.comment {
+  min-height: 120px;
+  padding: 0px 6px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.comment .header {
+  padding-top: 5px;
+  height: 30%;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+}
+
+.comment .content {
+  overflow-wrap: break-word;
+  padding-top: 10px;
+}
+
+.comment-node {
+  width: 100%;
+}
+
+.comment .avatar {
+  flex: 1;
+  margin-right: 10px;
+  height: 35px;
+  width: 35px;
+  border-radius: 100%;
+}
+
+.comment .info {
+  display: flex;
+  flex: 10;
+  flex-direction: column;
+}
+
+.comment .nickname {
+  font-size: 1em;
+}
+
+.comment .date {
+  font-size: 0.8em;
+}
+
+.nodes-wrapper .nodes {
+  overflow: auto;
+  flex-grow: 1;
+}
+
+.comment .header .left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.attachment * {
+  padding-top: 5px;
+  object-fit: contain;
+  width: 80%;
+}
+
+.karma {
+ padding: 2px 10px;
+ border-radius: 10%;
+}
+
+.positive-karma {
+  background: #abf3a3;
+  color: #03702c;
+}
+
+.negative-karma {
+  background: #f6a2a2;
+  color: #ee1a1a;
+}
+
+.neutral-karma {
+  background: #c6c6c6;
+  color: #353535;
+}
