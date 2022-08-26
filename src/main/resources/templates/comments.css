@@ -11,7 +11,7 @@
 .hide {
   width: 2%;
   min-width: 3px;
-  max-width: 10px;
+  max-width: 8px;
   background: green;
 }
 
