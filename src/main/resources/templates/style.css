@@ -1318,3 +1318,12 @@ and (min-width : 1024px) {
 i {
     font-style: italic;
 }
+
+.comments-list {
+    width: 100%;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
