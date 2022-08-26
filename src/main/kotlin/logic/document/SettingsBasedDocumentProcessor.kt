@@ -28,8 +28,12 @@ class SettingsBasedDocumentProcessor(
         RemoveAdsOperation,
         CombineTemplateOperation,
         FormatHtmlOperation,
-        ChangeTitleOperation(entry)
+        ChangeTitleOperation(entry),
     ).apply {
+        if (entry != null) {
+            add(SaveCommentsOperation(entry))
+        }
+
         if (entry != null && SettingsViewModel.saveMetadata.value) {
             add(SaveMetadata(entry, saveFolder))
         }
