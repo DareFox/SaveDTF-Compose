@@ -102,3 +102,10 @@
     max-height: 500px;
     width: auto;
 }
+
+
+a {
+    color: #3766a9;
+    border-bottom: 1px solid #bed0ea;
+    cursor: pointer;
+}

@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import util.dom.getWebsite
 import util.filesystem.readResource
+import util.kmttapi.SharedRegex
 import util.kmttapi.betterPublicKmtt
 import util.random.randomColor
 
@@ -107,18 +108,19 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         }
 
         // Get content block
-        val content = commentNode
-            .select(".comment .content")
+        val commentText = commentNode
+            .select(".comment .content .text")
             .first() ?: throw IllegalArgumentException("No content element")
 
-        content.text(comment.value.text ?: "")
+        commentText.text(comment.value.text ?: "")
+        makeElementTextLinkable(commentText)
 
         // Get/create attachment block
-        val attachment = content
-            .select(".attachment")
+        val attachment = commentNode
+            .select(".comment .content .attachment")
             .first() ?: Element("div").apply {
                 addClass("attachment")
-                content.appendChild(this)
+                commentText.appendChild(this)
             }
 
         comment.value.media?.forEach {
@@ -195,4 +197,11 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         return commentNode
     }
 
+    private fun makeElementTextLinkable(element: Element) {
+        val text = element.text()
+        val newText = text.replace(SharedRegex.urlRegex) {
+            "<a href=\"${it.value}\">${it.value}</a>"
+        }
+        element.html(newText)
+    }
 }

@@ -230,7 +230,8 @@ img {
 .andropov_telegram__logo .icon, .andropov_tweet__logo .icon {
     fill: #1d9bf0!important;
 }
-.advice__caption a, .advice__list a, .andropov_telegram__text a, .andropov_tweet__text a, .island__container--with_links a, .island__info a, .island__list__link, .subsite_about__text a {
+
+a, .advice__caption a, .advice__list a, .andropov_telegram__text a, .andropov_tweet__text a, .island__container--with_links a, .island__info a, .island__list__link, .subsite_about__text a {
     color: #3766a9;
     border-bottom: 1px solid #bed0ea;
     cursor: pointer;
