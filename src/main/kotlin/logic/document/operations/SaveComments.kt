@@ -194,6 +194,15 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
             hide.attr("style", "background: $hideColor" )
         }
 
+        // Get date block
+        val date = commentNode
+            .select(".comment .info .date")
+            .first() ?: throw IllegalArgumentException("No date element")
+
+        // Set date
+        val unixTime = comment.value.date ?: ""
+        date.attr("unix-time", unixTime.toString())
+
         return commentNode
     }
 
