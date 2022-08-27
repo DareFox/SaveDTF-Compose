@@ -97,7 +97,7 @@
   color: #353535;
 }
 
-.andropov_image--comment img {
+.andropov_image--comment img, .content .attachment video {
     all: initial;
     max-height: 500px;
     width: auto;
