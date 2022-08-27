@@ -75,8 +75,6 @@
 
 .attachment * {
   padding-top: 5px;
-  object-fit: contain;
-  width: 80%;
 }
 
 .karma {
@@ -97,4 +95,10 @@
 .neutral-karma {
   background: #c6c6c6;
   color: #353535;
+}
+
+.andropov_image--comment img {
+    all: initial;
+    max-height: 500px;
+    width: auto;
 }

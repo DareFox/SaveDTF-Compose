@@ -159,11 +159,17 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
                 return@forEach
             }
 
+            val url = it.additionalData?.url ?: return@forEach
+
             // Else it's image
-            val image = Element("img").apply {
-                attr("src", it.additionalData?.url ?: "")
+            val imageDiv = Element("div").apply {
+                addClass("andropov_image andropov_image--comment")
+                attr("data-image-src", url)
+
+                val image = Element("img")
+                appendChild(image)
             }
-            attachment.appendChild(image)
+            attachment.appendChild(imageDiv)
         }
 
         // Check nodes block
