@@ -1319,6 +1319,12 @@ i {
     font-style: italic;
 }
 
+.andropov_image img {
+    object-fit: contain;
+    height: 100%;
+    max-width: 100%
+}
+
 .comments-list {
     width: 100%;
     padding: 10px 0;
