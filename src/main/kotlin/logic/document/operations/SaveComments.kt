@@ -12,10 +12,14 @@ import util.dom.getWebsite
 import util.filesystem.readResource
 import util.kmttapi.SharedRegex
 import util.kmttapi.betterPublicKmtt
+import util.random.RGB
+import util.random.offsetRandomColor
 import util.random.randomColor
 
 class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
     override val name: String = "Save comments"
+    private val colorRange = 50..255
+    private val offset = 40
 
     override suspend fun process(document: Document): Document {
         val website = document.getWebsite() ?: return document
@@ -26,14 +30,19 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
             .getEntryComments(id, SortingType.POPULAR)
             .toTree()
             .associateWith {
-            createNodeHTML(it, null)
+            createNodeHTML(it, null) to randomColor(
+                colorRange, colorRange, colorRange
+            )
         }
         val toAdd = currentLayer.values
 
         while (currentLayer.isNotEmpty()) {
-            val nextLayer = mutableMapOf<CommentNode, Element>()
+            val nextLayer = mutableMapOf<CommentNode, Pair<Element, RGB>>()
 
-            for ((node, element) in currentLayer) {
+            for ((node, pair) in currentLayer) {
+                val element = pair.first
+                val color = pair.second
+
                 val nodesDiv = element
                     .select(".comment-node .nodes")
                     .first() ?: throw IllegalArgumentException("No nodes element")
@@ -43,7 +52,12 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
                 val htmlChildren = node.children.associateWith {
                     val htmlNode = createNodeHTML(it, "#${randomColor.toHex()}")
                     nodesDiv.appendChild(htmlNode)
-                    htmlNode
+                    htmlNode to offsetRandomColor(
+                        color = color,
+                        offset = offset,
+                        colorAmountOffset = 2,
+                        colorRange = colorRange
+                    )
                 }
 
                 nextLayer += htmlChildren
@@ -58,7 +72,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
 
         wrapper.appendChild(Element("div").apply {
             addClass("comments-list")
-            appendChildren(toAdd)
+            appendChildren(toAdd.map { it.first })
         })
 
         return document
