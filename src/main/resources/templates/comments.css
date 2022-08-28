@@ -15,6 +15,18 @@
   background: green;
 }
 
+.hide--invisible {
+  background: none !important;
+}
+
+.hide--disabled {
+  display: none;
+}
+
+.comment-wrapper {
+  display: flex;
+}
+
 .comment {
   min-height: 120px;
   padding: 0px 6px;
@@ -75,6 +87,8 @@
 
 .attachment * {
   padding-top: 5px;
+  object-fit: contain;
+  width: 80%;
 }
 
 .karma {
@@ -102,7 +116,6 @@
     max-height: 500px;
     width: auto;
 }
-
 
 a {
     color: #3766a9;

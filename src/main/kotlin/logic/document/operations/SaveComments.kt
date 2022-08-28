@@ -192,6 +192,8 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         // Set color of hide block
         if (hideColor != null) {
             hide.attr("style", "background: $hideColor" )
+        } else {
+            hide.addClass("hide--disabled")
         }
 
         // Get date block
