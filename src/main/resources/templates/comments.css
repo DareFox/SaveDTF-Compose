@@ -147,3 +147,8 @@ a {
     padding-bottom: 15px;
     font-size: 0.9em;
 }
+
+.postOP {
+    background: #c3eeee;
+    padding: 2px;
+}
