@@ -1,6 +1,7 @@
 package viewmodel.queue
 
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.ui.text.toLowerCase
 import exception.errorOnNull
 import kmtt.models.enums.Website
 import kotlinx.coroutines.cancel
@@ -12,6 +13,7 @@ import viewmodel.DebugQueueViewModel
 import viewmodel.SettingsViewModel
 import util.kmttapi.SharedRegex
 import util.kmttapi.UrlUtil
+import util.kmttapi.UrlUtil.getWebsiteType
 
 private val logger = KotlinLogging.logger { }
 
@@ -44,6 +46,9 @@ object QueueViewModel {
             DebugQueueViewModel.startQueue.forEach {
                 add(it)
             }
+        },
+        UrlChecker(::isSitemap) {
+            add(AllEntriesViewModel(getWebsiteType(it)!!))
         }
     )
 
@@ -110,6 +115,17 @@ object QueueViewModel {
         }
     }
 }
+
+private fun isSitemap(url: String): Boolean {
+    val regex = Website.values().map {
+        "${it.baseURL}(/sitemap|/|)\$".toRegex(RegexOption.IGNORE_CASE)
+    }
+
+    return regex.firstOrNull {
+        url.contains(it)
+    } != null
+}
+
 
 data class UrlChecker(
     /**
