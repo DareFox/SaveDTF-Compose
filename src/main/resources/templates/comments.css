@@ -13,14 +13,17 @@
   min-width: 3px;
   max-width: 8px;
   background: green;
+  cursor: pointer;
 }
 
 .hide--invisible {
   background: none !important;
+  cursor: auto;
 }
 
 .hide--disabled {
   display: none;
+  cursor: auto;
 }
 
 .comment-wrapper {
