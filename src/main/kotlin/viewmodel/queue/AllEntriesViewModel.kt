@@ -26,14 +26,14 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
     private val parentDir = File(pathToSave, "${site.name}/entry")
 
     override suspend fun initialize() {
-        progress("Fetching sitemap")
+        progress(Lang.value.allEntriesVmFetchingSitemap)
 
         val sitemap = "https://${site.baseURL}/sitemap"
         val response = Client.rateRequest<HttpResponse> {
             url(sitemap)
         }
 
-        progress("Parsing sitemap")
+        progress(Lang.value.allEntriesVmParsingSitemap)
         sitemapDoc = Jsoup.parse(response.readText())
 
         clearProgress()
@@ -61,7 +61,7 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
                             errorList += it
                         }
                         counter++
-                        progress("Waiting next entry. Finished: $counter. Failed: $errorCounter.")
+                        progress(Lang.value.allEntriesVmWaiting.format(counter, errorCounter))
                     }
                 }
 
@@ -107,7 +107,7 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
 
         return sequence<String> {
             for (it in yearPages) {
-                progress("Requesting all entries from $it")
+                progress(Lang.value.allEntriesVmFetchingYearLink.format(it))
 
                 val response = runBlocking {
                     Client.rateRequest<HttpResponse> {
@@ -127,7 +127,7 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
     }
 
     private fun convertYearPageToList(yearPage: Document): List<String> {
-        progress("Parsing all links")
+        progress(Lang.value.allEntriesVmParsingAllLinks)
         val sitemap = yearPage.selectFirst("ul.sitemap")
 
         requireNotNull(sitemap) {
