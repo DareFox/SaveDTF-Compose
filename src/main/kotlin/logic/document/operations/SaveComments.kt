@@ -1,9 +1,12 @@
 package logic.document.operations
 
+import androidx.compose.runtime.mutableStateOf
 import kmtt.models.entry.Entry
 import kmtt.models.enums.SortingType
 import kmtt.util.CommentNode
 import kmtt.util.toTree
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import logic.document.AbstractProcessorOperation
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -20,26 +23,40 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
     override val name: String = "Save comments"
     private val colorRange = 50..255
     private val offset = 40
+    private val maxLayerHideOffset = 10
 
     override suspend fun process(document: Document): Document {
+        val layerLevel = MutableStateFlow(0)
         val website = document.getWebsite() ?: return document
+
+        progress("Fetching comments")
         val id = entry.id ?: return document
         val api = betterPublicKmtt(website)
+
 
         var currentLayer = api.comments
             .getEntryComments(id, SortingType.POPULAR)
             .toTree()
             .associateWith {
-            createNodeHTML(it, null) to randomColor(
+            createNodeHTML(it, null, false) to randomColor(
                 colorRange, colorRange, colorRange
             )
+        }.also {
+            layerLevel.update { it + 1 }
         }
+
+        val counter = layerLevel.onEach {
+            progress("Parsing comments. Completed layers: $it")
+            yield()
+        }.launchIn(CoroutineScope(currentCoroutineContext()))
+
         val toAdd = currentLayer.values
 
         while (currentLayer.isNotEmpty()) {
             val nextLayer = mutableMapOf<CommentNode, Pair<Element, RGB>>()
 
             for ((node, pair) in currentLayer) {
+                val level = layerLevel.value
                 val element = pair.first
                 val color = pair.second
 
@@ -50,7 +67,11 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
                 val randomColor = randomColor()
 
                 val htmlChildren = node.children.associateWith {
-                    val htmlNode = createNodeHTML(it, "#${randomColor.toHex()}")
+                    val htmlNode = createNodeHTML(
+                        comment = it,
+                        hideColor = "#${randomColor.toHex()}",
+                        disableInvisibleHide = level > 10
+                    )
                     nodesDiv.appendChild(htmlNode)
                     htmlNode to offsetRandomColor(
                         color = color,
@@ -64,7 +85,11 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
             }
 
             currentLayer = nextLayer
+            layerLevel.update { it + 1 }
         }
+
+        counter.cancelAndJoin()
+        progress("Appending child")
 
         val wrapper = document
             .getElementsByClass("savedtf-wrapper")
@@ -78,7 +103,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         return document
     }
 
-    private fun createNodeHTML(comment: CommentNode, hideColor: String?): Element {
+    private fun createNodeHTML(comment: CommentNode, hideColor: String?, disableInvisibleHide: Boolean): Element {
         // Parse comment node template from resources folder
         val commentNode = readResource("templates/comment.html")
             .readText()
@@ -208,6 +233,14 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
             hide.attr("style", "background: $hideColor" )
         } else {
             hide.addClass("hide--disabled")
+        }
+
+        val invisibleHide = commentNode
+            .select(".hide--invisible")
+            .first()
+
+        if (invisibleHide != null && disableInvisibleHide) {
+            invisibleHide.addClass("hide--disabled")
         }
 
         // Get date block
