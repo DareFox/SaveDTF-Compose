@@ -28,7 +28,7 @@
 }
 
 .comment {
-  min-height: 120px;
+  width: 100%;
   padding: 0px 6px;
   box-sizing: border-box;
   overflow: auto;
@@ -36,7 +36,6 @@
 
 .comment .header {
   padding-top: 5px;
-  height: 30%;
   display: flex;
   justify-content: space-between;
   flex-direction: row;
@@ -46,10 +45,22 @@
 .comment .content {
   overflow-wrap: break-word;
   padding-top: 10px;
+  min-height: 50px;
+}
+
+.attachment .andropov_image img {
+    object-fit: contain;
+    max-width: 90%;
+    height: 100%;
+}
+
+.attachment video {
+    max-width: 90% !important;
 }
 
 .comment-node {
   width: 100%;
+  max-width: 800px;
 }
 
 .comment .avatar {
