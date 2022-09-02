@@ -48,7 +48,6 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
     }
 
     override suspend fun save(): Deferred<Boolean> {
-        val progress = this
         return waitAndAsyncJob {
             val sequence = sitemapDoc?.let {
                 sequenceOfPages(it)
