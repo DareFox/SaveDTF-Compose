@@ -256,4 +256,5 @@ a {
     font-size: 1em;
     margin-left: 2px;
     padding-top: 0.1em;
+    cursor: pointer;
 }
