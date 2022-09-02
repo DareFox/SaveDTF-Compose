@@ -49,28 +49,28 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
 
     override suspend fun save(): Deferred<Boolean> {
         return waitAndAsyncJob {
-            val sequence = sitemapDoc?.let {
-                sequenceOfPages(it)
-            }.errorOnNull("Sitemap document is null")
-
-            var errorCounter = 0
-            var counter = 0
-            val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
-
             elementMutex.withLock {
                 inUse()
+
+                val sequence = sitemapDoc?.let {
+                    sequenceOfPages(it)
+                }.errorOnNull("Sitemap document is null")
+
+                var counter = 0
+                val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
+
                 val errorList = mutableListOf<String>()
                 withProgressSuspend(allEntriesMessage) {
                     sequence.forEach {
                         if (!tryProcessDocument(it, parentDir, counter, logger)) {
-                            errorCounter++
                             errorList += it
                         }
                         counter++
-                        progress(Lang.value.allEntriesVmWaiting.format(counter, errorCounter))
+                        progress(Lang.value.allEntriesVmWaiting.format(counter, errorList.count()))
                     }
                 }
 
+                val errorCounter = errorList.count()
                 if (errorCounter > 0) {
                     saved()
                     progress(Lang.value.profileElementVmSomeErrors.format(counter, errorCounter))
@@ -83,9 +83,9 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
                     saved()
                     progress(Lang.value.profileElementVmNoErrors.format(counter))
                 }
-            }
 
-            errorCounter > 0
+                errorCounter == 0
+            }
         }
     }
 
