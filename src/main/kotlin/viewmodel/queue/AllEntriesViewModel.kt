@@ -121,19 +121,25 @@ class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(
             for (it in yearPages) {
                 progress(Lang.value.allEntriesVmFetchingYearLink.format(it))
 
-                val response = runBlocking {
-                    Client.rateRequest<HttpResponse> {
-                        url(it)
+                try {
+                    val response = runBlocking {
+                        Client.rateRequest<HttpResponse> {
+                            url(it)
+                        }
+                    }
+
+                    val doc = runBlocking {
+                        Jsoup.parse(response.readText())
+                    }
+
+                    val links = convertYearPageToList(doc)
+
+                    yieldAll(links)
+                } catch (ex: Exception) {
+                    logger.error(ex) {
+                        "Caught error during parsing $it in sequence"
                     }
                 }
-
-                val doc = runBlocking {
-                    Jsoup.parse(response.readText())
-                }
-
-                val links = convertYearPageToList(doc)
-
-                yieldAll(links)
             }
         }
     }
