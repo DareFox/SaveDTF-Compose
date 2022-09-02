@@ -152,6 +152,101 @@ a {
 .postOP {
     background: #c3eeee;
     padding: 2px;
+}
+
+.replyToFastEnter {
+    animation: background-fade-replyToFastEnter 1s forwards;
+    -webkit-animation: background-fade-replyToFastEnter 1s forwards;
+    -moz-animation: background-fade-replyToFastEnter 1s forwards;
+}
+
+@-webkit-keyframes background-fade-replyToFastEnter {
+    100% {
+        background:#d5fffb;
+    }
+}
+@-moz-keyframes background-fade-replyToFastEnter {
+    100% {
+        background:#d5fffb;
+    }
+}
+@keyframes background-fade-replyToFastEnter {
+    100% {
+        background:#d5fffb;
+    }
+}
+
+.replyToFastExit {
+    animation: background-fade-replyToFastExit 1s forwards;
+    -webkit-animation: background-fade-replyToFastExit 1s forwards;
+    -moz-animation: background-fade-replyToFastExit 1s forwards;
+}
+
+@-webkit-keyframes background-fade-replyToFastExit {
+    0% {
+        background:#d5fffb;
+    }
+    100% {
+        background:rgba(0, 0, 0, 0);
+    }
+}
+@-moz-keyframes background-fade-replyToFastExit {
+    0% {
+        background:#d5fffb;
+    }
+    100% {
+        background:rgba(0, 0, 0, 0);
+    }
+}
+@keyframes background-fade-replyToFastExit {
+    0% {
+        background:#d5fffb;
+    }
+    100% {
+        background:rgba(0, 0, 0, 0);
+    }
+}
+
+
+.replyToSlowExit {
+    animation: background-fade-replyToSlowExit 6s forwards;
+    -webkit-animation: background-fade-replyToSlowExit 6s forwards;
+    -moz-animation: background-fade-replyToSlowExit 6s forwards;
+}
+
+@-webkit-keyframes background-fade-replyToSlowExit {
+    0% {
+        background:#d5fffb;
+    }
+    65% {
+        background:#d5fffb;
+    }
+    100% {
+        background:rgba(0, 0, 0, 0);
+    }
+}
+@-moz-keyframes background-fade-replyToSlowExit {
+    0% {
+        background:#d5fffb;
+    }
+    65% {
+        background:#d5fffb;
+    }
+    100% {
+        background:rgba(0, 0, 0, 0);
+    }
+}
+@keyframes background-fade-replyToSlowExit {
+    0% {
+        background:#d5fffb;
+    }
+    65% {
+        background:#d5fffb;
+    }
+    100% {
+        background:rgba(0, 0, 0, 0);
+    }
+}
 
 .comment .header .info-wrapper {
     display: flex;
