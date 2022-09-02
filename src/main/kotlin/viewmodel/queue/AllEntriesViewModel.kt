@@ -26,18 +26,25 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
     private val parentDir = File(pathToSave, "${site.name}/entry")
 
     override suspend fun initialize() {
-        progress(Lang.value.allEntriesVmFetchingSitemap)
+        elementMutex.withLock {
+            try {
+                initializing()
+                progress(Lang.value.allEntriesVmFetchingSitemap)
 
-        val sitemap = "https://${site.baseURL}/sitemap"
-        val response = Client.rateRequest<HttpResponse> {
-            url(sitemap)
+                val sitemap = "https://${site.baseURL}/sitemap"
+                val response = Client.rateRequest<HttpResponse> {
+                    url(sitemap)
+                }
+
+                progress(Lang.value.allEntriesVmParsingSitemap)
+                sitemapDoc = Jsoup.parse(response.readText())
+
+                clearProgress()
+                readyToUse()
+            } catch (ex: Exception) {
+                error(ex)
+            }
         }
-
-        progress(Lang.value.allEntriesVmParsingSitemap)
-        sitemapDoc = Jsoup.parse(response.readText())
-
-        clearProgress()
-        readyToUse()
     }
 
     override suspend fun save(): Deferred<Boolean> {
@@ -142,5 +149,20 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
         }
 
         return entryLinks
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as AllEntriesViewModel
+
+        if (site != other.site) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return site.hashCode()
     }
 }
