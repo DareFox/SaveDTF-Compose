@@ -152,4 +152,13 @@ a {
 .postOP {
     background: #c3eeee;
     padding: 2px;
+
+.comment .header .info-wrapper {
+    display: flex;
+}
+
+.comment .header .replyTo {
+    font-size: 1em;
+    margin-left: 2px;
+    padding-top: 0.1em;
 }
