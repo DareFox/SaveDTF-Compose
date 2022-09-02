@@ -131,8 +131,15 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
 
         // Set nickname
         nickname.text(comment.value.author?.name ?: "Unknown")
+
+        // If author is creator of post, then add postOP class
         if (isAuthor) {
             nickname.addClass("postOP")
+        }
+
+        // Set id of comment author
+        comment.value.author?.id?.let {
+            nickname.attr("user-id", it.toString())
         }
 
         // Get karma div
