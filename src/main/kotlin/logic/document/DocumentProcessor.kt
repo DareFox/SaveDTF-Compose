@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.yield
 import logic.abstracts.AbstractProgress
+import mu.KotlinLogging
 import org.jsoup.nodes.Document
 import util.coroutine.cancelOnSuspendEnd
 import util.progress.redirectTo
@@ -18,6 +19,7 @@ class DocumentProcessor(
     operations: List<IProcessorOperation> = listOf(),
 ): AbstractProgress() {
     private val scope = CoroutineScope(Dispatchers.Default)
+    private val logger = KotlinLogging.logger {  }
 
     // read-only for public usage
     var document: Document = document
@@ -51,6 +53,7 @@ class DocumentProcessor(
 
         operationsQueue.forEach { operation ->
             yield()
+            logger.debug { "Processing document with ${operation::class.simpleName}" }
             val progressJob = operation.redirectTo(mutableProgress)
             progressJob.cancelOnSuspendEnd {
                 document = operation.process(document)
