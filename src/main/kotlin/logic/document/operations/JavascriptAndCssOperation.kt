@@ -17,12 +17,11 @@ object JavascriptAndCssOperation: AbstractProcessorOperation() {
 
         requireNotNull(wrapper)
 
-        val galleryJS = readResource("templates/index.js").readText()
+        val galleryJS = readResource("templates/galleryModal.js").readText()
         val css = readResource("templates/style.css").readText()
         val galleryModal = readResource("templates/galleryModal.html").readText().let { Jsoup.parse(it) }
         val commentsCss = readResource("templates/comments.css").readText()
         val commentsJs = readResource("templates/comments.js").readText()
-
 
         wrapper
             .appendChild(galleryModal.body())
