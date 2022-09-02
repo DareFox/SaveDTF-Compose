@@ -6,11 +6,12 @@ import androidx.compose.runtime.getValue
 import kotlinx.coroutines.flow.compose
 import ui.i18n.Lang
 import viewmodel.queue.AllEntriesViewModel
+import viewmodel.queue.IAllEntriesViewModel
 import viewmodel.queue.IProfileElementViewModel
 import viewmodel.queue.IQueueElementViewModel
 
 @Composable
-fun AllWebsiteCard(viewModel: AllEntriesViewModel, actionBar: List<ActionBarElement> = listOf()) {
+fun AllWebsiteCard(viewModel: IAllEntriesViewModel, actionBar: List<ActionBarElement> = listOf()) {
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
     val lang by Lang.collectAsState()
