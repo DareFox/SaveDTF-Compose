@@ -144,7 +144,7 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
             }
 
             logger.debug { "Getting entry from osnova api" }
-            progress("$prefix, Getting entry $url from API")
+            progress("$prefix, ${Lang.value.abstractElementVmRequestingEntry.format(url)}")
 
             val entry = betterPublicKmtt(site).entry.getEntry(url)
 
