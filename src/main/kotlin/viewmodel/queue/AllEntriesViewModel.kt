@@ -20,7 +20,13 @@ import util.kmttapi.betterPublicKmtt
 import util.progress.redirectTo
 import java.io.File
 
-class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
+interface IAllEntriesViewModel: IQueueElementViewModel {
+    val site: Website
+    override fun equals(other: Any?): Boolean
+    override fun hashCode(): Int
+}
+
+class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(), IAllEntriesViewModel {
     private var sitemapDoc: Document? = null
     private val logger = KotlinLogging.logger { }
     private val parentDir = File(pathToSave, "${site.name}/entry")
