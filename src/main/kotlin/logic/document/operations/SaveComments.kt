@@ -38,7 +38,8 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
             .getEntryComments(id, SortingType.POPULAR)
             .toTree()
             .associateWith {
-            createNodeHTML(it, null, false) to randomColor(
+                val isAuthorOfPost = entry.author?.id == it.value.author?.id
+                createNodeHTML(it, null, false, isAuthorOfPost) to randomColor(
                 colorRange, colorRange, colorRange
             )
         }.also {
