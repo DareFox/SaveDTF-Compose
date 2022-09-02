@@ -67,10 +67,13 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
                 val randomColor = randomColor()
 
                 val htmlChildren = node.children.associateWith {
+                    val isAuthorOfPost = entry.author?.id == it.value.author?.id
+
                     val htmlNode = createNodeHTML(
                         comment = it,
                         hideColor = "#${randomColor.toHex()}",
-                        disableInvisibleHide = level > 10
+                        disableInvisibleHide = level > 10,
+                        isAuthor = isAuthorOfPost
                     )
                     nodesDiv.appendChild(htmlNode)
                     htmlNode to offsetRandomColor(
@@ -103,7 +106,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         return document
     }
 
-    private fun createNodeHTML(comment: CommentNode, hideColor: String?, disableInvisibleHide: Boolean): Element {
+    private fun createNodeHTML(comment: CommentNode, hideColor: String?, disableInvisibleHide: Boolean, isAuthor: Boolean): Element {
         // Parse comment node template from resources folder
         val commentNode = readResource("templates/comment.html")
             .readText()
@@ -127,6 +130,9 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
 
         // Set nickname
         nickname.text(comment.value.author?.name ?: "Unknown")
+        if (isAuthor) {
+            nickname.addClass("postOP")
+        }
 
         // Get karma div
         val karma = commentNode
