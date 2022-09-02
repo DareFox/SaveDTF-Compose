@@ -23,6 +23,7 @@ import java.io.File
 class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
     private var sitemapDoc: Document? = null
     private val logger = KotlinLogging.logger { }
+    private val parentDir = File(pathToSave, "${site.name}/entry")
 
     override suspend fun initialize() {
         progress("Fetching sitemap")
@@ -52,10 +53,12 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
 
             elementMutex.withLock {
                 inUse()
+                val errorList = mutableListOf<String>()
                 withProgressSuspend(allEntriesMessage) {
                     sequence.forEach {
-                        if (!tryProcessDocument(it, progress, counter)) {
+                        if (!tryProcessDocument(it, parentDir, counter, logger)) {
                             errorCounter++
+                            errorList += it
                         }
                         counter++
                         progress("Waiting next entry. Finished: $counter. Failed: $errorCounter.")
@@ -65,8 +68,10 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
                 if (errorCounter > 0) {
                     saved()
                     progress(Lang.value.profileElementVmSomeErrors.format(counter, errorCounter))
+                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
                 } else if (errorCounter == counter) {
                     error(Lang.value.profileElementVmAllErrors.format(errorCounter))
+                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
                     clearProgress()
                 } else {
                     saved()
@@ -76,42 +81,6 @@ class AllEntriesViewModel(val site: Website): AbstractElementViewModel() {
 
             errorCounter > 0
         }
-    }
-
-    private suspend fun tryProcessDocument(url: String, progress: IProgress, currentCounter: Int): Boolean {
-        return try {
-            val entry = betterPublicKmtt(site).entry.getEntry(url)
-
-            val document = entry
-                .entryContent
-                .errorOnNull("Entry content is null")
-                .html
-                .errorOnNull("Entry html is null")
-                .let { Jsoup.parse(it) } // parse document
-
-            val processor = SettingsBasedDocumentProcessor(entry.toDirectory(File(pathToSave)), document, entry)
-
-            processor
-                .redirectTo(mutableProgress, ioScope) {// redirect progress of processor to this VM progress
-                    val progressValue = it?.run { ", $this" } ?: ""
-
-                    // show entry counter
-                    if (currentJob.value?.isCancelled != true) "${Lang.value.queueVmEntry} #${currentCounter + 1}$progressValue"
-                    // show nothing on cancellation
-                    else null
-                }
-                .cancelOnSuspendEnd {
-                    progress("Processing entry")
-                    processor.process() // save document
-                }
-
-
-            true
-        } catch (ex: Exception) { // on error, change result to false
-            logger.error(ex) {"Error during processing document $url"}
-            false
-        }
-
     }
 
     private fun sequenceOfPages(sitemapDoc: Document): Sequence<String> {

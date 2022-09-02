@@ -1,13 +1,25 @@
 package viewmodel.queue
 
+import exception.errorOnNull
+import kmtt.models.entry.Entry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import logic.abstracts.AbstractProgress
+import logic.document.SettingsBasedDocumentProcessor
+import mu.KLogger
 import mu.KotlinLogging
+import org.jsoup.Jsoup
+import ui.i18n.Lang
+import util.coroutine.cancelOnSuspendEnd
+import util.filesystem.toDirectory
+import util.kmttapi.UrlUtil
+import util.kmttapi.betterPublicKmtt
+import util.progress.redirectTo
 import viewmodel.SettingsViewModel
 import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
+import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -119,6 +131,64 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         }
 
         return job
+    }
+
+    protected suspend fun tryProcessDocument(url: String, parentDir: File, currentCounter: Int, logger: KLogger = KotlinLogging.logger {  }): Boolean {
+        return try {
+            val newCounter = currentCounter+1
+            val prefix = "${Lang.value.queueVmEntry} #${newCounter}"
+
+            val site = UrlUtil.getWebsiteType(url)
+            requireNotNull(site) {
+                "Can't get website type from $url url"
+            }
+
+            logger.debug { "Getting entry from osnova api" }
+            progress("$prefix, Getting entry $url from API")
+
+            val entry = betterPublicKmtt(site).entry.getEntry(url)
+
+            tryProcessDocument(entry, parentDir, currentCounter, logger)
+        } catch (ex: Exception) {
+            logger.error(ex) {
+                "Failed to process document $url"
+            }
+            false
+        }
+    }
+    protected suspend fun tryProcessDocument(entry: Entry, parentDir: File, currentCounter: Int, logger: KLogger = KotlinLogging.logger {}): Boolean {
+        return try {
+            val document = entry
+                .entryContent
+                .errorOnNull("Entry content is null")
+                .html
+                .errorOnNull("Entry html is null")
+                .let { Jsoup.parse(it) } // parse document
+
+            val processor = SettingsBasedDocumentProcessor(entry.toDirectory(parentDir), document, entry)
+
+            processor
+                .redirectTo(mutableProgress, ioScope) {// redirect progress of processor to this VM progress
+                    val progressValue = it?.run { ", $this" } ?: ""
+
+                    // show entry counter
+                    if (currentJob.value?.isCancelled != true) "${Lang.value.queueVmEntry} #${currentCounter + 1}$progressValue"
+                    // show nothing on cancellation
+                    else null
+                }
+                .cancelOnSuspendEnd {
+                    logger.debug { "Starting entry processing with id ${entry.id}" }
+                    processor.process() // save document
+                    logger.debug { "Finished processing entry with id ${entry.id}" }
+                }
+
+            true
+        } catch (ex: Exception) { // on error, change result to false
+            logger.error(ex) {
+                "Failed to process ${entry.id}"
+            }
+            false
+        }
     }
 
     private fun handleCancellation(error: Throwable?) {

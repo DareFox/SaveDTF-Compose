@@ -1,19 +1,13 @@
 package viewmodel.queue
 
-import exception.errorOnNull
 import kmtt.impl.authKmtt
-import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.sync.withLock
-import logic.document.SettingsBasedDocumentProcessor
-import org.jsoup.Jsoup
+import mu.KotlinLogging
 import ui.i18n.Lang
 import viewmodel.SettingsViewModel
 import viewmodel.SettingsViewModel.getToken
-import util.coroutine.cancelOnSuspendEnd
-import util.filesystem.toDirectory
-import util.progress.redirectTo
 import java.io.File
 
 interface IBookmarksElementViewModel : IQueueElementViewModel {
@@ -26,8 +20,8 @@ data class BookmarksElementViewModel(
     private val token: String
         get() = SettingsViewModel.tokens.getToken(site)
     private var client = authKmtt(site, token)
-    private var counter = 0
-    private var errorCounter = 0
+    private val logger = KotlinLogging.logger {  }
+    private val parentDir = File(pathToSave, "${site.name}/bookmarks")
 
     override suspend fun initialize() {
         elementMutex.withLock {
@@ -43,54 +37,20 @@ data class BookmarksElementViewModel(
             }
         }
     }
-
-    private suspend fun processDocument(list: List<Entry>): Boolean {
-        var result = true
-
-        for (entry in list) {
-            try {
-                val document = entry
-                    .entryContent
-                    .errorOnNull("Entry content is null")
-                    .html
-                    .errorOnNull("Entry html is null")
-                    .let { Jsoup.parse(it) } // parse document
-
-                val processor = SettingsBasedDocumentProcessor(entry.toDirectory(File(pathToSave, "bookmarks/${site.name}")), document, entry)
-                val newCounter = ++counter
-
-                processor
-                    .redirectTo(mutableProgress, ioScope) {// redirect progress of processor to this VM progress
-                        val progressValue = it?.run { ", $this" } ?: ""
-
-                        // show entry counter
-                        if (currentJob.value?.isCancelled != true) "${Lang.value.queueVmEntry} #${newCounter}$progressValue"
-                        // show nothing on cancellation
-                        else null
-                    }
-                    .cancelOnSuspendEnd {
-                        processor.process() // save document
-                    }
-
-            } catch (ex: Exception) { // on error, change result to false
-                result = false
-                errorCounter++
-            }
-        }
-
-        return result
-    }
-
     override suspend fun save(): Deferred<Boolean> {
         return waitAndAsyncJob {
-            var result = true
+            var errorCounter = 0
+            var counter = 0
 
             elementMutex.withLock { // run only 1 function at a time
                 inUse()
                 withProgressSuspend(Lang.value.bookmarksElementVmAllEntriesMessage) { // show progress message at start
-                    client.user.getAllMyFavoriteEntries { // save each chunk
-                        if (!processDocument(it)) { // process document and if there is error, change final result to false
-                            result = false
+                    client.user.getAllMyFavoriteEntries {
+                        it.forEach { entry ->
+                            if (!tryProcessDocument(entry, parentDir, counter)) {
+                                errorCounter++
+                            }
+                            counter++
                         }
                         progress(Lang.value.bookmarksElementVmNextChunk)
                     }
@@ -108,8 +68,7 @@ data class BookmarksElementViewModel(
                 }
             }
 
-            counter = 0
-            result
+            errorCounter > 0
         }
     }
 }
