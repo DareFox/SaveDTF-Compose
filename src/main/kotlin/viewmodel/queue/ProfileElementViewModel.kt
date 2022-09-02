@@ -62,18 +62,18 @@ data class ProfileElementViewModel(
 
     override suspend fun save(): Deferred<Boolean> {
         return waitAndAsyncJob {
-            var counter = 0
-            var errorCounter = 0
-
-            val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
-
             elementMutex.withLock {
                 inUse()
+
+                var counter = 0
+                val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
+                val errorList = mutableListOf<String>()
                 withProgressSuspend(allEntriesMessage) {
                     client.user.getAllUserEntries(id) {
                         it.forEach { entry ->
                             if(!tryProcessDocument(entry, parentDir, counter, logger)) {
-                                errorCounter++
+                                errorList += "${site.baseURL}/${entry.id} (author=${entry.author?.name})"
+
                             }
                             counter++
                         }
@@ -81,19 +81,24 @@ data class ProfileElementViewModel(
                     }
                 }
 
+                val errorCounter = errorList.count()
+
                 if (errorCounter > 0) {
                     saved()
+                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
                     progress(Lang.value.profileElementVmSomeErrors.format(counter, errorCounter))
                 } else if (errorCounter == counter) {
+                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
                     error(Lang.value.profileElementVmAllErrors.format(errorCounter))
                     clearProgress()
                 } else {
                     saved()
                     progress(Lang.value.profileElementVmNoErrors.format(counter))
                 }
-            }
 
-            errorCounter == 0
+                errorCounter == 0
+
+            }
         }
     }
 }

@@ -39,16 +39,17 @@ data class BookmarksElementViewModel(
     }
     override suspend fun save(): Deferred<Boolean> {
         return waitAndAsyncJob {
-            var errorCounter = 0
             var counter = 0
 
             elementMutex.withLock { // run only 1 function at a time
                 inUse()
+
+                val errorList = mutableListOf<String>()
                 withProgressSuspend(Lang.value.bookmarksElementVmAllEntriesMessage) { // show progress message at start
                     client.user.getAllMyFavoriteEntries {
                         it.forEach { entry ->
                             if (!tryProcessDocument(entry, parentDir, counter)) {
-                                errorCounter++
+                                errorList += "${site.baseURL}/${entry.id} (author=${entry.author?.name})"
                             }
                             counter++
                         }
@@ -56,19 +57,24 @@ data class BookmarksElementViewModel(
                     }
                 }
 
+                val errorCounter = errorList.count()
+
                 if (errorCounter > 0) {
                     saved()
+                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
                     progress(Lang.value.bookmarksElementVmSomeErrors.format(counter, errorCounter))
                 } else if (errorCounter == counter) {
+                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
                     error(Lang.value.bookmarksElementVmAllErrors.format(errorCounter))
                     clearProgress()
                 } else {
                     saved()
                     progress(Lang.value.bookmarksElementVmNoErrors.format(counter))
                 }
+
+                errorCounter == 0
             }
 
-            errorCounter > 0
         }
     }
 }
