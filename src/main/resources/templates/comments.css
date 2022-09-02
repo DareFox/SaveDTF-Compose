@@ -66,12 +66,18 @@
   max-width: 800px;
 }
 
-.comment .avatar {
+.comment .avatar  {
   flex: 1;
-  margin-right: 10px;
   height: 35px;
   width: 35px;
   border-radius: 100%;
+  object-align: cover;
+}
+
+.comment .avatar-wrapper {
+  margin-right: 10px;
+  height: 35px;
+  width: 35px;
 }
 
 .comment .info {
