@@ -58,6 +58,9 @@ fun main() {
 
 
         if (lastError != null) {
+            logger.error(lastError) {
+                "Caught error!"
+            }
             ComposeCrashMenu(lastError!!)
             logger.error { "Process exited with code 1" }
             exitProcess(1)
