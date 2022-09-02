@@ -1,6 +1,6 @@
-
-
-
+/**
+ * Hide button behaviour
+ */
 const hides = document.querySelectorAll('.hide:not(.hide--invisible):not(.hide--disabled)')
 
 hides.forEach( hide => {
@@ -17,7 +17,38 @@ hides.forEach( hide => {
     }))    
 })
 
+function hideNodes(nodeWrapper: Element, commentWrapper: Element) {
+    const footer = commentWrapper.querySelector(".comment .footer")
 
+    if (!footer) return 
+    
+    let openCommentsButton = footer.querySelector("a.openComments") 
+
+    // if no button, create it
+    if (!openCommentsButton) {
+        openCommentsButton = document.createElement("a")
+        openCommentsButton.classList.add("openComments")
+
+        footer.appendChild(openCommentsButton)
+    } 
+
+    // hide nodes
+    nodeWrapper.setAttribute("style", "display: none")
+
+    // make reset button visable
+    openCommentsButton.setAttribute("style", "")
+    openCommentsButton.innerHTML = "Показать скрытые комментарии"
+
+    // button to re-open 
+    openCommentsButton.addEventListener("click", () => {
+        nodeWrapper.setAttribute("style", "")
+        openCommentsButton?.setAttribute("style", "display: none")
+    })
+}
+
+/** 
+ * Date formating 
+ */
 const dates = document.querySelectorAll(".comment .info .date")
 
 dates.forEach( date => {
@@ -58,31 +89,60 @@ function formatDate(date: Date) {
     }
 }
 
-function hideNodes(nodeWrapper: Element, commentWrapper: Element) {
-    const footer = commentWrapper.querySelector(".comment .footer")
+/**
+ * "Reply to" behaviour
+ */
+const comments = document.querySelectorAll(".comments-list .comment-node")
+const allReplyToAnimations = ["replyToFastEnter", "replyToFastExit", "replyToSlowExit"]
 
-    if (!footer) return 
+comments.forEach(comment => {
+    const replyToDiv = comment.querySelector(".comment .header .replyTo")
+
+    if (!replyToDiv) return
+
+    const nodewrap = comment.closest(".nodes-wrapper")
+    const commentWrapper = nodewrap?.parentElement?.querySelector(".comment-wrapper")
     
-    let openCommentsButton = footer.querySelector("a.openComments") 
+    if (!commentWrapper) return
 
-    // if no button, create it
-    if (!openCommentsButton) {
-        openCommentsButton = document.createElement("a")
-        openCommentsButton.classList.add("openComments")
+    let clickDate = new Date()
 
-        footer.appendChild(openCommentsButton)
-    } 
+    replyToDiv.innerHTML="↑"
 
-    // hide nodes
-    nodeWrapper.setAttribute("style", "display: none")
+    replyToDiv.addEventListener("mouseover", () => {
+        onHoverEnter(commentWrapper)
+    })
 
-    // make reset button visable
-    openCommentsButton.setAttribute("style", "")
-    openCommentsButton.innerHTML = "Показать скрытые комментарии"
+    replyToDiv.addEventListener("mouseout", () => {
+        if (new Date().getTime() - clickDate.getTime() > 100) {
+            onHoverExit(commentWrapper)
+        }
+    })
 
-    // button to re-open 
-    openCommentsButton.addEventListener("click", () => {
-        nodeWrapper.setAttribute("style", "")
-        openCommentsButton?.setAttribute("style", "display: none")
+    replyToDiv.addEventListener("click", () => {
+        clickDate = new Date()
+        onHoverClick(commentWrapper)
+    })
+})
+
+function onHoverEnter(parent: Element) {
+    parent.classList.remove(...allReplyToAnimations)
+
+    parent.classList.add("replyToFastEnter")
+}
+
+function onHoverExit(parent: Element) {
+    parent.classList.remove(...allReplyToAnimations)
+
+    parent.classList.add("replyToFastExit")
+}
+
+function onHoverClick(parent: Element) {
+    parent.classList.remove(...allReplyToAnimations)
+
+    parent.classList.add("replyToSlowExit")
+    parent.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
     })
 }
