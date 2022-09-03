@@ -89,6 +89,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
                 documentProcessor.value = null
 
                 logger.info { "Parsing website" }
+                progress(Lang.value.entryElementVmParsingLink)
                 val website = UrlUtil.getWebsiteType(url).errorOnNull(Lang.value.entryQueueElementVmUrlNotSupported.format(url))
                 _website.value = website
 
@@ -100,12 +101,15 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
                     publicKmtt(website)
                 }
 
+                progress(Lang.value.entryElementVmRequestingEntry)
                 val entry = api.entry.getEntry(url)
                 _entry.value = entry
 
                 val html = entry.entryContent.errorOnNull("Entry content is null").html.errorOnNull("Entry html is null")
+                progress(Lang.value.entryElementVmParsingEntryHtml)
                 document = Jsoup.parse(html)
 
+                clearProgress()
                 readyToUse()
             } catch (ex: QueueElementException) {
                 error(ex.errorMessage)
