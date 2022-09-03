@@ -11,6 +11,7 @@ import logic.document.AbstractProcessorOperation
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import ui.i18n.Lang
 import util.dom.getWebsite
 import util.filesystem.readResource
 import util.kmttapi.SharedRegex
@@ -20,7 +21,8 @@ import util.random.offsetRandomColor
 import util.random.randomColor
 
 class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
-    override val name: String = "Save comments"
+    override val name: String
+        get() = Lang.value.saveCommentsOperation
     private val colorRange = 50..255
     private val offset = 40
     private val maxLayerHideOffset = 10
@@ -30,7 +32,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         val layerLevel = MutableStateFlow(0)
         val website = document.getWebsite() ?: return document
 
-        progress("Fetching comments")
+        progress(Lang.value.saveCommentsOperationFetchComments)
         val id = entry.id ?: return document
         val api = betterPublicKmtt(website)
 
@@ -51,7 +53,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         }
 
         val counter = layerLevel.onEach {
-            progress("Parsing comments. Completed layers: $it")
+            progress(Lang.value.saveCommentsOperationParsingCommentsLayers.format(it))
             yield()
         }.launchIn(CoroutineScope(currentCoroutineContext()))
 
@@ -97,7 +99,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         }
 
         counter.cancelAndJoin()
-        progress("Appending child")
+        progress(Lang.value.saveCommentsOperationSavingChanges)
 
         val wrapper = document
             .getElementsByClass("savedtf-wrapper")
