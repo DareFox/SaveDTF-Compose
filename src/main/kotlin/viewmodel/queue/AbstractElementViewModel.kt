@@ -191,6 +191,55 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         }
     }
 
+    /**
+     * Generate final message based on errorList size and total counter
+     *
+     * If errorList is not empty, then his content will be called in logger
+     *
+     * Returns true if errorList is empty
+     */
+    protected fun resultMessage(
+        errorList: List<String>, counter: Int, logger: KLogger
+    ): Boolean {
+        val errorCounter = errorList.count()
+        if (errorCounter > 0) {
+            saved()
+            progress(Lang.value.genericElementVmAllErrorsWithLogs.format(counter, errorCounter))
+            logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
+        } else if (errorCounter == counter) {
+            error(Lang.value.genericElementVmSomeErrorsWithLogs.format(errorCounter))
+            logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
+            clearProgress()
+        } else {
+            saved()
+            progress(Lang.value.genericElementVmNoErrors.format(counter))
+        }
+
+        return errorCounter == 0
+    }
+
+    /**
+     * Generate final message based on errorCounter and total counter
+     *
+     * Returns true if errorCounter is 0
+     */
+    protected fun resultMessage(
+        errorCounter: Int, counter: Int, logger: KLogger
+    ): Boolean {
+        if (errorCounter > 0) {
+            saved()
+            progress(Lang.value.genericElementVmAllErrors.format(counter, errorCounter))
+        } else if (errorCounter == counter) {
+            error(Lang.value.genericElementVmSomeErrors.format(errorCounter))
+            clearProgress()
+        } else {
+            saved()
+            progress(Lang.value.genericElementVmNoErrors.format(counter))
+        }
+
+        return errorCounter == 0
+    }
+
     private fun handleCancellation(error: Throwable?) {
         if (error?.cause is CancellationException || error is CancellationException) {
             readyToUse()
