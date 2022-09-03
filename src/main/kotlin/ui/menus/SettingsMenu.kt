@@ -283,6 +283,14 @@ fun SettingsMenu() {
                 }
             }
 
+            val saveComments by SettingsViewModel.saveComments.collectAsState()
+
+            fields += {
+                SettingsBoolField(lang.settingsSaveCommentsQuestion, saveComments) {
+                    SettingsViewModel.setSaveComments(it)
+                }
+            }
+
             val downloadMetadata by SettingsViewModel.saveMetadata.collectAsState()
 
             fields += {

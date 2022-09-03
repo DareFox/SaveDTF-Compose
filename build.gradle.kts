@@ -60,7 +60,7 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
 
     // API for cmtt websites
-    implementation("com.github.DareFox:kmttAPI:0.3.5")
+    implementation("com.github.DareFox:kmttAPI:0.3.6")
 
     // HTML Parser
     implementation("org.jsoup:jsoup:1.14.3")
@@ -74,6 +74,13 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("ch.qos.logback:logback-core:1.2.11")
+
+    // Tester
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 javafx {

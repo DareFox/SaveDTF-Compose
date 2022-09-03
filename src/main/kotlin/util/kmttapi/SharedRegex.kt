@@ -75,4 +75,8 @@ object SharedRegex {
     val filenameValidationRegex =
         // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s25.html
         """([\\\/:"*?<>|]+|(\.\s*)*${'$'})""".toRegex()
+
+    val urlRegex = "[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)".toRegex(
+        setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE)
+    )
 }

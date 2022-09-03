@@ -22,11 +22,7 @@ object ImageDownloadModule: IDownloadModule {
             // Because regular images are in container, but images of quotes aren't
             it.attr("data-image-src").isNotEmpty() && it.tagName() == "div"
         }.map { div ->
-            val img = Element("img").also {
-                // Set css style to img
-                it.attr("style", "object-fit: contain; height: 100%; max-width: 100%")
-            }
-
+            val img = Element("img")
             val newDiv = div.recreateWithoutNodes()
             newDiv.appendChild(img)
 
