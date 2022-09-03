@@ -286,7 +286,7 @@ fun SettingsMenu() {
             val saveComments by SettingsViewModel.saveComments.collectAsState()
 
             fields += {
-                SettingsBoolField("savecomment", saveComments) {
+                SettingsBoolField(lang.settingsSaveCommentsQuestion, saveComments) {
                     SettingsViewModel.setSaveComments(it)
                 }
             }
