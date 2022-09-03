@@ -8,6 +8,7 @@ import kmtt.util.toTree
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import logic.document.AbstractProcessorOperation
+import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -24,6 +25,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
     override val name: String
         get() = Lang.value.saveCommentsOperation
     private val colorRange = 50..255
+    private val logger = KotlinLogging.logger {  }
     private val offset = 40
     private val maxLayerHideOffset = 10
     private val cacheListeners = mutableListOf<(List<Comment>) -> Unit>()
@@ -36,10 +38,19 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         val id = entry.id ?: return document
         val api = betterPublicKmtt(website)
 
-        val commentList = cachedComments ?: api.comments.getEntryComments(id, SortingType.POPULAR)
-            .also { cache ->
-                callListeners(cache)
+        val commentList = try {
+            cachedComments ?: api.comments.getEntryComments(id, SortingType.POPULAR)
+                .also { cache ->
+                    callListeners(cache)
+                }
+        } catch (ex: Exception) {
+            logger.error(ex) {
+                "Caught exception during getting comments in SaveCommentsOperation. Aborting SaveComments operation silently..."
             }
+
+            null
+        } ?: return document
+
 
         var currentLayer = commentList
             .toTree()
