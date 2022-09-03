@@ -30,6 +30,7 @@ data class BookmarksElementViewModel(
             client = authKmtt(site, token)
             try {
                 // check if token works
+                progress(Lang.value.bookmarksElementVmRequestingProfile)
                 client.user.getMe()
                 readyToUse()
             } catch (ex: Exception) {

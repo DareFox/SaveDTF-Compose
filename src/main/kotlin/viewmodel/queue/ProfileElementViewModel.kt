@@ -45,6 +45,7 @@ data class ProfileElementViewModel(
             initializing()
             client = betterPublicKmtt(site) // recreate client if token changed
             try {
+                progress(Lang.value.profileElementVmRequestingProfile)
                 _user.value = client.user.getUserByID(id)
                 readyToUse()
             } catch(ex: OsnovaRequestException) {
