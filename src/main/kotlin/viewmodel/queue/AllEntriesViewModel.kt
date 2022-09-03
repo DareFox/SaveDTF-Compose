@@ -30,7 +30,7 @@ interface IAllEntriesViewModel: IQueueElementViewModel {
 open class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(), IAllEntriesViewModel {
     private var sitemapDoc: Document? = null
     private val logger = KotlinLogging.logger { }
-    protected val parentDir = File(pathToSave, "${site.name}/entry")
+    private val parentDir by lazy { File(pathToSave, "${site.name}/entry") }
     protected val yearRegex = "/year-\\d{4}-\\d{2}-\\d{2}".toRegex(RegexOption.IGNORE_CASE)
 
     override suspend fun initialize() {
