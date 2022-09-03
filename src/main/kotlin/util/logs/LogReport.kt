@@ -61,7 +61,7 @@ fun getCrashLogReport(ex: Throwable): String {
             val linesNum = if (level != SettingsViewModel.LoggerLevel.DEBUG) {
                 200
             } else {
-                500
+                600
             }
             stringBuilder.append("Level: ${level.name}\n")
             stringBuilder.append("Last $linesNum lines\n")
