@@ -13,7 +13,6 @@ object UrlUtil {
     fun isBookmarkLink(url: String): Boolean {
         return SharedRegex.bookmarksRegex.find(url) != null
     }
-
     fun getWebsiteType(url: String): Website? {
         return when (SharedRegex.websiteRegex.find(url)?.value) {
             "dtf" -> Website.DTF
@@ -32,4 +31,38 @@ object UrlUtil {
 
         return id.value.toLong()
     }
+
+    /**
+     * Check if url is
+     *
+     * "dtf|vc|tjournal.ru/sitemap"
+     */
+    fun isSitemapAll(url: String): Boolean {
+        return SharedRegex.sitemapAll.find(url) != null
+    }
+
+    /**
+     * Check if url is empty website
+     *
+     * dtf.ru/ for example
+     */
+    fun isEmpty(url: String): Boolean {
+        return SharedRegex.entryUrlRegex.find(url) != null
+    }
+
+    /**
+     * Check if url is sitemap period
+     *
+     * "dtf|vc|tjournal.ru/sitemap/year-xxxx-xx-xx"
+     */
+    fun isPeriodSitemap(url: String): Boolean {
+        return SharedRegex.sitemapPeriod.find(url) != null
+    }
+
+    /**
+     * Extract period from sitemap url
+     *
+     * "dtf|vc|tjournal.ru/sitemap/year-xxxx-xx-xx" -> "year-xxxx-xx-xx"
+     */
+    fun extractPeriod(url: String): String? = SharedRegex.sitemapExtractPeriod.find(url)?.value
 }
