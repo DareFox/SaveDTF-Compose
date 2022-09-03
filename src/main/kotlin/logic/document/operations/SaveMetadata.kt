@@ -12,6 +12,7 @@ import kotlinx.serialization.json.encodeToStream
 import logic.document.AbstractProcessorOperation
 import mu.KotlinLogging
 import org.jsoup.nodes.Document
+import ui.i18n.Lang
 import util.dom.getWebsite
 import util.kmttapi.betterPublicKmtt
 import java.io.File
@@ -20,7 +21,8 @@ import java.io.IOException
 class SaveMetadata(val entry: Entry, val folder: File): AbstractProcessorOperation() {
     private val logger = KotlinLogging.logger { }
     private var cachedComments: List<Comment>? = null
-    override val name: String = "Save metadata"
+    override val name: String
+        get() = Lang.value.saveMetadataOperation
     private val cacheListeners = mutableListOf<(List<Comment>) -> Unit>()
     override suspend fun process(document: Document): Document {
         val website = document.getWebsite()
@@ -31,6 +33,7 @@ class SaveMetadata(val entry: Entry, val folder: File): AbstractProcessorOperati
                 val client = betterPublicKmtt(website)
 
                 logger.info { "Trying to get comments metadata" }
+                progress(Lang.value.saveMetadataOperationFetchComments)
                 client.comments.getEntryComments(id, SortingType.POPULAR)
                     .also {
                         callListeners(it)
@@ -51,7 +54,7 @@ class SaveMetadata(val entry: Entry, val folder: File): AbstractProcessorOperati
 
         try {
             logger.info { "Trying to save metadata to .json file in ${folder.absolutePath}" }
-
+            progress(Lang.value.saveMetadataOperationWritingToFile)
             val jsonFile = folder.resolve("metadata.json")
 
             withContext(Dispatchers.IO) {
