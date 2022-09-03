@@ -49,6 +49,7 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
         is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
         is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
         is IProfileElementViewModel -> ProfileCard(viewModel, actionBar)
+        is IPeriodEntriesViewModel -> PeriodEntriesCard(viewModel, actionBar)
         is IAllEntriesViewModel -> AllWebsiteCard(viewModel, actionBar)
         else -> {}
     }
