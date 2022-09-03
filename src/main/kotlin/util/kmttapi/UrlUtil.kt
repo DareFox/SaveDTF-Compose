@@ -46,8 +46,8 @@ object UrlUtil {
      *
      * dtf.ru/ for example
      */
-    fun isEmpty(url: String): Boolean {
-        return SharedRegex.entryUrlRegex.find(url) != null
+    fun isEmptyWebsite(url: String): Boolean {
+        return SharedRegex.emptyWebsiteUrl.find(url) != null
     }
 
     /**
@@ -65,4 +65,14 @@ object UrlUtil {
      * "dtf|vc|tjournal.ru/sitemap/year-xxxx-xx-xx" -> "year-xxxx-xx-xx"
      */
     fun extractPeriod(url: String): String? = SharedRegex.sitemapExtractPeriod.find(url)?.value
+
+    fun extractPeriodAndFormat(url: String): String? {
+        val period = extractPeriod(url) ?: return null
+
+        val year = """(?<=year-)\d{4}""".toRegex().find(period) ?: return null
+        val month = """(?<=-)\d{2}(?=-)""".toRegex().find(period) ?: return null
+        val day = """\d{2}${'$'}""".toRegex().find(period) ?: return null
+
+        return "${day.value}.${month.value}.${year.value}"
+    }
 }
