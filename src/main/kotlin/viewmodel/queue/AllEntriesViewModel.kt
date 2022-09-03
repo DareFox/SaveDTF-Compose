@@ -125,7 +125,7 @@ open class AllEntriesViewModel(override val site: Website): AbstractElementViewM
                     yieldAll(links)
                 } catch (ex: Exception) {
                     logger.error(ex) {
-                        "Caught error during parsing $it in sequence"
+                        "Caught error during parsing $it in sequence. $it period will be skipped silently!!!!!"
                     }
                 }
             }
