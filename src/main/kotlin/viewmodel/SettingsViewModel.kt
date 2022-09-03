@@ -121,7 +121,6 @@ object SettingsViewModel {
         }
 
         setLogbackLevel(enum)
-
         return enum
     }
 

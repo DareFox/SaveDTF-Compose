@@ -25,13 +25,15 @@ object QueueViewModel {
     val creationStateMap: StateFlow<Map<IQueueElementViewModel, MutableTransitionState<Boolean>>> = _creationStateMap
 
     private val urlChecks: List<UrlChecker> = listOf(
+        UrlChecker(UrlUtil::isPeriodSitemap) {
+            add(PeriodEntriesViewModel(it, getWebsiteType(it)!!))
+        },
         UrlChecker(UrlUtil::isUserProfile) {
             add(
                 ProfileElementViewModel(
-                UrlUtil.getWebsiteType(it)!!,
+                getWebsiteType(it)!!,
                 UrlUtil.getProfileID(it)
-            )
-            )
+            ))
         },
         UrlChecker(UrlUtil::isEntry) check@ {
             // url should start from https to get entry from API
@@ -40,14 +42,17 @@ object QueueViewModel {
             add(EntryQueueElementViewModel(url))
         },
         UrlChecker(UrlUtil::isBookmarkLink) {
-            add(createBookmarks(UrlUtil.getWebsiteType(it)!!)) // we do a little bit of trolling !!
+            add(createBookmarks(getWebsiteType(it)!!)) // we do a little bit of trolling !!
         },
         UrlChecker( { it == "debug"} ) {
             DebugQueueViewModel.startQueue.forEach {
                 add(it)
             }
         },
-        UrlChecker(::isSitemap) {
+        UrlChecker(UrlUtil::isSitemapAll) {
+            add(AllEntriesViewModel(getWebsiteType(it)!!))
+        },
+        UrlChecker(UrlUtil::isEmptyWebsite) {
             add(AllEntriesViewModel(getWebsiteType(it)!!))
         }
     )
@@ -115,17 +120,6 @@ object QueueViewModel {
         }
     }
 }
-
-private fun isSitemap(url: String): Boolean {
-    val regex = Website.values().map {
-        "${it.baseURL}(/sitemap|/|)\$".toRegex(RegexOption.IGNORE_CASE)
-    }
-
-    return regex.firstOrNull {
-        url.contains(it)
-    } != null
-}
-
 
 data class UrlChecker(
     /**
