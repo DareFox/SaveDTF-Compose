@@ -59,22 +59,7 @@ data class BookmarksElementViewModel(
                     }
                 }
 
-                val errorCounter = errorList.count()
-
-                if (errorCounter > 0) {
-                    saved()
-                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
-                    progress(Lang.value.bookmarksElementVmSomeErrors.format(counter, errorCounter))
-                } else if (errorCounter == counter) {
-                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
-                    error(Lang.value.bookmarksElementVmAllErrors.format(errorCounter))
-                    clearProgress()
-                } else {
-                    saved()
-                    progress(Lang.value.bookmarksElementVmNoErrors.format(counter))
-                }
-
-                errorCounter == 0
+                resultMessage(errorList, counter, logger)
             }
 
         }

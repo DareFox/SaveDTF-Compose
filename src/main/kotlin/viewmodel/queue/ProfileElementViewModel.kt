@@ -83,23 +83,7 @@ data class ProfileElementViewModel(
                     }
                 }
 
-                val errorCounter = errorList.count()
-
-                if (errorCounter > 0) {
-                    saved()
-                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
-                    progress(Lang.value.profileElementVmSomeErrors.format(counter, errorCounter))
-                } else if (errorCounter == counter) {
-                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
-                    error(Lang.value.profileElementVmAllErrors.format(errorCounter))
-                    clearProgress()
-                } else {
-                    saved()
-                    progress(Lang.value.profileElementVmNoErrors.format(counter))
-                }
-
-                errorCounter == 0
-
+                resultMessage(errorList, counter, logger)
             }
         }
     }

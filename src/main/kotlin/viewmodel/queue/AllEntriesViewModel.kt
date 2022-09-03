@@ -76,21 +76,7 @@ class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(
                     }
                 }
 
-                val errorCounter = errorList.count()
-                if (errorCounter > 0) {
-                    saved()
-                    progress(Lang.value.profileElementVmSomeErrors.format(counter, errorCounter))
-                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
-                } else if (errorCounter == counter) {
-                    error(Lang.value.profileElementVmAllErrors.format(errorCounter))
-                    logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
-                    clearProgress()
-                } else {
-                    saved()
-                    progress(Lang.value.profileElementVmNoErrors.format(counter))
-                }
-
-                errorCounter == 0
+                resultMessage(errorList, counter, logger)
             }
         }
     }
