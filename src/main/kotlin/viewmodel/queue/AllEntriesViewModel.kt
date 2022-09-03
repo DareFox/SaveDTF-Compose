@@ -16,6 +16,7 @@ import org.jsoup.nodes.Document
 import ui.i18n.Lang
 import util.coroutine.cancelOnSuspendEnd
 import util.filesystem.toDirectory
+import util.kmttapi.UrlUtil
 import util.kmttapi.betterPublicKmtt
 import util.progress.redirectTo
 import java.io.File
@@ -26,10 +27,11 @@ interface IAllEntriesViewModel: IQueueElementViewModel {
     override fun hashCode(): Int
 }
 
-class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(), IAllEntriesViewModel {
+open class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(), IAllEntriesViewModel {
     private var sitemapDoc: Document? = null
     private val logger = KotlinLogging.logger { }
-    private val parentDir = File(pathToSave, "${site.name}/entry")
+    protected val parentDir = File(pathToSave, "${site.name}/entry")
+    protected val yearRegex = "/year-\\d{4}-\\d{2}-\\d{2}".toRegex(RegexOption.IGNORE_CASE)
 
     override suspend fun initialize() {
         elementMutex.withLock {
@@ -81,7 +83,7 @@ class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(
         }
     }
 
-    private fun sequenceOfPages(sitemapDoc: Document): Sequence<String> {
+    protected fun sequenceOfPages(sitemapDoc: Document): Sequence<String> {
         val sitemap = sitemapDoc.selectFirst("ul.sitemap")
 
         requireNotNull(sitemap) {
@@ -130,7 +132,7 @@ class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(
         }
     }
 
-    private fun convertYearPageToList(yearPage: Document): List<String> {
+    protected fun convertYearPageToList(yearPage: Document): List<String> {
         progress(Lang.value.allEntriesVmParsingAllLinks)
         val sitemap = yearPage.selectFirst("ul.sitemap")
 
