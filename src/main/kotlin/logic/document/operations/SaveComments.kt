@@ -56,7 +56,12 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
             .toTree()
             .associateWith {
                 val isAuthorOfPost = entry.author?.id == it.value.author?.id
-                createNodeHTML(it, null, false, isAuthorOfPost) to randomColor(
+                createNodeHTML(
+                    comment = it,
+                    hideColor = null,
+                    disableInvisibleHide = layerLevel.value > maxLayerHideOffset,
+                    isAuthor = isAuthorOfPost
+                ) to randomColor(
                 colorRange, colorRange, colorRange
             )
         }.also {
@@ -90,7 +95,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
                     val htmlNode = createNodeHTML(
                         comment = it,
                         hideColor = "#${randomColor.toHex()}",
-                        disableInvisibleHide = level > 10,
+                        disableInvisibleHide = level > maxLayerHideOffset,
                         isAuthor = isAuthorOfPost
                     )
                     nodesDiv.appendChild(htmlNode)
