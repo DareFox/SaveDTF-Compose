@@ -25,6 +25,7 @@ import viewmodel.NotificationData
 import viewmodel.NotificationType
 import viewmodel.NotificationsViewModel
 import viewmodel.SettingsViewModel
+import viewmodel.queue.AllEntriesViewModel
 import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import viewmodel.queue.QueueViewModel
 
@@ -63,6 +64,19 @@ fun QueueCreatorMenu() {
             val scope = rememberCoroutineScope()
 
             var showBookmarksMenu by rememberSaveable { mutableStateOf(false) }
+            var showArchiveMenu by rememberSaveable { mutableStateOf(false) }
+
+            val bookmarkIcon = if (showBookmarksMenu) {
+                FeatherIcons.ChevronRight
+            } else {
+                FeatherIcons.Bookmark
+            }
+
+            val archiveIcon = if (showArchiveMenu) {
+                FeatherIcons.ChevronRight
+            } else {
+                FeatherIcons.Archive
+            }
 
             Row(Modifier.height(50.dp)) {
                 /* search field */
@@ -84,11 +98,31 @@ fun QueueCreatorMenu() {
 
                 }
 
-                val bookmarkIcon = if (showBookmarksMenu) {
-                    FeatherIcons.ChevronRight
-                } else {
-                    FeatherIcons.Bookmark
+                if (showArchiveMenu) {
+                    /* create bookmark element with associated website */
+                    Website.values().forEach { website ->
+                        Surface(modifier = Modifier.padding(start = 10.dp).width(50.dp)) {
+                            FancyButton(true, onClick = {
+                                QueueViewModel.add(AllEntriesViewModel(website))
+                            }) {
+                                Image(getPainterByWebsite(website), null)
+                            }
+                        }
+                    }
                 }
+
+
+                /* archive button */
+                Surface(modifier = Modifier.padding(start = 10.dp).width(50.dp)) {
+                    // Show/hide website selector
+                    FancyButton(true, onClick = {
+                        showArchiveMenu = !showArchiveMenu
+                    }) {
+                        Icon(archiveIcon, null)
+                    }
+                }
+
+
 
                 if (showBookmarksMenu) {
                     /* create bookmark element with associated website */

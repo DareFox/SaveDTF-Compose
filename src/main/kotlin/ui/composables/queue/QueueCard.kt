@@ -32,12 +32,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.animations.pulseColor
 import ui.i18n.Lang
-import viewmodel.queue.IBookmarksElementViewModel
-import viewmodel.queue.IEntryQueueElementViewModel
-import viewmodel.queue.IProfileElementViewModel
-import viewmodel.queue.IQueueElementViewModel
 import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import util.desktop.openFileInDefaultApp
+import viewmodel.queue.*
 import java.io.File
 
 data class ActionBarElement(
@@ -52,6 +49,7 @@ fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElemen
         is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
         is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
         is IProfileElementViewModel -> ProfileCard(viewModel, actionBar)
+        is IAllEntriesViewModel -> AllWebsiteCard(viewModel, actionBar)
         else -> {}
     }
 }
