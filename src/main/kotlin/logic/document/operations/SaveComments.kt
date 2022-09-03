@@ -1,6 +1,6 @@
 package logic.document.operations
 
-import androidx.compose.runtime.mutableStateOf
+import kmtt.models.comment.Comment
 import kmtt.models.entry.Entry
 import kmtt.models.enums.SortingType
 import kmtt.util.CommentNode
@@ -24,7 +24,8 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
     private val colorRange = 50..255
     private val offset = 40
     private val maxLayerHideOffset = 10
-
+    private val cacheListeners = mutableListOf<(List<Comment>) -> Unit>()
+    private var cachedComments: List<Comment>? = null
     override suspend fun process(document: Document): Document {
         val layerLevel = MutableStateFlow(0)
         val website = document.getWebsite() ?: return document
@@ -33,9 +34,12 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         val id = entry.id ?: return document
         val api = betterPublicKmtt(website)
 
+        val commentList = cachedComments ?: api.comments.getEntryComments(id, SortingType.POPULAR)
+            .also { cache ->
+                callListeners(cache)
+            }
 
-        var currentLayer = api.comments
-            .getEntryComments(id, SortingType.POPULAR)
+        var currentLayer = commentList
             .toTree()
             .associateWith {
                 val isAuthorOfPost = entry.author?.id == it.value.author?.id
@@ -275,5 +279,19 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
             "<a href=\"${it.value}\">${it.value}</a>"
         }
         element.html(newText)
+    }
+
+    private fun callListeners(cache: List<Comment>) {
+        cacheListeners.forEach {
+            it(cache)
+        }
+    }
+
+    fun setCachedComments(comments: List<Comment>) {
+        cachedComments = comments
+    }
+
+    fun addCacheListener(listener: (List<Comment>) -> Unit) {
+        cacheListeners += listener
     }
 }

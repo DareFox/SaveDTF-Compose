@@ -10,6 +10,7 @@ import logic.document.operations.media.SaveMediaOperation
 import logic.document.operations.media.modules.IDownloadModule
 import logic.document.operations.media.modules.ImageDownloadModule
 import logic.document.operations.media.modules.VideoDownloadModule
+import mu.KotlinLogging
 import org.jsoup.nodes.Document
 import viewmodel.SettingsViewModel
 import util.progress.redirectTo
@@ -23,6 +24,8 @@ class SettingsBasedDocumentProcessor(
     document: Document,
     val entry: Entry? = null
 ): AbstractProgress() {
+    private val logger = KotlinLogging.logger {  }
+
     private val necessaryFirstOperations = mutableListOf(
         RemoveCssOperation,
         RemoveAdsOperation,
@@ -30,14 +33,31 @@ class SettingsBasedDocumentProcessor(
         FormatHtmlOperation,
         ChangeTitleOperation(entry),
     ).apply {
-        if (entry != null) {
-            add(SaveCommentsOperation(entry))
-        }
+        entry?.let {
+            val metadataOp = SaveMetadata(it, saveFolder)
+            val commentsOp = SaveCommentsOperation(it)
 
-        if (entry != null && SettingsViewModel.saveMetadata.value) {
-            add(SaveMetadata(entry, saveFolder))
+            commentsOp.addCacheListener {
+                logger.debug { "Got cache from save comments operation" }
+                metadataOp.setCachedComments(it)
+            }
+
+            metadataOp.addCacheListener {
+                logger.debug { "Got cache from metadata operation" }
+                commentsOp.setCachedComments(it)
+            }
+
+            if (SettingsViewModel.saveMetadata.value) {
+                add(metadataOp)
+            }
+
+            if (SettingsViewModel.saveComments.value) {
+                add(commentsOp)
+            }
         }
     }
+
+
 
     private val necessaryLastOperations = mutableListOf(
         JavascriptAndCssOperation,

@@ -5,7 +5,6 @@ import kmtt.models.entry.Entry
 import kmtt.models.enums.SortingType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -19,19 +18,23 @@ import java.io.File
 import java.io.IOException
 
 class SaveMetadata(val entry: Entry, val folder: File): AbstractProcessorOperation() {
-    private val logger = KotlinLogging.logger {  }
-
+    private val logger = KotlinLogging.logger { }
+    private var cachedComments: List<Comment>? = null
     override val name: String = "Save metadata"
-
+    private val cacheListeners = mutableListOf<(List<Comment>) -> Unit>()
     override suspend fun process(document: Document): Document {
         val website = document.getWebsite()
         val id = entry.id
 
         val comments = if (website != null && id != null) {
-            try {
+            cachedComments ?: try {
                 val client = betterPublicKmtt(website)
+
                 logger.info { "Trying to get comments metadata" }
                 client.comments.getEntryComments(id, SortingType.POPULAR)
+                    .also {
+                        callListeners(it)
+                    }
             } catch (e: Exception) {
                 logger.error(e) {
                     "Can't get comments from entry $id"
@@ -67,7 +70,20 @@ class SaveMetadata(val entry: Entry, val folder: File): AbstractProcessorOperati
 
         return document
     }
-}
 
+    private fun callListeners(cache: List<Comment>) {
+        cacheListeners.forEach {
+            it(cache)
+        }
+    }
+
+    fun setCachedComments(comments: List<Comment>) {
+        cachedComments = comments
+    }
+
+    fun addCacheListener(listener: (List<Comment>) -> Unit) {
+        cacheListeners += listener
+    }
+}
 @Serializable
 private data class EntryMetadata(val entry: Entry?, val comments: List<Comment>?)
