@@ -63,6 +63,43 @@ object SharedRegex {
     val websiteRegex = """(dtf|vc|tjournal)(?=\.ru)""".toRegex(RegexOption.IGNORE_CASE)
 
     /**
+     * Check if website is empty
+     *
+     * Example:
+     * dtf.ru/ is empty
+     * dtf.ru/u/123 is NOT empty
+     *
+     * https://dtf.ru/ is empty too
+     */
+    val emptyWebsiteUrl = """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru(/|)${'$'}""".toRegex(RegexOption.IGNORE_CASE)
+
+    /**
+     * Check if link is **.ru/sitemap only
+     *
+     * Example:
+     * dtf.ru/sitemap is sitemap to all entries
+     * dtf.ru/sitemap/year-2022-02-02 is NOT*
+     */
+    val sitemapAll = """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru/sitemap(/|)${'$'}""".toRegex(RegexOption.IGNORE_CASE)
+
+    /** Check if link is sitemap period
+     *
+     * Example:
+     * https://dtf.ru/sitemap/year-2022-08-01 is period
+     * https://dtf.ru/sitemap/ is NOT
+     */
+    val sitemapPeriod = """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru/sitemap/year-\d{4}-\d{2}-\d{2}""".toRegex(RegexOption.IGNORE_CASE)
+
+    /**
+     * Extract sitemap period:
+     *
+     * Example:
+     * https://dtf.ru/sitemap/year-2022-08-01 -> year-2022-08-01
+     * https://dtf.ru/sitemap -> null
+     */
+    val sitemapExtractPeriod = """(?<=sitemap/)year-\d{4}-\d{2}-\d{2}""".toRegex(RegexOption.IGNORE_CASE)
+
+    /**
      * Check bookmark URL
      *
      * Returns `(dtf/vc/tjournal).ru/bookmarks` or `null`
