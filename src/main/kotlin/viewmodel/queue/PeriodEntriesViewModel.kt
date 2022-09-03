@@ -73,7 +73,7 @@ class PeriodEntriesViewModel(
                 }
 
                 entriesLinks.forEach {
-                    if (!tryProcessDocument(it, parentDir, counter, logger)) {
+                    if (!tryProcessDocument(it, parentDir, counter, logger = logger)) {
                         errorLinks += it
                     }
                     counter++

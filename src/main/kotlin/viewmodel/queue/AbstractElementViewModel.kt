@@ -133,7 +133,7 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
         return job
     }
 
-    protected suspend fun tryProcessDocument(url: String, parentDir: File, currentCounter: Int, logger: KLogger = KotlinLogging.logger {  }): Boolean {
+    protected suspend fun tryProcessDocument(url: String, parentDir: File, currentCounter: Int, timeoutMs: Long = 60000L, logger: KLogger = KotlinLogging.logger {  }): Boolean {
         return try {
             val newCounter = currentCounter+1
             val prefix = "${Lang.value.queueVmEntry} #${newCounter}"
@@ -146,9 +146,16 @@ abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgre
             logger.debug { "Getting entry from osnova api" }
             progress("$prefix, ${Lang.value.abstractElementVmRequestingEntry.format(url)}")
 
-            val entry = betterPublicKmtt(site).entry.getEntry(url)
+            val entry = withTimeout(timeoutMs) {
+                betterPublicKmtt(site).entry.getEntry(url)
+            }
 
             tryProcessDocument(entry, parentDir, currentCounter, logger)
+        } catch (ex: TimeoutCancellationException) {
+            logger.error(ex) {
+                "Timeout for processing document"
+            }
+            false
         } catch (ex: Exception) {
             logger.error(ex) {
                 "Failed to process document $url"

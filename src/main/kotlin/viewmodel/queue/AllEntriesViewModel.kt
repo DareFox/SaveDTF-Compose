@@ -70,7 +70,7 @@ open class AllEntriesViewModel(override val site: Website): AbstractElementViewM
                 val errorList = mutableListOf<String>()
                 withProgressSuspend(allEntriesMessage) {
                     sequence.forEach {
-                        if (!tryProcessDocument(it, parentDir, counter, logger)) {
+                        if (!tryProcessDocument(it, parentDir, counter, logger = logger)) {
                             errorList += it
                         }
                         counter++
