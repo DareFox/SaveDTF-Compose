@@ -3,6 +3,13 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
+/**
+ * NOTE:
+ * If version doesn't update in UI do this before compilation
+ * -> Delete ./build/kotlin
+ * -> Delete ./build/generated
+ */
+
 allprojects {
     configurations.all {
         resolutionStrategy.dependencySubstitution {
@@ -101,6 +108,16 @@ tasks.withType<KotlinCompile> {
 var increment = true
 var isDevVersion = true
 
+/**
+ * Delete previous generated code
+ */
+val generated = file("build/generated/")
+if (!generated.deleteRecursively()) {
+    println("CAN'T DELETE /build/generated! THIS MAY CAUSE SOME ISSUES SUCH AS IRRELEVANT BUILD CONFIG")
+} else {
+    println("Successfully deleted /build/generated before generating new code")
+}
+
 tasks.withType {
     val isPackageTask = gradle.startParameter.taskNames.any {
         it.contains("package") // check if package* (package, packageDeb, packageMsi and etc...)
@@ -116,6 +133,7 @@ tasks.withType {
 
 buildConfig {
     val version = getBuildVersion(increment)
+    println("Build version: $version")
 
     buildConfigField("String", "APP_FULL_VERSION", "\"${version}\"")
     buildConfigField("String", "APP_SEMANTIC_VERSION", "\"${version.convertToSemanticVersion()}\"")
@@ -188,7 +206,10 @@ fun getBuildVersion(increment: Boolean): BuildVersion {
         else -> previous.copy(build = if (increment) previous.build + 1 else previous.build)
     }
 
-    return newVersion.also { saveVersion(it) }
+    return newVersion.also {
+        saveVersion(it)
+    }
+
 }
 
 fun getPreviousVersion(): BuildVersion? {
@@ -205,7 +226,6 @@ fun getPreviousVersion(): BuildVersion? {
         val minor = properties["MINOR_VERSION"].toString().toInt()
         val patch = properties["PATCH_VERSION"].toString().toInt()
         val build = properties["BUILD_NUMBER"].toString().toLong()
-
         BuildVersion(major, minor, patch, build)
     } catch(ex: Exception) {
         println(ex.toString())
