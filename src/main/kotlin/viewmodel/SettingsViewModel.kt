@@ -101,8 +101,8 @@ object SettingsViewModel {
         return preferences.node("tkn").get(website.name, "")
     }
     private fun getPrefDownloadVideo() = preferences.getBoolean(DOWNLOAD_VIDEO_BOOL_KEY, true)
-    private fun getSaveMetadata() = preferences.getBoolean(SAVE_METADATA_KEY, false)
-    private fun getSaveComments() = preferences.getBoolean(SAVE_COMMENTS_KEY, false)
+    private fun getSaveMetadata() = preferences.getBoolean(SAVE_METADATA_KEY, true)
+    private fun getSaveComments() = preferences.getBoolean(SAVE_COMMENTS_KEY, true)
     private fun getPrefDownloadImage() = preferences.getBoolean(DOWNLOAD_IMAGE_BOOL_KEY, true)
     private fun getPrefIgnoreUpdates() = preferences.getBoolean(MUTE_UPDATES_NOTIFICATION_KEY, false)
     private fun getPrefMediaTimeout() = preferences.getInt(MEDIA_TIMEOUT_TIME_KEY, 300)
