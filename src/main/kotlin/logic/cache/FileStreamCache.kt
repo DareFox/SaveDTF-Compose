@@ -156,7 +156,15 @@ object FileStreamCache: StreamCache {
 
         val files = tempFolder.recursiveFileList()
 
-        for (file in files.sortedBy(File::lastModified)) {
+        /**
+         * Why randomize?
+         *
+         * Because deleting files without any regard to how often or
+         * how many times they were accessed before is inefficient.
+         *
+         * ...and I'm too lazy to create history access based cache
+         */
+        for (file in files.shuffled()) {
             if (file.extension == "json") continue
 
             val deletedFilename = file.name
