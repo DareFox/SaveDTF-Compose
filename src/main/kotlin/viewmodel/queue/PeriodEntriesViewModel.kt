@@ -11,6 +11,7 @@ import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
+import java.io.File
 
 interface IPeriodEntriesViewModel: IQueueElementViewModel {
     val periodSitemapLink: String
@@ -21,6 +22,7 @@ class PeriodEntriesViewModel(
     override val periodSitemapLink: String,
     override val site: Website
 ): AllEntriesViewModel(site), IPeriodEntriesViewModel {
+    private val parentDir = File(pathToSave, "${site.name}/entry")
     private var sitemapPeriodDoc: Document? = null
     private val logger = KotlinLogging.logger { }
 
@@ -37,9 +39,8 @@ class PeriodEntriesViewModel(
             try {
                 progress(Lang.value.allEntriesVmFetchingSitemap)
 
-                val sitemap = "https://${site.baseURL}/sitemap$period"
                 val response = Client.rateRequest<HttpResponse> {
-                    url(sitemap)
+                    url(periodSitemapLink)
                 }
 
                 progress(Lang.value.allEntriesVmParsingSitemap)
