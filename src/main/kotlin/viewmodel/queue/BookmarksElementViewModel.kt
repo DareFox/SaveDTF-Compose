@@ -32,6 +32,7 @@ data class BookmarksElementViewModel(
                 // check if token works
                 progress(Lang.value.bookmarksElementVmRequestingProfile)
                 client.user.getMe()
+                clearProgress()
                 readyToUse()
             } catch (ex: Exception) {
                 error(Lang.value.bookmarksElementVmProfileError)

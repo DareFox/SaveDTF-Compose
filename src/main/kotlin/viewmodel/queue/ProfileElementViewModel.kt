@@ -47,6 +47,7 @@ data class ProfileElementViewModel(
             try {
                 progress(Lang.value.profileElementVmRequestingProfile)
                 _user.value = client.user.getUserByID(id)
+                clearProgress()
                 readyToUse()
             } catch(ex: OsnovaRequestException) {
                 // 403 Forbidden
