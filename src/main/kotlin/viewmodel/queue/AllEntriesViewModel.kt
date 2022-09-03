@@ -106,6 +106,8 @@ open class AllEntriesViewModel(override val site: Website): AbstractElementViewM
         }
 
         return sequence<String> {
+            val failedLinks = mutableListOf<String>()
+
             for (it in yearPages) {
                 progress(Lang.value.allEntriesVmFetchingYearLink.format(it))
 
@@ -127,7 +129,13 @@ open class AllEntriesViewModel(override val site: Website): AbstractElementViewM
                     logger.error(ex) {
                         "Caught error during parsing $it in sequence. $it period will be skipped silently!!!!!"
                     }
+                    failedLinks += it
                 }
+            }
+
+            if (failedLinks.isNotEmpty()) {
+                val links = failedLinks.joinToString("\n")
+                logger.error("FAILED TO DOWNLOAD THIS PERIOD LINKS:\n$links")
             }
         }
     }
