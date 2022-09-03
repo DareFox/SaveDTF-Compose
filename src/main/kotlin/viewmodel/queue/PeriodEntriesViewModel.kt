@@ -12,10 +12,15 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
 
+interface IPeriodEntriesViewModel: IQueueElementViewModel {
+    val periodSitemapLink: String
+    val site: Website
+}
+
 class PeriodEntriesViewModel(
-    val periodSitemapLink: String,
+    override val periodSitemapLink: String,
     override val site: Website
-): AllEntriesViewModel(site) {
+): AllEntriesViewModel(site), IPeriodEntriesViewModel {
     private var sitemapPeriodDoc: Document? = null
     private val logger = KotlinLogging.logger { }
 
