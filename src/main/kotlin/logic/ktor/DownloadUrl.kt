@@ -58,6 +58,7 @@ private suspend fun download(
 ): InputStream? {
     var attemptCounter = 0
     do {
+        attemptCounter++
         timeout?.join() // Wait if there is too many requests
         val caught = runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
             val shouldUseTimeoutRestriction = timeoutInSeconds > 0
