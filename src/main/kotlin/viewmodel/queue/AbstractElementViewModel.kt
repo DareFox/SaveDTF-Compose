@@ -171,7 +171,7 @@ abstract class AbstractElementViewModel(
      * Retrieve, process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
      */
     protected suspend fun processEntry(url: String, parentDir: File, currentCounter: Int) {
-        val apiTimeout = 30 * 1000L
+        val apiTimeout = SettingsViewModel.apiTimeoutInSeconds.value * 1000L
 
         val newCounter = currentCounter+1
         val prefix = "${Lang.value.queueVmEntry} #${newCounter}"
@@ -224,7 +224,7 @@ abstract class AbstractElementViewModel(
         parentDir: File,
         currentCounter: Int
     ) {
-        val entryMs = 60 * 1000L
+        val entryMs = SettingsViewModel.entryTimeoutInSeconds.value * 1000L
 
         val document = entry
             .entryContent
@@ -244,10 +244,19 @@ abstract class AbstractElementViewModel(
         }
 
         internalLogger.debug { "Starting entry processing with id ${entry.id}" }
-        timeoutOperation(entryMs, "Entry processing", {
-            counter.cancel()
-        }) {
+        if (entryMs <= 0) {
             processor.process()
+            counter.cancel()
+        } else {
+            timeoutOperation(
+                timeout = entryMs,
+                name = "Entry processing",
+                finallyBlock = {
+                    counter.cancel()
+                }
+            ) {
+                processor.process()
+            }
         }
         internalLogger.debug { "Finished processing entry with id ${entry.id}" }
     }
