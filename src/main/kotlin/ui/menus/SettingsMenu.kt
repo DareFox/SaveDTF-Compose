@@ -188,7 +188,7 @@ fun SettingsMenu() {
             var retryAmount by remember { mutableStateOf("${SettingsViewModel.retryAmount.value}") }
             var mediaTimeout by remember { mutableStateOf("${SettingsViewModel.mediaTimeoutInSeconds.value}") }
             var entryTimeout by remember { mutableStateOf("${SettingsViewModel.entryTimeoutInSeconds.value}") }
-
+            var apiTimeout by remember { mutableStateOf("${SettingsViewModel.apiTimeoutInSeconds.value}") }
             val fields = mutableListOf<@Composable () -> Unit>()
 
             fields += {
@@ -257,6 +257,20 @@ fun SettingsMenu() {
 //                    entryTimeout = it
 //                }
 //            }
+            fields += {
+                SettingsTextField(
+                    name = "Максимальное время ожидания ответа API",
+                    input = apiTimeout,
+                    textPlaceholder = "<= 0 - бесконечное ожидание.",
+                    hideContent = false,
+                    width = textWidth
+                ) {
+                    it.toIntOrNull()?.also { timeout ->
+                        SettingsViewModel.setApiTimeoutInSeconds(timeout)
+                    }
+                    apiTimeout = it
+                }
+            }
 
 
             val replaceErrors by SettingsViewModel.replaceErrorMedia.collectAsState()
