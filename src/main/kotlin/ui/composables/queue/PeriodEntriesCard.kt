@@ -3,7 +3,6 @@ package ui.composables.queue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import kotlinx.coroutines.flow.compose
 import ui.i18n.Lang
 import util.kmttapi.UrlUtil
 import viewmodel.queue.*
@@ -23,7 +22,7 @@ fun PeriodEntriesCard(viewModel: IPeriodEntriesViewModel, actionBar: List<Action
         title = lang.periodEntriesVmCardTitle.format(period),
         author = viewModel.site.name,
         status = status,
-        error = if (status == IQueueElementViewModel.QueueElementStatus.ERROR) error else null,
+        error = if (status == IQueueElementViewModel.Status.ERROR) error else null,
         website = viewModel.site
     )
 }

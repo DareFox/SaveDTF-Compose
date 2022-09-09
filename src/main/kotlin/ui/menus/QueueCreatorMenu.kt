@@ -26,7 +26,7 @@ import viewmodel.NotificationType
 import viewmodel.NotificationsViewModel
 import viewmodel.SettingsViewModel
 import viewmodel.queue.AllEntriesViewModel
-import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
+import viewmodel.queue.IQueueElementViewModel.Status
 import viewmodel.queue.QueueViewModel
 
 @Composable
@@ -168,8 +168,8 @@ fun QueueCreatorMenu() {
                     FancyButton(isQueueNotEmpty, onClick = {
                         queue.forEach {
                             scope.launch {
-                                if (QueueElementStatus.READY_TO_USE == it.status.value) {
-                                    it.save()
+                                if (Status.READY_TO_USE == it.status.value) {
+                                    it.saveAsync()
                                 }
                             }
                         }
@@ -190,8 +190,8 @@ fun QueueCreatorMenu() {
                     FancyButton(isQueueNotEmpty, onClick = {
                         queueVM.queue.value.forEach {
                             scope.launch {
-                                if (it.status.value != QueueElementStatus.IN_USE) {
-                                    it.initialize()
+                                if (it.status.value != Status.IN_USE) {
+                                    it.initializeAsync()
                                 }
                             }
                         }

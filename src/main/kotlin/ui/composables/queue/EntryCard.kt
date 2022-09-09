@@ -32,7 +32,7 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
         title = title,
         author = author,
         status = status,
-        error = if (status == IQueueElementViewModel.QueueElementStatus.ERROR) error else null,
+        error = if (status == IQueueElementViewModel.Status.ERROR) error else null,
         website = website
     )
 }
