@@ -1,5 +1,6 @@
 package viewmodel.queue
 
+import exception.errorOnNull
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kmtt.models.enums.Website
@@ -11,6 +12,7 @@ import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
+import viewmodel.SettingsViewModel
 import java.io.File
 
 interface IPeriodEntriesViewModel: IQueueElementViewModel {
@@ -22,66 +24,45 @@ class PeriodEntriesViewModel(
     override val periodSitemapLink: String,
     override val site: Website
 ): AllEntriesViewModel(site), IPeriodEntriesViewModel {
-    private val parentDir = File(pathToSave, "${site.name}/entry")
     private var sitemapPeriodDoc: Document? = null
-    private val logger = KotlinLogging.logger { }
 
-    override suspend fun initialize() {
-        elementMutex.withLock {
-            initializing()
-            val period = yearRegex.find(periodSitemapLink)
+    override suspend fun initializeImpl() {
+        val period = yearRegex.find(periodSitemapLink).errorOnNull(
+            "Invalid sitemap period"
+        )
 
-            if (period == null) {
-                error("Invalid sitemap period")
-                return@withLock
-            }
+        setProgress(Lang.value.allEntriesVmFetchingSitemap)
 
-            try {
-                progress(Lang.value.allEntriesVmFetchingSitemap)
-
-                val response = Client.rateRequest<HttpResponse> {
-                    url(periodSitemapLink)
-                }
-
-                progress(Lang.value.allEntriesVmParsingSitemap)
-                sitemapPeriodDoc = Jsoup.parse(response.readText())
-
-                clearProgress()
-                readyToUse()
-            } catch (ex: Exception) {
-                error(ex)
-            }
+        val response = Client.rateRequest<HttpResponse> {
+            url(periodSitemapLink)
         }
+
+        setProgress(Lang.value.allEntriesVmParsingSitemap)
+        sitemapPeriodDoc = Jsoup.parse(response.readText())
     }
 
-    override suspend fun save(): Deferred<Boolean> {
-        return waitAndAsyncJob {
-            elementMutex.withLock {
-                var counter = 0
-                val errorLinks = mutableListOf<String>()
-                val document = sitemapPeriodDoc
-                if (document == null) {
-                    error("Document is null")
-                    return@withLock false
-                }
+    override suspend fun saveImpl() {
+        var counter = 0
+        val errorLinks = mutableListOf<String>()
 
-                val entriesLinks = convertYearPageToList(document)
 
-                if (entriesLinks.isEmpty()) {
-                    error("No links in sitemap $periodSitemapLink")
-                    return@withLock false
-                }
+        val parentDir = File(baseSaveFolder, "${site.name}/entry")
+        val document = sitemapPeriodDoc.errorOnNull("Document is null")
 
-                entriesLinks.forEach {
-                    if (!tryProcessDocument(it, parentDir, counter, logger = logger)) {
-                        errorLinks += it
-                    }
-                    counter++
-                }
+        val entriesLinks = convertYearPageToList(document)
 
-                resultMessage(errorLinks, counter, logger)
-            }
+        if (entriesLinks.isEmpty()) {
+            throw IllegalArgumentException("No links in sitemap $periodSitemapLink")
         }
+
+        entriesLinks.forEach {
+            if (!tryProcessEntry(it, parentDir, counter)) {
+                errorLinks += it
+            }
+            counter++
+        }
+
+        showResult(errorLinks, counter, parentDir.absolutePath)
     }
 
     override fun equals(other: Any?): Boolean {
