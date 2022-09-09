@@ -52,6 +52,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
         parentDir = File("$type/entry")
 
         _entry.value = client.entry.getEntry(url)
+        _website.value = type
     }
 
     override suspend fun saveImpl() {
