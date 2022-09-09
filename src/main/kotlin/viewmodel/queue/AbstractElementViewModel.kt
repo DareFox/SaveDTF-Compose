@@ -168,7 +168,7 @@ abstract class AbstractElementViewModel(
     }
 
     /**
-     * Retrieve, process and save entry to `%parentDir%/ID-ENTRYNAME`
+     * Retrieve, process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
      */
     protected suspend fun processEntry(url: String, parentDir: File, currentCounter: Int) {
         val apiTimeout = 30 * 1000L
@@ -196,7 +196,7 @@ abstract class AbstractElementViewModel(
     }
 
     /**
-     * Try to retrieve, process and save entry to `%parentDir%/ID-ENTRYNAME`
+     * Try to retrieve, process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
      *
      * On success, returns **true**.
      *
@@ -217,7 +217,7 @@ abstract class AbstractElementViewModel(
     }
 
     /**
-     * Process and save entry to `%parentDir%/ID-ENTRYNAME`
+     * Process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
      */
     protected suspend fun processEntry(
         entry: Entry,
@@ -253,7 +253,7 @@ abstract class AbstractElementViewModel(
     }
 
     /**
-     * Try to process and save entry to `%parentDir%/ID-ENTRYNAME`
+     * Try to process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
      *
      * On success, returns **true**.
      *
