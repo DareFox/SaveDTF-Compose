@@ -307,6 +307,7 @@ abstract class AbstractElementViewModel(
             } else {
                 setErrorMessage("Error! $errorName")
             }
+            return
         }
 
         if (!message.isNullOrBlank()) {
