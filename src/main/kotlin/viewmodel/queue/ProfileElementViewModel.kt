@@ -1,5 +1,6 @@
 package viewmodel.queue
 
+import exception.QueueElementException
 import exception.errorOnNull
 import kmtt.exception.OsnovaRequestException
 import kmtt.models.entry.Entry
@@ -31,60 +32,45 @@ interface IProfileElementViewModel : IQueueElementViewModel {
 data class ProfileElementViewModel(
     override val site: Website,
     override val id: Long
-): AbstractElementViewModel(), IProfileElementViewModel {
-    val _user = MutableStateFlow<Subsite?>(null)
+): AbstractElementViewModel({}), IProfileElementViewModel {
+    private val _user = MutableStateFlow<Subsite?>(null)
+    override val user: StateFlow<Subsite?> =_user
+    override suspend fun initializeImpl() {
+        val client = betterPublicKmtt(site)
 
-    private var client = betterPublicKmtt(site)
-    override val user: StateFlow<Subsite?> = _user
-    private val logger = KotlinLogging.logger { }
-    private val parentDir: File
-        get() = File(pathToSave, "${site.name}/entry")
-
-    override suspend fun initialize() {
-        elementMutex.withLock {
-            initializing()
-            client = betterPublicKmtt(site) // recreate client if token changed
-            try {
-                progress(Lang.value.profileElementVmRequestingProfile)
-                _user.value = client.user.getUserByID(id)
-                clearProgress()
-                readyToUse()
-            } catch(ex: OsnovaRequestException) {
-                // 403 Forbidden
-                if (ex.httpResponse.status.value == 403) {
-                    error(Lang.value.profileElementVmAccessError)
-                } else {
-                    error(Lang.value.profileElementVmGenericInitError.format(ex))
-                }
-            } catch (ex: Exception) {
-                error(Lang.value.profileElementVmGenericInitError.format(ex))
+        try {
+            _user.value = client.user.getUserByID(id)
+        } catch (ex: OsnovaRequestException) {
+            if (ex.httpResponse.status.value == 403) {
+                throw QueueElementException(Lang.value.profileElementVmAccessError)
+            } else {
+                throw ex
             }
         }
     }
 
-    override suspend fun save(): Deferred<Boolean> {
-        return waitAndAsyncJob {
-            elementMutex.withLock {
-                inUse()
+    override suspend fun saveImpl() {
+        val client = betterPublicKmtt(site)
+        val parentDir = File(baseSaveFolder, "${site.name}/entry")
+        var counter = 0
+        val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
+        val errorList = mutableListOf<String>()
 
-                var counter = 0
-                val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
-                val errorList = mutableListOf<String>()
-                withProgressSuspend(allEntriesMessage) {
-                    client.user.getAllUserEntries(id) {
-                        it.forEach { entry ->
-                            if(!tryProcessDocument(entry, parentDir, counter, logger)) {
-                                errorList += "${site.baseURL}/${entry.id} (author=${entry.author?.name})"
+        setProgress(allEntriesMessage)
 
-                            }
-                            counter++
-                        }
-                        progress(Lang.value.profileElementVmNextChunk)
-                    }
+        client.user.getAllUserEntries(id) {
+            it.forEach { entry ->
+                if(!tryProcessEntry(entry, parentDir, counter)) {
+                    errorList += "${site.baseURL}/${entry.id} (author=${entry.author?.name})"
+
                 }
-
-                resultMessage(errorList, counter, logger)
+                counter++
             }
+            setProgress(Lang.value.profileElementVmNextChunk)
         }
+
+        showResult(errorList, counter, parentDir.absolutePath)
     }
+
+
 }
