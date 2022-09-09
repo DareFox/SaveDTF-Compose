@@ -32,6 +32,7 @@ object SettingsViewModel {
     private const val LOGGER_LEVEL = "logger_level"
     private const val SAVE_METADATA_KEY = "save_metadata"
     private const val SAVE_COMMENTS_KEY = "save_comments"
+    private const val API_TIMEOUT_TIME_KEY = "timeout_time_api"
 
     /**
     ———————————No Updates?——————————————
@@ -65,6 +66,7 @@ object SettingsViewModel {
     private val _retryAmount = createUpdatableState { getPrefRetryAmount() }
     private val _mediaTimeoutInSeconds = createUpdatableState { getPrefMediaTimeout() }
     private val _entryTimeoutInSeconds = createUpdatableState { getPrefEntryTimeout() }
+    private val _apiTimeoutInSeconds = createUpdatableState { getPrefApiTimeout() }
     private val _folderToSave = createUpdatableState<String?> { getPrefFolder() }
     private val _downloadVideo = createUpdatableState { getPrefDownloadVideo() }
     private val _downloadImage = createUpdatableState { getPrefDownloadImage() }
@@ -79,6 +81,7 @@ object SettingsViewModel {
     val retryAmount: StateFlow<Int> = _retryAmount
     val mediaTimeoutInSeconds: StateFlow<Int> = _mediaTimeoutInSeconds
     val entryTimeoutInSeconds: StateFlow<Int> = _entryTimeoutInSeconds
+    val apiTimeoutInSeconds: StateFlow<Int> = _apiTimeoutInSeconds
     val folderToSave: StateFlow<String?> = _folderToSave
     val downloadVideo: StateFlow<Boolean> = _downloadVideo
     val downloadImage: StateFlow<Boolean> = _downloadImage
@@ -106,6 +109,7 @@ object SettingsViewModel {
     private fun getPrefDownloadImage() = preferences.getBoolean(DOWNLOAD_IMAGE_BOOL_KEY, true)
     private fun getPrefIgnoreUpdates() = preferences.getBoolean(MUTE_UPDATES_NOTIFICATION_KEY, false)
     private fun getPrefMediaTimeout() = preferences.getInt(MEDIA_TIMEOUT_TIME_KEY, 300)
+    private fun getPrefApiTimeout() = preferences.getInt(API_TIMEOUT_TIME_KEY, 90)
     private fun getPrefEntryTimeout() = preferences.getInt(ENTRY_TIMEOUT_TIME_KEY, -1)
     private fun getPrefLocalTag() = preferences.get(PROGRAM_LOCALE_KEY, DefaultLanguageResource.localeName)
     private fun getProxyLocale(default: LanguageResource = DefaultLanguageResource): LanguageResource {
@@ -127,6 +131,11 @@ object SettingsViewModel {
     fun setSaveComments(enable: Boolean) {
         preferences.putBoolean(SAVE_COMMENTS_KEY, enable)
         _saveComments.value = getSaveComments()
+    }
+
+    fun setApiTimeoutInSeconds(timeout: Int) {
+        preferences.putInt(API_TIMEOUT_TIME_KEY, timeout)
+        _apiTimeoutInSeconds.value = getPrefApiTimeout()
     }
 
     fun setToken(token: String?, website: Website) {
