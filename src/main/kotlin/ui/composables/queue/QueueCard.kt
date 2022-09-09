@@ -173,6 +173,8 @@ fun QueueCard(
         }
     }
 
+    val path by viewModel.savedTo.collectAsState()
+
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(10))
@@ -287,9 +289,9 @@ fun QueueCard(
                         })
                     }
 
-                    if (status == Status.SAVED) {
+                    if (status == Status.SAVED && path != null) {
                         buttons.add(ActionBarElement(FeatherIcons.Folder, lang.queueCardOpen) {
-                            File(viewModel.pathToSave).openFileInDefaultApp()
+                            File(path!!).openFileInDefaultApp()
                         })
                     }
 
