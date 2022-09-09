@@ -242,21 +242,21 @@ fun SettingsMenu() {
                 }
             }
 
-            // TODO: Implement usage for entry timeout setting
-//            fields += {
-//                SettingsTextField(
-//                    name = "Время ожидание загрузки статьи",
-//                    input = entryTimeout,
-//                    textPlaceholder = "0 или отрицательное число секунд - бесконечное ожидание.",
-//                    hideContent = false,
-//                    width = textWidth
-//                ) {
-//                    it.toIntOrNull()?.also { timeout ->
-//                        SettingsViewModel.setEntryTimeoutInSeconds(timeout)
-//                    }
-//                    entryTimeout = it
-//                }
-//            }
+            fields += {
+                SettingsTextField(
+                    name = "Максимальное время ожидания обработки статьи",
+                    input = entryTimeout,
+                    textPlaceholder = "<= 0 - бесконечное ожидание.",
+                    hideContent = false,
+                    width = textWidth
+                ) {
+                    it.toIntOrNull()?.also { timeout ->
+                        SettingsViewModel.setEntryTimeoutInSeconds(timeout)
+                    }
+                    entryTimeout = it
+                }
+            }
+
             fields += {
                 SettingsTextField(
                     name = "Максимальное время ожидания ответа API",
