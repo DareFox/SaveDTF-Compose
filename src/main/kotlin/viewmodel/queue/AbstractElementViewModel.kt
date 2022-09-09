@@ -18,6 +18,7 @@ import util.filesystem.toDirectory
 import util.kmttapi.UrlUtil
 import util.kmttapi.betterPublicKmtt
 import util.progress.redirectTo
+import viewmodel.SettingsViewModel
 import viewmodel.queue.IQueueElementViewModel.Status
 import java.io.File
 
@@ -41,6 +42,14 @@ abstract class AbstractElementViewModel(
 ): IQueueElementViewModel {
     private val internalLogger = KotlinLogging.logger {  }
     protected val logger = KotlinLogging.logger(emptyLambda)
+
+    /**
+     * Get current [SettingsViewModel.folderToSave].
+     *
+     * @throws QueueElementException if [SettingsViewModel.folderToSave] is null
+     * */
+    protected val baseSaveFolder: String
+        get() = SettingsViewModel.folderToSave.value.errorOnNull("Folder to save isn't set")
 
     protected val lang: LanguageResource
         get() = Lang.value
