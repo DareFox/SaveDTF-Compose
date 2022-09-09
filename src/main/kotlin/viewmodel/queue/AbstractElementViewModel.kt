@@ -93,7 +93,7 @@ abstract class AbstractElementViewModel(
                 } finally {
                     mutex.unlock()
                 }
-            }
+            }.also { handleJob(it) }
             else -> null
         }
     }
@@ -119,7 +119,7 @@ abstract class AbstractElementViewModel(
                 } finally {
                     mutex.unlock()
                 }
-            }
+            }.also { handleJob(it) }
             else -> null
         }
     }
@@ -142,22 +142,28 @@ abstract class AbstractElementViewModel(
             tryBlock()
             null
         } catch (ex: Throwable) {
-            if (ex.cause is CancellationException || ex is CancellationException) {
-                setStatus(Status.READY_TO_USE)
-                resetPathAndMessages()
-                setProgress(lang.entryQueueElementVmOperationCancelled)
-                return null
-            }
-
-            val errorName = ex::class.simpleName
-            val message = ex.message
-
-            if (!message.isNullOrBlank()) {
-                setErrorMessage("Error! $errorName: $message")
-            } else {
-                setErrorMessage("Error! $errorName")
-            }
+            setErrorMessage(ex)
             ex
+        }
+    }
+
+    /**
+     * Handles job cancellation and adding to [currentJob] field
+     */
+    private fun handleJob(job: Job) {
+        _currentJob.value = job
+
+        job.invokeOnCompletion { error ->
+            // TODO: setErrorMessage already handles cancellation
+            // Decide what to do with it
+            if (error?.cause is CancellationException || error is CancellationException) {
+                setStatus(Status.READY_TO_USE)
+                removeProgress()
+            }
+
+            if (error != null) {
+                setErrorMessage(error)
+            }
         }
     }
 
@@ -273,6 +279,41 @@ abstract class AbstractElementViewModel(
     protected fun setErrorMessage(message: String) {
         _lastErrorMessage.update { message }
         setStatus(Status.ERROR)
+    }
+
+    /**
+     * Set error message from exception.
+     *
+     * If error is [CancellationException], element will be set to [READY_TO_USE][Status.READY_TO_USE] status.
+     *
+     * If error is [QueueElementException] and it's [message][Throwable.message] is not null, then only this message will be printed. Otherwise,
+     * it will be print error as usual
+     */
+    protected fun setErrorMessage(ex: Throwable) {
+        if (ex.cause is CancellationException || ex is CancellationException) {
+            setStatus(Status.READY_TO_USE)
+            resetPathAndMessages()
+            setProgress(lang.entryQueueElementVmOperationCancelled)
+            return
+        }
+
+
+        val errorName = ex::class.simpleName
+        val message = ex.message
+
+        if (ex is QueueElementException) {
+            if (!message.isNullOrBlank()) {
+                setErrorMessage(message)
+            } else {
+                setErrorMessage("Error! $errorName")
+            }
+        }
+
+        if (!message.isNullOrBlank()) {
+            setErrorMessage("Error! $errorName: $message")
+        } else {
+            setErrorMessage("Error! $errorName")
+        }
     }
 
     /**
