@@ -187,7 +187,7 @@ abstract class AbstractElementViewModel(
         val entry = if (apiTimeout <= 0) {
             betterPublicKmtt(site).entry.getEntry(url)
         } else {
-            timeoutOperation(apiTimeout, "API") {
+            timeoutOperation(apiTimeout, lang.withTimeoutApiRequestOperation) {
                 betterPublicKmtt(site).entry.getEntry(url)
             }
         }
@@ -250,7 +250,7 @@ abstract class AbstractElementViewModel(
         } else {
             timeoutOperation(
                 timeout = entryMs,
-                name = "Entry processing",
+                name = lang.withTimeoutEntryProcessingOperation,
                 finallyBlock = {
                     counter.cancel()
                 }

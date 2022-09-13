@@ -1,6 +1,12 @@
 package exception
 
+import ui.i18n.Lang
+
 data class OperationTimeoutException(val timeout: Long, val operationName: String) :
     QueueElementException(
-        "Operation \"$operationName\" timed out ${if (timeout < 0) "immediately" else "in $timeout ms"}"
+        if (timeout < 0) {
+            Lang.value.exceptionOperationTimeoutMessageImmediately.format(operationName, timeout)
+        } else {
+            Lang.value.exceptionOperationTimeoutMessage.format(operationName, timeout)
+        }
     )
