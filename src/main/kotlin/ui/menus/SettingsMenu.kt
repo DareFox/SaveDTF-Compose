@@ -244,9 +244,9 @@ fun SettingsMenu() {
 
             fields += {
                 SettingsTextField(
-                    name = "Максимальное время ожидания обработки статьи",
+                    name = lang.settingsDownloadEntryTimeout,
                     input = entryTimeout,
-                    textPlaceholder = "<= 0 - бесконечное ожидание.",
+                    textPlaceholder = lang.settingsDownloadEntryTimeoutPlaceholder,
                     hideContent = false,
                     width = textWidth
                 ) {
@@ -259,9 +259,9 @@ fun SettingsMenu() {
 
             fields += {
                 SettingsTextField(
-                    name = "Максимальное время ожидания ответа API",
+                    name = lang.settingsDownloadApiTimeout,
                     input = apiTimeout,
-                    textPlaceholder = "<= 0 - бесконечное ожидание.",
+                    textPlaceholder = lang.settingsDownloadApiTimeoutPlaceholder,
                     hideContent = false,
                     width = textWidth
                 ) {
