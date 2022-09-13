@@ -3,7 +3,6 @@ package logic.document.operations
 import kmtt.models.comment.Comment
 import kmtt.models.entry.Entry
 import kmtt.models.enums.SortingType
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable

@@ -1,19 +1,17 @@
 package viewmodel.queue
 
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.ui.text.toLowerCase
 import exception.errorOnNull
 import kmtt.models.enums.Website
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import mu.KotlinLogging
-import viewmodel.DebugQueueViewModel
-import viewmodel.SettingsViewModel
 import util.kmttapi.SharedRegex
 import util.kmttapi.UrlUtil
 import util.kmttapi.UrlUtil.getWebsiteType
+import viewmodel.DebugQueueViewModel
+import viewmodel.SettingsViewModel
 
 private val logger = KotlinLogging.logger { }
 

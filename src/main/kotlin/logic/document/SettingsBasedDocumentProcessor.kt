@@ -12,8 +12,8 @@ import logic.document.operations.media.modules.ImageDownloadModule
 import logic.document.operations.media.modules.VideoDownloadModule
 import mu.KotlinLogging
 import org.jsoup.nodes.Document
-import viewmodel.SettingsViewModel
 import util.progress.redirectTo
+import viewmodel.SettingsViewModel
 import java.io.File
 
 /**

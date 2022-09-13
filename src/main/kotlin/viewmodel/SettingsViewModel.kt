@@ -1,5 +1,6 @@
 package viewmodel
 
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,6 @@ import ui.i18n.DefaultLanguageResource
 import ui.i18n.LanguageResource
 import ui.i18n.ProxyLanguageResource
 import java.util.prefs.Preferences
-import ch.qos.logback.classic.Level
 
 object SettingsViewModel {
     private val preferences = Preferences.userRoot().node("savedtf-prefs")

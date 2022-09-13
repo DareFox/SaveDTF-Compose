@@ -35,9 +35,9 @@ import ui.composables.directoryDialog
 import ui.i18n.AvailableLanguages
 import ui.i18n.Lang
 import ui.theme.CustomPallet
-import viewmodel.SettingsViewModel
 import util.desktop.openUrl
 import util.logs.openLogsFolder
+import viewmodel.SettingsViewModel
 
 @Composable
 fun SettingsMenu() {

@@ -5,8 +5,14 @@ import kmtt.models.entry.Entry
 import kmtt.models.enums.SortingType
 import kmtt.util.CommentNode
 import kmtt.util.toTree
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.yield
 import logic.document.AbstractProcessorOperation
 import mu.KotlinLogging
 import org.jsoup.Jsoup

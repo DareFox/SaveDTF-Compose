@@ -3,11 +3,9 @@ package viewmodel.queue
 import exception.QueueElementException
 import kmtt.impl.authKmtt
 import kmtt.models.enums.Website
-import kotlinx.coroutines.sync.withLock
 import ui.i18n.Lang
 import viewmodel.SettingsViewModel
 import viewmodel.SettingsViewModel.getToken
-import java.io.File
 
 interface IBookmarksElementViewModel : IQueueElementViewModel {
     val site: Website

@@ -1,27 +1,13 @@
 package viewmodel.queue
 
 import exception.QueueElementException
-import exception.errorOnNull
 import kmtt.exception.OsnovaRequestException
-import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
 import kmtt.models.subsite.Subsite
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.yield
-import logic.document.SettingsBasedDocumentProcessor
-import mu.KotlinLogging
-import org.jsoup.Jsoup
 import ui.i18n.Lang
-import util.coroutine.cancelOnSuspendEnd
-import util.filesystem.toDirectory
 import util.kmttapi.betterPublicKmtt
-import util.progress.redirectTo
-import java.io.File
 
 interface IProfileElementViewModel : IQueueElementViewModel {
     val site: Website

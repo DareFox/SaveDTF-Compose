@@ -3,6 +3,7 @@ package viewmodel.queue
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
+import viewmodel.queue.IQueueElementViewModel.Status.*
 
 sealed interface IQueueElementViewModel {
     /**

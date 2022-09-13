@@ -4,24 +4,12 @@ import exception.errorOnNull
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kmtt.models.enums.Website
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import logic.abstracts.IProgress
-import logic.document.SettingsBasedDocumentProcessor
-import logic.document.operations.CombineTemplateOperation.withProgressSuspend
+import kotlinx.coroutines.runBlocking
 import logic.ktor.Client
 import logic.ktor.rateRequest
-import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
-import util.coroutine.cancelOnSuspendEnd
-import util.filesystem.toDirectory
-import util.kmttapi.UrlUtil
-import util.kmttapi.betterPublicKmtt
-import util.progress.redirectTo
-import viewmodel.SettingsViewModel
-import java.io.File
 
 interface IAllEntriesViewModel: IQueueElementViewModel {
     val site: Website

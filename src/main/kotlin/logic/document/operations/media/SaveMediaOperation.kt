@@ -1,7 +1,10 @@
 package logic.document.operations.media
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import logic.document.AbstractProcessorOperation
 import logic.document.operations.media.modules.IDownloadModule
 import logic.ktor.Client

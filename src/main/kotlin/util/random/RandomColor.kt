@@ -2,7 +2,6 @@ package util.random
 
 import util.range.size
 import kotlin.random.Random
-import kotlin.random.nextInt
 
 fun randomColor(
     red: IntRange = 0..255,

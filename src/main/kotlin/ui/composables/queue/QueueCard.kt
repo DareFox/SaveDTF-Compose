@@ -32,9 +32,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.animations.pulseColor
 import ui.i18n.Lang
-import viewmodel.queue.IQueueElementViewModel.Status
 import util.desktop.openFileInDefaultApp
 import viewmodel.queue.*
+import viewmodel.queue.IQueueElementViewModel.Status
 import java.io.File
 
 data class ActionBarElement(

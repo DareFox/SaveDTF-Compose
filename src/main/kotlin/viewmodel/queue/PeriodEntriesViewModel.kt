@@ -4,16 +4,11 @@ import exception.errorOnNull
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kmtt.models.enums.Website
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.sync.withLock
 import logic.ktor.Client
 import logic.ktor.rateRequest
-import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
-import viewmodel.SettingsViewModel
-import java.io.File
 
 interface IPeriodEntriesViewModel: IQueueElementViewModel {
     val periodSitemapLink: String

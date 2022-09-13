@@ -1,30 +1,13 @@
 package viewmodel.queue
 
-import exception.QueueElementException
 import exception.errorOnNull
-import kmtt.impl.authKmtt
-import kmtt.impl.publicKmtt
 import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import logic.document.SettingsBasedDocumentProcessor
-import mu.KotlinLogging
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import ui.i18n.Lang
-import viewmodel.SettingsViewModel
-import util.filesystem.convertToValidName
 import util.kmttapi.UrlUtil
 import util.kmttapi.betterPublicKmtt
-import util.progress.redirectTo
 import java.io.File
-import java.util.*
 
 interface IEntryQueueElementViewModel : IQueueElementViewModel {
     val url: String

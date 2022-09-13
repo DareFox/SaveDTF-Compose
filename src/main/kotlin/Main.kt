@@ -20,7 +20,6 @@ import java.awt.Toolkit
 import java.awt.Window
 import java.awt.datatransfer.StringSelection
 import java.awt.event.WindowEvent
-import java.io.File
 import kotlin.system.exitProcess
 
 
