@@ -33,7 +33,7 @@ data class BookmarksElementViewModel(
 
     override suspend fun saveImpl() {
         var counter = 0
-        val parentDirFile = File(baseSaveFolder, "${site.name}/bookmarks")
+        val parentDirFile = baseSaveFolder.resolve("${site.name}/bookmarks")
         val errorList = mutableListOf<String>()
 
         setProgress(Lang.value.bookmarksElementVmAllEntriesMessage)

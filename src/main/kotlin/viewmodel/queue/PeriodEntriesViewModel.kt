@@ -46,7 +46,7 @@ class PeriodEntriesViewModel(
         val errorLinks = mutableListOf<String>()
 
 
-        val parentDir = File(baseSaveFolder, "${site.name}/entry")
+        val parentDir = baseSaveFolder.resolve("${site.name}/entry")
         val document = sitemapPeriodDoc.errorOnNull("Document is null")
 
         val entriesLinks = convertYearPageToList(document)

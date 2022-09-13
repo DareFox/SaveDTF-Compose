@@ -59,7 +59,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
         val parentDir = this.parentDir.errorOnNull("Parent dir is null")
         val entry = _entry.value.errorOnNull("Entry is null")
 
-        processEntry(entry, parentDir, 0)
+        processEntry(entry, baseSaveFolder.resolve(parentDir), 0)
     }
 
 

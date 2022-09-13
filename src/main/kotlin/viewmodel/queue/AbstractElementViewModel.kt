@@ -48,8 +48,8 @@ abstract class AbstractElementViewModel(
      *
      * @throws QueueElementException if [SettingsViewModel.folderToSave] is null
      * */
-    protected val baseSaveFolder: String
-        get() = SettingsViewModel.folderToSave.value.errorOnNull("Folder to save isn't set")
+    protected val baseSaveFolder: File
+        get() = File(SettingsViewModel.folderToSave.value.errorOnNull("Folder to save isn't set"))
 
     protected val lang: LanguageResource
         get() = Lang.value

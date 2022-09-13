@@ -51,7 +51,7 @@ data class ProfileElementViewModel(
 
     override suspend fun saveImpl() {
         val client = betterPublicKmtt(site)
-        val parentDir = File(baseSaveFolder, "${site.name}/entry")
+        val parentDir = baseSaveFolder.resolve("${site.name}/entry")
         var counter = 0
         val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
         val errorList = mutableListOf<String>()

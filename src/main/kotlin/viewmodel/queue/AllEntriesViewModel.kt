@@ -31,12 +31,9 @@ interface IAllEntriesViewModel: IQueueElementViewModel {
 
 open class AllEntriesViewModel(override val site: Website): AbstractElementViewModel({}), IAllEntriesViewModel {
     private var sitemapDoc: Document? = null
-    private var parentDir: File? = null
     protected val yearRegex = "/year-\\d{4}-\\d{2}-\\d{2}".toRegex(RegexOption.IGNORE_CASE)
 
     override suspend fun initializeImpl() {
-        parentDir.errorOnNull("Parent to save is null")
-
         setProgress(Lang.value.allEntriesVmFetchingSitemap)
 
         val sitemap = "https://${site.baseURL}/sitemap"
@@ -50,8 +47,8 @@ open class AllEntriesViewModel(override val site: Website): AbstractElementViewM
 
     override suspend fun saveImpl() {
         var counter = 0
+        val parentDir = baseSaveFolder.resolve("$site/entry")
         val errorList = mutableListOf<String>()
-        val parentDir = parentDir.errorOnNull("Parent to save is null")
 
         val sequence = sitemapDoc?.let {
             sequenceOfPages(it)
