@@ -11,7 +11,7 @@ fun randomColor(
     return RGB(red.random(), green.random(), blue.random())
 }
 
-fun offsetRandomColor (
+fun offsetRandomColor(
     color: RGB,
     offset: Int,
     colorAmountOffset: Int = 2,
@@ -36,7 +36,7 @@ fun offsetRandomColor (
     } else {
         val shuffleRed: Boolean
         val shuffleGreen: Boolean
-        val shuffleBlue : Boolean
+        val shuffleBlue: Boolean
 
         if (colorAmountOffset == 2) { // 2 colors needs to be shuffled
             shuffleRed = Random.nextBoolean()

@@ -81,7 +81,7 @@ object FormatGalleryModule : IHtmlFormatModule {
 
             // <br> || <br/> regex
             val breakLineRegex = """<\s*br\s*(/|)>""".toRegex()
-            val cleanTitle = it.title.replace(breakLineRegex,"")
+            val cleanTitle = it.title.replace(breakLineRegex, "")
 
             div.attr("title", cleanTitle)
 
@@ -100,7 +100,7 @@ object FormatGalleryModule : IHtmlFormatModule {
 internal class GalleryDOM(
     val size: Int,
     val maxPreviewGallerySize: Int,
-): Element("div") {
+) : Element("div") {
     val sidebar = Element("div").also {
         it.addClass("gall--sidebar")
     }

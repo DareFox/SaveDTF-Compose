@@ -2,7 +2,8 @@ package util.kmttapi
 
 object SharedRegex {
     // ${'$'} is needed to escape $ symbol in kotlin
-    val entryUrlRegex = """(dtf|vc|tjournal)\.ru\/((u\/|).+?\/.+?|\d+.*)(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)
+    val entryUrlRegex =
+        """(dtf|vc|tjournal)\.ru\/((u\/|).+?\/.+?|\d+.*)(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)
 
     /**
      * Get user id from url
@@ -71,7 +72,8 @@ object SharedRegex {
      *
      * https://dtf.ru/ is empty too
      */
-    val emptyWebsiteUrl = """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru(/|)${'$'}""".toRegex(RegexOption.IGNORE_CASE)
+    val emptyWebsiteUrl =
+        """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru(/|)${'$'}""".toRegex(RegexOption.IGNORE_CASE)
 
     /**
      * Check if link is **.ru/sitemap only
@@ -80,7 +82,8 @@ object SharedRegex {
      * dtf.ru/sitemap is sitemap to all entries
      * dtf.ru/sitemap/year-2022-02-02 is NOT*
      */
-    val sitemapAll = """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru/sitemap(/|)${'$'}""".toRegex(RegexOption.IGNORE_CASE)
+    val sitemapAll =
+        """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru/sitemap(/|)${'$'}""".toRegex(RegexOption.IGNORE_CASE)
 
     /** Check if link is sitemap period
      *
@@ -88,7 +91,8 @@ object SharedRegex {
      * https://dtf.ru/sitemap/year-2022-08-01 is period
      * https://dtf.ru/sitemap/ is NOT
      */
-    val sitemapPeriod = """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru/sitemap/year-\d{4}-\d{2}-\d{2}""".toRegex(RegexOption.IGNORE_CASE)
+    val sitemapPeriod =
+        """^(https://|http://|www\.|)(dtf|vc|tjournal)\.ru/sitemap/year-\d{4}-\d{2}-\d{2}""".toRegex(RegexOption.IGNORE_CASE)
 
     /**
      * Extract sitemap period:
@@ -113,7 +117,8 @@ object SharedRegex {
         // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s25.html
         """([\\\/:"*?<>|]+|(\.\s*)*${'$'})""".toRegex()
 
-    val urlRegex = "[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)".toRegex(
-        setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE)
-    )
+    val urlRegex =
+        "[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)".toRegex(
+            setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE)
+        )
 }

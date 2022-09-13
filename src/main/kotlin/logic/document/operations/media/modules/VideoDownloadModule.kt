@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element
 import ui.i18n.Lang
 import util.dom.recreateWithoutNodes
 
-object VideoDownloadModule: IDownloadModule {
+object VideoDownloadModule : IDownloadModule {
     override val folder: String = "vid"
     override val onErrorMedia: BinaryMedia = Resources.videoLoadFail
 
@@ -27,8 +27,8 @@ object VideoDownloadModule: IDownloadModule {
         // Convert each gallery items to list of pairs
         return document.getElementsByClass("gall--item").mapNotNull { div ->
             // If type or url is empty, then skip it by returning null
-            val type = div.attr("media-type").ifEmpty { return@mapNotNull null  }
-            val url = div.attr("media-url").ifEmpty { return@mapNotNull null  }
+            val type = div.attr("media-type").ifEmpty { return@mapNotNull null }
+            val url = div.attr("media-url").ifEmpty { return@mapNotNull null }
             if (type != "video") return@mapNotNull null
             addVideoPreviewElement(div) to url
         }

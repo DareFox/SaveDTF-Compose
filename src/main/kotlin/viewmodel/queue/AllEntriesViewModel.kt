@@ -11,13 +11,13 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
 
-interface IAllEntriesViewModel: IQueueElementViewModel {
+interface IAllEntriesViewModel : IQueueElementViewModel {
     val site: Website
     override fun equals(other: Any?): Boolean
     override fun hashCode(): Int
 }
 
-open class AllEntriesViewModel(override val site: Website): AbstractElementViewModel({}), IAllEntriesViewModel {
+open class AllEntriesViewModel(override val site: Website) : AbstractElementViewModel({}), IAllEntriesViewModel {
     private var sitemapDoc: Document? = null
     protected val yearRegex = "/year-\\d{4}-\\d{2}-\\d{2}".toRegex(RegexOption.IGNORE_CASE)
 

@@ -17,9 +17,9 @@ class DocumentProcessor(
     document: Document,
     val saveFolder: File,
     operations: List<IProcessorOperation> = listOf(),
-): AbstractProgress() {
+) : AbstractProgress() {
     private val scope = CoroutineScope(Dispatchers.Default)
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
 
     // read-only for public usage
     var document: Document = document

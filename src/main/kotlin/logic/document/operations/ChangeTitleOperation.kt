@@ -20,7 +20,8 @@ class ChangeTitleOperation(val entry: Entry? = null) : AbstractProcessorOperatio
             // If title is not null, then use entry title as html title,
             // Else, if author is not null -> use author and subsite name
             // Else show "No title"
-            val title = entry?.title ?: entry?.author?.name?.let { "Entry by $it in ${entry.subsite?.name}" } ?: "No title"
+            val title =
+                entry?.title ?: entry?.author?.name?.let { "Entry by $it in ${entry.subsite?.name}" } ?: "No title"
 
             document.head().getElementsByTag("title").first()?.text("$title [SaveDTF]")
 

@@ -25,7 +25,7 @@ import kotlin.system.exitProcess
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    val logger = KotlinLogging.logger {  }
+    val logger = KotlinLogging.logger { }
 
     try {
         var lastError: Throwable? by mutableStateOf(null)
@@ -73,6 +73,7 @@ fun main() {
         }
     }
 }
+
 private fun ComposeCrashMenu(ex: Throwable) {
     var show by mutableStateOf(true)
     val log = getCrashLogReport(ex)

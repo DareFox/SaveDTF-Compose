@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document
  *
  *  Example operations: [Remove all CSS styles][RemoveCssOperation], [Format HTML][FormatHtmlOperation] and etc.
  */
-sealed interface IProcessorOperation: IProgress {
+sealed interface IProcessorOperation : IProgress {
     /**
      * Name of operation
      */

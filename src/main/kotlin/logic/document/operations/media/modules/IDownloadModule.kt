@@ -12,6 +12,7 @@ sealed interface IDownloadModule {
      * If folder is null, [MediaProcessor] will save media to folder with html
      */
     val folder: String?
+
     /**
      * On error, replace with this media
      */

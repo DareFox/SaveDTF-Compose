@@ -18,9 +18,9 @@ interface IProfileElementViewModel : IQueueElementViewModel {
 data class ProfileElementViewModel(
     override val site: Website,
     override val id: Long
-): AbstractElementViewModel({}), IProfileElementViewModel {
+) : AbstractElementViewModel({}), IProfileElementViewModel {
     private val _user = MutableStateFlow<Subsite?>(null)
-    override val user: StateFlow<Subsite?> =_user
+    override val user: StateFlow<Subsite?> = _user
     override suspend fun initializeImpl() {
         val client = betterPublicKmtt(site)
 
@@ -46,7 +46,7 @@ data class ProfileElementViewModel(
 
         client.user.getAllUserEntries(id) {
             it.forEach { entry ->
-                if(!tryProcessEntry(entry, parentDir, counter)) {
+                if (!tryProcessEntry(entry, parentDir, counter)) {
                     errorList += "${site.baseURL}/${entry.id} (author=${entry.author?.name})"
 
                 }

@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element
 import ui.i18n.Lang
 import util.dom.recreateWithoutNodes
 
-object ImageDownloadModule: IDownloadModule {
+object ImageDownloadModule : IDownloadModule {
     override val folder: String = "img"
     override val onErrorMedia: BinaryMedia = Resources.imageLoadFail
 
@@ -35,14 +35,15 @@ object ImageDownloadModule: IDownloadModule {
         // Convert each gallery items to list of pairs
         return document.getElementsByClass("gall--item").mapNotNull { div ->
             // If type or url is empty, then skip it by returning null
-            val type = div.attr("media-type").ifEmpty { return@mapNotNull null  }
-            val url = div.attr("media-url").ifEmpty { return@mapNotNull null  }
+            val type = div.attr("media-type").ifEmpty { return@mapNotNull null }
+            val url = div.attr("media-url").ifEmpty { return@mapNotNull null }
 
             if (type != "image") return@mapNotNull null
 
             div to url
         }
     }
+
     override fun transform(element: Element, relativePath: String) {
         if (element.tagName() == "div") {
             element.attr("style", createBackgroundImageStyleValue(relativePath))

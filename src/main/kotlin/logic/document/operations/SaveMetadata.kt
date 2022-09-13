@@ -17,7 +17,7 @@ import util.kmttapi.betterPublicKmtt
 import java.io.File
 import java.io.IOException
 
-class SaveMetadata(val entry: Entry, val folder: File): AbstractProcessorOperation() {
+class SaveMetadata(val entry: Entry, val folder: File) : AbstractProcessorOperation() {
     private val logger = KotlinLogging.logger { }
     private var cachedComments: List<Comment>? = null
     override val name: String
@@ -87,5 +87,6 @@ class SaveMetadata(val entry: Entry, val folder: File): AbstractProcessorOperati
         cacheListeners += listener
     }
 }
+
 @Serializable
 private data class EntryMetadata(val entry: Entry?, val comments: List<Comment>?)

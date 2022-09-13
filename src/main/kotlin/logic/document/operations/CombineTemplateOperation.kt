@@ -6,7 +6,7 @@ import org.jsoup.nodes.Document
 import ui.i18n.Lang
 import util.filesystem.readResource
 
-object CombineTemplateOperation: AbstractProcessorOperation() {
+object CombineTemplateOperation : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.value.templateHtmlOperation
 

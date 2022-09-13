@@ -6,6 +6,7 @@ object UrlUtil {
     fun isUserProfile(url: String): Boolean {
         return SharedRegex.userProfileLinkRegex.find(url) != null
     }
+
     fun isEntry(url: String): Boolean {
         return SharedRegex.entryUrlRegex.find(url) != null
     }
@@ -13,6 +14,7 @@ object UrlUtil {
     fun isBookmarkLink(url: String): Boolean {
         return SharedRegex.bookmarksRegex.find(url) != null
     }
+
     fun getWebsiteType(url: String): Website? {
         return when (SharedRegex.websiteRegex.find(url)?.value) {
             "dtf" -> Website.DTF

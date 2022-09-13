@@ -25,7 +25,7 @@ class SaveMediaOperation(
     val timeoutInSeconds: Int
 ) : AbstractProcessorOperation() {
     override val name: String = Lang.value.saveMediaOperation
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     override suspend fun process(document: Document): Document {
         for (moduleIgnorePair in downloaderModules) {
             val downloader = moduleIgnorePair.first
@@ -35,7 +35,8 @@ class SaveMediaOperation(
             val counter = MutableStateFlow(0)
 
             withContext(Dispatchers.IO) {
-                val counterJob = launch { counter.onEach {
+                val counterJob = launch {
+                    counter.onEach {
                         progress(
                             Lang.value.saveMediaDownloading.format(
                                 downloader.downloadingContentType,

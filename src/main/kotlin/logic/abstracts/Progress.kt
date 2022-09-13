@@ -14,7 +14,7 @@ interface IProgress {
 /**
  * Abstract interface that implements [IProgress] functionality
  */
-abstract class AbstractProgress: IProgress {
+abstract class AbstractProgress : IProgress {
     /**
      * Mutable state flow of progress
      */

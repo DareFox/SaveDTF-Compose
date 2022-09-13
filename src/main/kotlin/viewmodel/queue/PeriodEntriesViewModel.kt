@@ -10,7 +10,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
 
-interface IPeriodEntriesViewModel: IQueueElementViewModel {
+interface IPeriodEntriesViewModel : IQueueElementViewModel {
     val periodSitemapLink: String
     val site: Website
 }
@@ -18,7 +18,7 @@ interface IPeriodEntriesViewModel: IQueueElementViewModel {
 class PeriodEntriesViewModel(
     override val periodSitemapLink: String,
     override val site: Website
-): AllEntriesViewModel(site), IPeriodEntriesViewModel {
+) : AllEntriesViewModel(site), IPeriodEntriesViewModel {
     private var sitemapPeriodDoc: Document? = null
 
     override suspend fun initializeImpl() {

@@ -121,7 +121,7 @@ fun SettingsMenu() {
                     else -> if (success!!) lang.settingsAppResetSettingsSuccess else lang.settingsAppResetSettingsError
                 }
 
-                val colors = when(success) {
+                val colors = when (success) {
                     true -> ButtonDefaults.buttonColors(CustomPallet.successVariant)
                     false -> ButtonDefaults.buttonColors(CustomPallet.error)
                     else -> ButtonDefaults.buttonColors()
@@ -513,11 +513,14 @@ fun <T> SettingsDropdown(
                 .clip(shape)
                 .border(1.dp, Color.Gray, shape)
                 .clickable {
-                show = !show
-            },
+                    show = !show
+                },
             contentAlignment = Alignment.CenterStart
         ) {
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+            ) {
                 Text(text = value, style = MaterialTheme.typography.subtitle1)
                 Icon(icon, null)
             }
@@ -532,8 +535,13 @@ fun <T> SettingsDropdown(
                         .clickable {
                             onFieldClick(it.second)
                             show = !show
-                       }, contentAlignment = Alignment.CenterStart) {
-                        Text(text = it.first, style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(start = 10.dp))
+                        }, contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(
+                            text = it.first,
+                            style = MaterialTheme.typography.subtitle1,
+                            modifier = Modifier.padding(start = 10.dp)
+                        )
                     }
                 }
             }

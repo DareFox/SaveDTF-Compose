@@ -39,8 +39,8 @@ import java.io.File
  */
 abstract class AbstractElementViewModel(
     emptyLambda: () -> Unit
-): IQueueElementViewModel {
-    private val internalLogger = KotlinLogging.logger {  }
+) : IQueueElementViewModel {
+    private val internalLogger = KotlinLogging.logger { }
     protected val logger = KotlinLogging.logger(emptyLambda)
 
     /**
@@ -97,6 +97,7 @@ abstract class AbstractElementViewModel(
             else -> null
         }
     }
+
     /**
      * Implementation of [initializeAsync]. This method will have exception handling,
      * meaning exception will be caught, printed to [lastErrorMessage] and operation will be cancelled
@@ -173,7 +174,7 @@ abstract class AbstractElementViewModel(
     protected suspend fun processEntry(url: String, parentDir: File, currentCounter: Int) {
         val apiTimeout = SettingsViewModel.apiTimeoutInSeconds.value * 1000L
 
-        val newCounter = currentCounter+1
+        val newCounter = currentCounter + 1
         val prefix = "${Lang.value.queueVmEntry} #${newCounter}"
 
         val site = UrlUtil.getWebsiteType(url)

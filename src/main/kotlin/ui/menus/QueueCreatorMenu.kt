@@ -135,10 +135,10 @@ fun QueueCreatorMenu() {
                             }, onDisabledClick = {
                                 NotificationsViewModel.add(
                                     NotificationData(
-                                    text = lang.queueCreatorNoTokenError.format(website),
-                                    type = NotificationType.ERROR,
-                                    onScreenDuration = 5
-                                )
+                                        text = lang.queueCreatorNoTokenError.format(website),
+                                        type = NotificationType.ERROR,
+                                        onScreenDuration = 5
+                                    )
                                 )
                             }) {
                                 Image(getPainterByWebsite(website), null)
@@ -156,7 +156,6 @@ fun QueueCreatorMenu() {
                         Icon(bookmarkIcon, null)
                     }
                 }
-
 
 
             }

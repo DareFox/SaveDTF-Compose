@@ -30,16 +30,18 @@ fun AppUI() {
                 }
             }
             Box {
-                TextNavBar(listOf(
-                    TextBarElement(lang.navBarMenuDownload) {
-                        navbarIndex = it
-                        navbarElement = NavBar.DOWNLOAD_MENU
-                    },
-                    TextBarElement(lang.navBarMenuSettings) {
-                        navbarIndex = it
-                        navbarElement = NavBar.SETTINGS_MENU
-                    },
-                ), navbarIndex)
+                TextNavBar(
+                    listOf(
+                        TextBarElement(lang.navBarMenuDownload) {
+                            navbarIndex = it
+                            navbarElement = NavBar.DOWNLOAD_MENU
+                        },
+                        TextBarElement(lang.navBarMenuSettings) {
+                            navbarIndex = it
+                            navbarElement = NavBar.SETTINGS_MENU
+                        },
+                    ), navbarIndex
+                )
             }
         }
     }

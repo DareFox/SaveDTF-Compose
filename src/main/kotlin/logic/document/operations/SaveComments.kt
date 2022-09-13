@@ -27,11 +27,11 @@ import util.random.RGB
 import util.random.offsetRandomColor
 import util.random.randomColor
 
-class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
+class SaveCommentsOperation(val entry: Entry) : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.value.saveCommentsOperation
     private val colorRange = 50..255
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     private val offset = 40
     private val maxLayerHideOffset = 10
     private val cacheListeners = mutableListOf<(List<Comment>) -> Unit>()
@@ -68,11 +68,11 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
                     disableInvisibleHide = layerLevel.value > maxLayerHideOffset,
                     isAuthor = isAuthorOfPost
                 ) to randomColor(
-                colorRange, colorRange, colorRange
-            )
-        }.also {
-            layerLevel.update { it + 1 }
-        }
+                    colorRange, colorRange, colorRange
+                )
+            }.also {
+                layerLevel.update { it + 1 }
+            }
 
         val counter = layerLevel.onEach {
             progress(Lang.value.saveCommentsOperationParsingCommentsLayers.format(it))
@@ -135,7 +135,12 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         return document
     }
 
-    private fun createNodeHTML(comment: CommentNode, hideColor: String?, disableInvisibleHide: Boolean, isAuthor: Boolean): Element {
+    private fun createNodeHTML(
+        comment: CommentNode,
+        hideColor: String?,
+        disableInvisibleHide: Boolean,
+        isAuthor: Boolean
+    ): Element {
         // Parse comment node template from resources folder
         val commentNode = readResource("templates/comment.html")
             .readText()
@@ -200,9 +205,9 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
         val attachment = commentNode
             .select(".comment .content .attachment")
             .first() ?: Element("div").apply {
-                addClass("attachment")
-                commentText.appendChild(this)
-            }
+            addClass("attachment")
+            commentText.appendChild(this)
+        }
 
         comment.value.media?.forEach {
             val iframeURL = it.iframeUrl
@@ -272,7 +277,7 @@ class SaveCommentsOperation(val entry: Entry): AbstractProcessorOperation() {
 
         // Set color of hide block
         if (hideColor != null) {
-            hide.attr("style", "background: $hideColor" )
+            hide.attr("style", "background: $hideColor")
         } else {
             hide.addClass("hide--disabled")
         }

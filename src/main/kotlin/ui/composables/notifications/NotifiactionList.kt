@@ -23,7 +23,7 @@ inline fun NotificationList() {
     val scope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally){
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
 
         LazyColumn(state = lazyListState) {

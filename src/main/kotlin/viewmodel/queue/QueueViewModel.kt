@@ -29,11 +29,12 @@ object QueueViewModel {
         UrlChecker(UrlUtil::isUserProfile) {
             add(
                 ProfileElementViewModel(
-                getWebsiteType(it)!!,
-                UrlUtil.getProfileID(it)
-            ))
+                    getWebsiteType(it)!!,
+                    UrlUtil.getProfileID(it)
+                )
+            )
         },
-        UrlChecker(UrlUtil::isEntry) check@ {
+        UrlChecker(UrlUtil::isEntry) check@{
             // url should start from https to get entry from API
             // todo: maybe don't call same regex twice?
             val url = "https://" + (SharedRegex.entryUrlRegex.find(it)?.value ?: return@check)
@@ -42,7 +43,7 @@ object QueueViewModel {
         UrlChecker(UrlUtil::isBookmarkLink) {
             add(createBookmarks(getWebsiteType(it)!!)) // we do a little bit of trolling !!
         },
-        UrlChecker( { it == "debug"} ) {
+        UrlChecker({ it == "debug" }) {
             DebugQueueViewModel.startQueue.forEach {
                 add(it)
             }
