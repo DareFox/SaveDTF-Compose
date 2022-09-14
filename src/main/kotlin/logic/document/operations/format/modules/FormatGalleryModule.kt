@@ -9,7 +9,9 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
 object FormatGalleryModule : IHtmlFormatModule {
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
 
     private val imageFormats = listOf(
         "png", "jpg", "jpeg", "bmp", "webp"
@@ -81,7 +83,7 @@ object FormatGalleryModule : IHtmlFormatModule {
 
             // <br> || <br/> regex
             val breakLineRegex = """<\s*br\s*(/|)>""".toRegex()
-            val cleanTitle = it.title.replace(breakLineRegex, "")
+            val cleanTitle = it.title?.replace(breakLineRegex, "") ?: ""
 
             div.attr("title", cleanTitle)
 
@@ -122,11 +124,11 @@ internal class GalleryDOM(
 }
 
 @Serializable
-data class GalleryElement(val title: String, val image: GalleryElementMedia)
+data class GalleryElement(val title: String? = null, val image: GalleryElementMedia)
 
 @Serializable
 data class GalleryElementMedia(
-    val type: String,
+    val type: String? = null,
     val data: GalleryElementMediaData
 )
 
@@ -135,10 +137,10 @@ data class GalleryElementMediaData(
     val uuid: String,
     val width: Int,
     val height: Int,
-    val size: Long,
-    val type: String,
-    val color: String,
-    val hash: String
+    val size: Long? = null,
+    val type: String? = null,
+    val color: String? = null,
+    val hash: String? = null
 )
 
 
