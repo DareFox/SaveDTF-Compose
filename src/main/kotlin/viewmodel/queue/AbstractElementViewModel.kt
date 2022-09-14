@@ -158,7 +158,14 @@ abstract class AbstractElementViewModel(
             _currentJob.value = null
 
             if (error?.cause is CancellationException || error is CancellationException) {
-                removeProgress()
+                resetPathAndMessages()
+
+                val job = initializeAsync()
+                runBlocking {
+                    job?.await()
+                }
+
+                return@invokeOnCompletion
             }
 
             if (error != null) {
