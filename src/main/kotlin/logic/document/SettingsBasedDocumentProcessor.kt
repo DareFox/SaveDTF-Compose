@@ -12,8 +12,8 @@ import logic.document.operations.media.modules.ImageDownloadModule
 import logic.document.operations.media.modules.VideoDownloadModule
 import mu.KotlinLogging
 import org.jsoup.nodes.Document
-import viewmodel.SettingsViewModel
 import util.progress.redirectTo
+import viewmodel.SettingsViewModel
 import java.io.File
 
 /**
@@ -23,8 +23,8 @@ class SettingsBasedDocumentProcessor(
     val saveFolder: File,
     document: Document,
     val entry: Entry? = null
-): AbstractProgress() {
-    private val logger = KotlinLogging.logger {  }
+) : AbstractProgress() {
+    private val logger = KotlinLogging.logger { }
 
     private val necessaryFirstOperations = mutableListOf(
         RemoveCssOperation,
@@ -56,7 +56,6 @@ class SettingsBasedDocumentProcessor(
             }
         }
     }
-
 
 
     private val necessaryLastOperations = mutableListOf(
@@ -92,7 +91,8 @@ class SettingsBasedDocumentProcessor(
         saveMediaModules += VideoDownloadModule to shouldDownloadVideo
 
         val timeoutMedia = SettingsViewModel.mediaTimeoutInSeconds.value
-        val mediaOperation = SaveMediaOperation(saveMediaModules, retryAmount, shouldReplaceErrorMedia, saveFolder, timeoutMedia)
+        val mediaOperation =
+            SaveMediaOperation(saveMediaModules, retryAmount, shouldReplaceErrorMedia, saveFolder, timeoutMedia)
 
         variableOperations.add(mediaOperation)
 

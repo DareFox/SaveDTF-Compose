@@ -1,5 +1,6 @@
 package viewmodel
 
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,11 +13,11 @@ import ui.i18n.DefaultLanguageResource
 import ui.i18n.LanguageResource
 import ui.i18n.ProxyLanguageResource
 import java.util.prefs.Preferences
-import ch.qos.logback.classic.Level
 
 object SettingsViewModel {
     private val preferences = Preferences.userRoot().node("savedtf-prefs")
     private val eventListeners = mutableListOf<() -> Unit>()
+
     enum class LoggerLevel {
         INFO, DEBUG
     }
@@ -103,6 +104,7 @@ object SettingsViewModel {
     private fun getPrefToken(website: Website): String {
         return preferences.node("tkn").get(website.name, "")
     }
+
     private fun getPrefDownloadVideo() = preferences.getBoolean(DOWNLOAD_VIDEO_BOOL_KEY, true)
     private fun getSaveMetadata() = preferences.getBoolean(SAVE_METADATA_KEY, true)
     private fun getSaveComments() = preferences.getBoolean(SAVE_COMMENTS_KEY, true)
@@ -114,7 +116,7 @@ object SettingsViewModel {
     private fun getPrefLocalTag() = preferences.get(PROGRAM_LOCALE_KEY, DefaultLanguageResource.localeName)
     private fun getProxyLocale(default: LanguageResource = DefaultLanguageResource): LanguageResource {
         val tag = getPrefLocalTag()
-        return ProxyLanguageResource(AvailableLanguages.firstOrNull { tag == it.localeTag} ?: default, default)
+        return ProxyLanguageResource(AvailableLanguages.firstOrNull { tag == it.localeTag } ?: default, default)
     }
 
     private fun getLoggerLevel(): LoggerLevel {
@@ -264,7 +266,7 @@ object SettingsViewModel {
             LoggerLevel.DEBUG -> Level.DEBUG
         }
 
-        val logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
+        val logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 
         logger.level = toSet
     }

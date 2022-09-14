@@ -20,7 +20,7 @@ fun BookmarksCard(viewModel: IBookmarksElementViewModel, actionBar: List<ActionB
         title = lang.bookmarksCard,
         author = author,
         status = status,
-        error = if (status == IQueueElementViewModel.QueueElementStatus.ERROR) error else null,
+        error = if (status == IQueueElementViewModel.Status.ERROR) error else null,
         website = viewModel.site
     )
 }

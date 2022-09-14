@@ -4,84 +4,58 @@ import exception.errorOnNull
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kmtt.models.enums.Website
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import logic.abstracts.IProgress
-import logic.document.SettingsBasedDocumentProcessor
+import kotlinx.coroutines.runBlocking
 import logic.ktor.Client
 import logic.ktor.rateRequest
-import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang
-import util.coroutine.cancelOnSuspendEnd
-import util.filesystem.toDirectory
-import util.kmttapi.UrlUtil
-import util.kmttapi.betterPublicKmtt
-import util.progress.redirectTo
-import java.io.File
 
-interface IAllEntriesViewModel: IQueueElementViewModel {
+interface IAllEntriesViewModel : IQueueElementViewModel {
     val site: Website
     override fun equals(other: Any?): Boolean
     override fun hashCode(): Int
 }
 
-open class AllEntriesViewModel(override val site: Website): AbstractElementViewModel(), IAllEntriesViewModel {
+open class AllEntriesViewModel(override val site: Website) : AbstractElementViewModel({}), IAllEntriesViewModel {
     private var sitemapDoc: Document? = null
-    private val logger = KotlinLogging.logger { }
-    private val parentDir by lazy { File(pathToSave, "${site.name}/entry") }
     protected val yearRegex = "/year-\\d{4}-\\d{2}-\\d{2}".toRegex(RegexOption.IGNORE_CASE)
 
-    override suspend fun initialize() {
-        elementMutex.withLock {
-            try {
-                initializing()
-                progress(Lang.value.allEntriesVmFetchingSitemap)
+    override suspend fun initializeImpl() {
+        setProgress(Lang.value.allEntriesVmFetchingSitemap)
 
-                val sitemap = "https://${site.baseURL}/sitemap"
-                val response = Client.rateRequest<HttpResponse> {
-                    url(sitemap)
-                }
-
-                progress(Lang.value.allEntriesVmParsingSitemap)
-                sitemapDoc = Jsoup.parse(response.readText())
-
-                clearProgress()
-                readyToUse()
-            } catch (ex: Exception) {
-                error(ex)
-            }
+        val sitemap = "https://${site.baseURL}/sitemap"
+        val response = Client.rateRequest<HttpResponse> {
+            url(sitemap)
         }
+
+        setProgress(Lang.value.allEntriesVmParsingSitemap)
+        sitemapDoc = Jsoup.parse(response.readText())
     }
 
-    override suspend fun save(): Deferred<Boolean> {
-        return waitAndAsyncJob {
-            elementMutex.withLock {
-                inUse()
+    override suspend fun saveImpl() {
+        var counter = 0
+        val parentDir = baseSaveFolder.resolve("$site/entry")
+        val errorList = mutableListOf<String>()
 
-                val sequence = sitemapDoc?.let {
-                    sequenceOfPages(it)
-                }.errorOnNull("Sitemap document is null")
+        val sequence = sitemapDoc?.let {
+            sequenceOfPages(it)
+        }.errorOnNull("Sitemap document is null")
 
-                var counter = 0
-                val allEntriesMessage = Lang.value.profileElementVmAllEntriesMessage
 
-                val errorList = mutableListOf<String>()
-                withProgressSuspend(allEntriesMessage) {
-                    sequence.forEach {
-                        if (!tryProcessDocument(it, parentDir, counter, logger = logger)) {
-                            errorList += it
-                        }
-                        counter++
-                        progress(Lang.value.allEntriesVmWaiting.format(counter, errorList.count()))
-                    }
-                }
+        setProgress(Lang.value.profileElementVmAllEntriesMessage)
 
-                resultMessage(errorList, counter, logger)
+        sequence.forEach {
+            if (!tryProcessEntry(it, parentDir, counter)) {
+                errorList += it
             }
+            counter++
+            setProgress(Lang.value.allEntriesVmWaiting.format(counter, errorList.count()))
         }
+
+        showResult(errorList, counter, parentDir.absolutePath)
     }
+
 
     protected fun sequenceOfPages(sitemapDoc: Document): Sequence<String> {
         val sitemap = sitemapDoc.selectFirst("ul.sitemap")
@@ -109,7 +83,7 @@ open class AllEntriesViewModel(override val site: Website): AbstractElementViewM
             val failedLinks = mutableListOf<String>()
 
             for (it in yearPages) {
-                progress(Lang.value.allEntriesVmFetchingYearLink.format(it))
+                setProgress(Lang.value.allEntriesVmFetchingYearLink.format(it))
 
                 try {
                     val response = runBlocking {
@@ -141,7 +115,7 @@ open class AllEntriesViewModel(override val site: Website): AbstractElementViewM
     }
 
     protected fun convertYearPageToList(yearPage: Document): List<String> {
-        progress(Lang.value.allEntriesVmParsingAllLinks)
+        setProgress(Lang.value.allEntriesVmParsingAllLinks)
         val sitemap = yearPage.selectFirst("ul.sitemap")
 
         requireNotNull(sitemap) {
@@ -157,6 +131,7 @@ open class AllEntriesViewModel(override val site: Website): AbstractElementViewM
 
         return entryLinks
     }
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

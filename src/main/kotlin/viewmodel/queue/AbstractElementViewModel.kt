@@ -1,260 +1,452 @@
 package viewmodel.queue
 
+import exception.OperationTimeoutException
+import exception.QueueElementException
 import exception.errorOnNull
 import kmtt.models.entry.Entry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
-import logic.abstracts.AbstractProgress
 import logic.document.SettingsBasedDocumentProcessor
-import mu.KLogger
 import mu.KotlinLogging
 import org.jsoup.Jsoup
 import ui.i18n.Lang
-import util.coroutine.cancelOnSuspendEnd
+import ui.i18n.LanguageResource
 import util.filesystem.toDirectory
 import util.kmttapi.UrlUtil
 import util.kmttapi.betterPublicKmtt
 import util.progress.redirectTo
 import viewmodel.SettingsViewModel
-import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
+import viewmodel.queue.IQueueElementViewModel.Status
 import java.io.File
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * Abstract class that implements default fields of [IQueueElementViewModel]
+ * Abstract class of [IQueueElementViewModel] that implements all interface methods and fields.
+ *
+ * This class provides functions for easier
+ * class constructing such as [saveImpl], [initializeImpl], [timeoutOperation] and etc
+ *
+ * @param func Leave empty lambda `{}`. It's needed to infer class name for logger
+ *
+ * @see saveImpl
+ * @see initializeImpl
+ * @see timeoutOperation
+ * @see setStatus
+ * @see setProgress
+ * @see setSavedTo
  */
-abstract class AbstractElementViewModel : IQueueElementViewModel, AbstractProgress() {
-    protected val _status = MutableStateFlow(QueueElementStatus.INITIALIZING)
-    override val status: StateFlow<QueueElementStatus> = _status
+abstract class AbstractElementViewModel(
+    emptyLambda: () -> Unit
+) : IQueueElementViewModel {
+    private val internalLogger = KotlinLogging.logger { }
+    protected val logger = KotlinLogging.logger(emptyLambda)
 
-    protected val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    /**
+     * Get current [SettingsViewModel.folderToSave].
+     *
+     * @throws QueueElementException if [SettingsViewModel.folderToSave] is null
+     * */
+    protected val baseSaveFolder: File
+        get() = File(SettingsViewModel.folderToSave.value.errorOnNull("Folder to save isn't set"))
 
-    protected val _currentJob = MutableStateFlow<Job?>(null)
-    override val currentJob: StateFlow<Job?> = _currentJob
+    protected val lang: LanguageResource
+        get() = Lang.value
+
+    protected var ioScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    protected val mutex = Mutex()
+
+    protected val _savedTo = MutableStateFlow<String?>(null)
+    override val savedTo: StateFlow<String?>
+        get() = _savedTo
+
+    protected val _status = MutableStateFlow(Status.INITIALIZING)
+    override val status: StateFlow<Status>
+        get() = _status
 
     protected val _lastErrorMessage = MutableStateFlow<String?>(null)
-    override val lastErrorMessage: StateFlow<String?> = _lastErrorMessage
+    override val lastErrorMessage: StateFlow<String?>
+        get() = _lastErrorMessage
 
-    protected var customPath: String? = null
-    override val pathToSave: String?
-        get() = customPath ?: SettingsViewModel.folderToSave.value
+    protected val _progress = MutableStateFlow<String?>(null)
+    override val progress: StateFlow<String?>
+        get() = _progress
 
-    override fun setPathToSave(folder: String) {
-        customPath = folder
+    protected val _currentJob = MutableStateFlow<Job?>(null)
+    override val currentJob: StateFlow<Job?>
+        get() = _currentJob
+
+    override fun initializeAsync(): Deferred<Throwable?>? {
+        return when {
+            mutex.tryLock() -> ioScope.async {
+                try {
+                    resetPathAndMessages()
+                    setStatus(Status.INITIALIZING)
+                    val result = catchAndPrint { initializeImpl() }
+
+                    if (result == null) {
+                        setStatus(Status.READY_TO_USE)
+                    }
+
+                    result
+                } finally {
+                    mutex.unlock()
+                }
+            }.also { handleJob(it) }
+            else -> null
+        }
     }
 
     /**
-     * Use it to restrict multiple parallel executions
+     * Implementation of [initializeAsync]. This method will have exception handling,
+     * meaning exception will be caught, printed to [lastErrorMessage] and operation will be cancelled
      */
-    protected val elementMutex = Mutex()
+    abstract suspend fun initializeImpl()
 
-    protected val _selected = MutableStateFlow(false)
-    override val selected: StateFlow<Boolean> = _selected
+    override fun saveAsync(): Deferred<Throwable?>? {
+        return when {
+            mutex.tryLock() -> ioScope.async {
+                try {
+                    resetPathAndMessages()
+                    setStatus(Status.IN_USE)
+                    val catch = catchAndPrint { saveImpl() }
 
-    override fun select() {
-        _selected.value = true
-    }
+                    if (catch == null) {
+                        setStatus(Status.SAVED)
+                    }
 
-    override fun unselect() {
-        _selected.value = false
-    }
-
-    protected fun initializing() {
-        _status.value = QueueElementStatus.INITIALIZING
-    }
-
-    protected fun readyToUse() {
-        _status.value = QueueElementStatus.READY_TO_USE
-    }
-
-    protected fun inUse() {
-        _status.value = QueueElementStatus.IN_USE
-    }
-
-    protected fun error(message: String) {
-        _lastErrorMessage.value = message
-        _status.value = QueueElementStatus.ERROR
-    }
-
-    protected inline fun error(exception: Throwable) {
-        _lastErrorMessage.value = "[${exception.javaClass.simpleName}] ${exception.message ?: ""}"
-        _status.value = QueueElementStatus.ERROR
-
-        // TODO: Use child class in logger, not abstract
-        val klogger = KotlinLogging.logger {  }
-
-        klogger.error {
-            "Error() log:\n\n${exception.stackTraceToString()}"
+                    catch
+                } finally {
+                    mutex.unlock()
+                }
+            }.also { handleJob(it) }
+            else -> null
         }
     }
 
-    protected fun saved() {
-        _lastErrorMessage.value = null
-        _status.value = QueueElementStatus.SAVED
-    }
-    protected suspend fun waitAndLaunchJob(
-        context: CoroutineContext = EmptyCoroutineContext,
-        start: CoroutineStart = CoroutineStart.DEFAULT,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job {
-        _currentJob.value?.join()
+    /**
+     * Implementation of [saveAsync]. This method will have exception handling,
+     * meaning exception will be caught, printed to [lastErrorMessage] and operation will be cancelled
+     */
+    abstract suspend fun saveImpl()
 
-        val job = ioScope.launch(
-            context, start, block
-        )
-        _currentJob.value = job
-
-        job.invokeOnCompletion {
-            handleCancellation(it)
-        }
-
-        return job
-    }
-
-    protected suspend fun <T> waitAndAsyncJob(
-        context: CoroutineContext = EmptyCoroutineContext,
-        start: CoroutineStart = CoroutineStart.DEFAULT,
-        block: suspend CoroutineScope.() -> T
-    ): Deferred<T> {
-        _currentJob.value?.join()
-
-        val job = ioScope.async(
-            context, start, block
-        )
-        _currentJob.value = job
-
-        job.invokeOnCompletion {
-            handleCancellation(it)
-        }
-
-        return job
-    }
-
-    protected suspend fun tryProcessDocument(url: String, parentDir: File, currentCounter: Int, timeoutMs: Long = 60000L, logger: KLogger = KotlinLogging.logger {  }): Boolean {
+    /**
+     * Run suspending block and catch exceptions.
+     *
+     * If function caught exception, it will print error to [lastErrorMessage],
+     * set status of element to [ERROR][IQueueElementViewModel.Status.ERROR] and
+     * cancel current operation
+     */
+    private suspend fun catchAndPrint(tryBlock: suspend () -> Unit): Throwable? {
         return try {
-            val newCounter = currentCounter+1
-            val prefix = "${Lang.value.queueVmEntry} #${newCounter}"
+            tryBlock()
+            null
+        } catch (ex: Throwable) {
+            setErrorMessageWithStatus(ex)
+            ex
+        }
+    }
 
-            val site = UrlUtil.getWebsiteType(url)
-            requireNotNull(site) {
-                "Can't get website type from $url url"
+    /**
+     * Handles job cancellation and adding to [currentJob] field
+     */
+    private fun handleJob(job: Job) {
+        _currentJob.value = job
+
+        job.invokeOnCompletion { error ->
+            _currentJob.value = null
+
+            if (error?.cause is CancellationException || error is CancellationException) {
+                resetPathAndMessages()
+
+                val job = initializeAsync()
+                runBlocking {
+                    job?.await()
+                }
+
+                return@invokeOnCompletion
             }
 
-            logger.debug { "Getting entry from osnova api" }
-            progress("$prefix, ${Lang.value.abstractElementVmRequestingEntry.format(url)}")
+            if (error != null) {
+                setErrorMessageWithStatus(error)
+            }
+        }
+    }
 
-            val entry = withTimeout(timeoutMs) {
+    /**
+     * Retrieve, process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
+     */
+    protected suspend fun processEntry(url: String, parentDir: File, currentCounter: Int) {
+        val apiTimeout = SettingsViewModel.apiTimeoutInSeconds.value * 1000L
+
+        val newCounter = currentCounter + 1
+        val prefix = "${Lang.value.queueVmEntry} #${newCounter}"
+
+        val site = UrlUtil.getWebsiteType(url)
+        requireNotNull(site) {
+            "Can't get website type from $url url"
+        }
+
+        internalLogger.debug { "Getting entry from osnova api" }
+        setProgress("$prefix, ${Lang.value.abstractElementVmRequestingEntry.format(url)}")
+
+        val entry = if (apiTimeout <= 0) {
+            betterPublicKmtt(site).entry.getEntry(url)
+        } else {
+            timeoutOperation(apiTimeout, lang.withTimeoutApiRequestOperation) {
                 betterPublicKmtt(site).entry.getEntry(url)
             }
-
-            tryProcessDocument(entry, parentDir, currentCounter, logger)
-        } catch (ex: TimeoutCancellationException) {
-            logger.error(ex) {
-                "Timeout for processing document"
-            }
-            false
-        } catch (ex: Exception) {
-            logger.error(ex) {
-                "Failed to process document $url"
-            }
-            false
         }
+
+        return processEntry(entry, parentDir, currentCounter)
     }
-    protected suspend fun tryProcessDocument(entry: Entry, parentDir: File, currentCounter: Int, logger: KLogger = KotlinLogging.logger {}): Boolean {
+
+    /**
+     * Try to retrieve, process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
+     *
+     * On success, returns **true**.
+     *
+     * Else, returns **false**.
+     */
+    protected suspend fun tryProcessEntry(
+        url: String,
+        parentDir: File,
+        currentCounter: Int
+    ): Boolean {
         return try {
-            val document = entry
-                .entryContent
-                .errorOnNull("Entry content is null")
-                .html
-                .errorOnNull("Entry html is null")
-                .let { Jsoup.parse(it) } // parse document
-
-            val processor = SettingsBasedDocumentProcessor(entry.toDirectory(parentDir), document, entry)
-
-            processor
-                .redirectTo(mutableProgress, ioScope) {// redirect progress of processor to this VM progress
-                    val progressValue = it?.run { ", $this" } ?: ""
-
-                    // show entry counter
-                    if (currentJob.value?.isCancelled != true) "${Lang.value.queueVmEntry} #${currentCounter + 1}$progressValue"
-                    // show nothing on cancellation
-                    else null
-                }
-                .cancelOnSuspendEnd {
-                    logger.debug { "Starting entry processing with id ${entry.id}" }
-                    processor.process() // save document
-                    logger.debug { "Finished processing entry with id ${entry.id}" }
-                }
-
+            processEntry(url, parentDir, currentCounter)
             true
-        } catch (ex: Exception) { // on error, change result to false
-            logger.error(ex) {
-                "Failed to process ${entry.id}"
-            }
+        } catch (ex: Throwable) {
+            logger.error(ex) { "Failed to process $url" }
             false
         }
     }
 
     /**
-     * Generate final message based on errorList size and total counter
-     *
-     * If errorList is not empty, then his content will be called in logger
-     *
-     * Returns true if errorList is empty
+     * Process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
      */
-    protected fun resultMessage(
-        errorList: List<String>, counter: Int, logger: KLogger
-    ): Boolean {
-        val errorCounter = errorList.count()
-        if (errorCounter > 0) {
-            saved()
-            progress(Lang.value.genericElementVmAllErrorsWithLogs.format(counter, errorCounter))
-            logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
-        } else if (errorCounter == counter) {
-            error(Lang.value.genericElementVmSomeErrorsWithLogs.format(errorCounter))
-            logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
-            clearProgress()
-        } else {
-            saved()
-            progress(Lang.value.genericElementVmNoErrors.format(counter))
+    protected suspend fun processEntry(
+        entry: Entry,
+        parentDir: File,
+        currentCounter: Int
+    ) {
+        val entryMs = SettingsViewModel.entryTimeoutInSeconds.value * 1000L
+
+        val document = entry
+            .entryContent
+            .errorOnNull("Entry content is null")
+            .html
+            .errorOnNull("Entry html is null")
+            .let { Jsoup.parse(it) } // parse document
+
+        val processor = SettingsBasedDocumentProcessor(entry.toDirectory(parentDir), document, entry)
+
+        val counter = processor.redirectTo(_progress, ioScope) {// redirect progress of processor to this VM progress
+            val progressValue = it?.run { ", $this" } ?: ""
+            // show entry counter
+            if (currentJob.value?.isCancelled != true) "${Lang.value.queueVmEntry} #${currentCounter + 1}$progressValue"
+            // show nothing on cancellation
+            else null
         }
 
-        return errorCounter == 0
+        internalLogger.debug { "Starting entry processing with id ${entry.id}" }
+        if (entryMs <= 0) {
+            processor.process()
+            counter.cancel()
+        } else {
+            timeoutOperation(
+                timeout = entryMs,
+                name = lang.withTimeoutEntryProcessingOperation,
+                finallyBlock = {
+                    counter.cancel()
+                }
+            ) {
+                processor.process()
+            }
+        }
+        internalLogger.debug { "Finished processing entry with id ${entry.id}" }
     }
 
     /**
-     * Generate final message based on errorCounter and total counter
+     * Try to process and save entry to `%parentDir%/ID-AUTHORNAME/ID-ENTRYNAME`
      *
-     * Returns true if errorCounter is 0
+     * On success, returns **true**.
+     *
+     * Else, returns **false**.
      */
-    protected fun resultMessage(
-        errorCounter: Int, counter: Int, logger: KLogger
+    protected suspend fun tryProcessEntry(
+        entry: Entry,
+        parentDir: File,
+        currentCounter: Int
     ): Boolean {
-        if (errorCounter > 0) {
-            saved()
-            progress(Lang.value.genericElementVmAllErrors.format(counter, errorCounter))
-        } else if (errorCounter == counter) {
-            error(Lang.value.genericElementVmSomeErrors.format(errorCounter))
-            clearProgress()
-        } else {
-            saved()
-            progress(Lang.value.genericElementVmNoErrors.format(counter))
+        return try {
+            processEntry(entry, parentDir, currentCounter)
+            true
+        } catch (ex: Throwable) {
+            logger.error(ex) { "Failed to process entry with ${entry.id} id" }
+            false
         }
-
-        return errorCounter == 0
     }
 
-    private fun handleCancellation(error: Throwable?) {
-        if (error?.cause is CancellationException || error is CancellationException) {
-            readyToUse()
-            clearProgress()
+    /**
+     * Set error message to argument and change status to [Status.ERROR]
+     */
+    protected fun setErrorMessageWithStatus(message: String) {
+        setErrorMessage(message)
+        setStatus(Status.ERROR)
+    }
+
+    /**
+     * Set error message to argument.
+     * Status will not change
+     */
+    protected fun setErrorMessage(message: String) {
+        _lastErrorMessage.update { message }
+    }
+
+    /**
+     * Set error message from exception.
+     *
+     * If error is [CancellationException], element will be set to [READY_TO_USE][Status.READY_TO_USE] status.
+     *
+     * If error is [QueueElementException] and it's [message][Throwable.message] is not null, then only this message will be printed. Otherwise,
+     * it will be print error as usual
+     */
+    protected fun setErrorMessageWithStatus(ex: Throwable) {
+        if (ex.cause is CancellationException || ex is CancellationException) {
+            setErrorMessageWithStatus(lang.entryQueueElementVmOperationCancelled)
+            return
         }
 
-        if (error != null) {
-            error(error)
+
+        val errorName = ex::class.simpleName
+        val message = ex.message
+
+        if (ex is QueueElementException) {
+            if (!message.isNullOrBlank()) {
+                setErrorMessageWithStatus(message)
+            } else {
+                setErrorMessageWithStatus("Error! $errorName")
+            }
+            return
         }
+
+        if (!message.isNullOrBlank()) {
+            setErrorMessageWithStatus("Error! $errorName: $message")
+        } else {
+            setErrorMessageWithStatus("Error! $errorName")
+        }
+    }
+
+    /**
+     * Clear last error message.
+     *
+     * **IT DOES NOT REMOVE ERROR [STATUS][IQueueElementViewModel.status]**
+     */
+    protected fun removeErrorMessage() {
+        _lastErrorMessage.value = null
+
+    }
+
+    /**
+     * Set progress message
+     */
+    protected fun setProgress(progress: String) {
+        _progress.value = progress
+    }
+
+    /**
+     * Clear progress
+     */
+    protected fun removeProgress() {
+        _progress.value = null
+    }
+
+    /**
+     * Set status of element
+     *
+     * Values: [Status]
+     */
+    protected fun setStatus(status: Status) {
+        _status.update { status }
+    }
+
+    /**
+     * Removes ["saved to" path][setSavedTo], last [progress] and [error message][lastErrorMessage]
+     */
+    protected fun resetPathAndMessages() {
+        removeProgress()
+        removeErrorMessage()
+        removeSavedPath()
+    }
+
+    /**
+     * Print result based on [errorList]
+     *
+     * If errorList is not empty, then his content will be called in logger and [QueueElementException] will be thrown
+     */
+    protected fun showResult(
+        errorList: List<String>,
+        counter: Int,
+        savedTo: String
+    ) {
+        val errorCounter = errorList.count()
+
+        when {
+            errorCounter > 0 -> {
+                removeProgress()
+                logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
+
+                throw QueueElementException(Lang.value.genericElementVmAllErrorsWithLogs.format(counter, errorCounter))
+            }
+            errorCounter == counter -> {
+                logger.error("Failed to download:\n${errorList.joinToString(",\n")}")
+                removeProgress()
+
+                throw QueueElementException(Lang.value.genericElementVmSomeErrorsWithLogs.format(errorCounter))
+            }
+            else -> {
+                setProgress(Lang.value.genericElementVmNoErrors.format(counter))
+                setSavedTo(savedTo)
+            }
+        }
+    }
+
+    /**
+     * Runs a given suspending [block] of code inside
+     * a coroutine with a specified timeout
+     *
+     * Internally wraps [withTimeout] and converts [TimeoutCancellationException] to [OperationTimeoutException]
+     *
+     * @throws OperationTimeoutException if the timeout was exceeded
+     */
+    protected suspend fun <T> timeoutOperation(
+        timeout: Long,
+        name: String,
+        finallyBlock: () -> Unit = {},
+        block: suspend CoroutineScope.() -> T
+    ): T {
+        try {
+            return withTimeout(timeout, block)
+        } catch (ex: TimeoutCancellationException) {
+            throw OperationTimeoutException(timeout, name)
+        } finally {
+            finallyBlock()
+        }
+    }
+
+    /**
+     * Set ["saved to"][savedTo] path
+     */
+    protected fun setSavedTo(path: String) {
+        _savedTo.value = path
+    }
+
+    /**
+     * Remove ["saved to"][savedTo] path and set null
+     */
+    protected fun removeSavedPath() {
+        _savedTo.value = null
     }
 }

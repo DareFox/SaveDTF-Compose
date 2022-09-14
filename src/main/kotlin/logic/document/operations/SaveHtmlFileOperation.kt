@@ -9,7 +9,7 @@ import java.io.File
 /**
  * Save HTML file
  */
-class SaveHtmlFileOperation(val saveFolder: File, val filename: String = "index.html"): AbstractProcessorOperation() {
+class SaveHtmlFileOperation(val saveFolder: File, val filename: String = "index.html") : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.value.saveHtmlOperation
 

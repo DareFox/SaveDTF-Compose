@@ -6,7 +6,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import util.filesystem.readResource
 
-object JavascriptAndCssOperation: AbstractProcessorOperation() {
+object JavascriptAndCssOperation : AbstractProcessorOperation() {
     override val name: String
         get() = "JS & CSS"
 

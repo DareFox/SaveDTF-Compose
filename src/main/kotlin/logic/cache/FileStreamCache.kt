@@ -1,4 +1,3 @@
-
 package logic.cache
 
 import kotlinx.coroutines.CoroutineScope
@@ -19,10 +18,10 @@ import java.io.OutputStream
 import java.util.*
 
 
-object FileStreamCache: StreamCache {
+object FileStreamCache : StreamCache {
     private val tempFolder = getTempCacheFolder()
     private val fileMap = FileMap.createMap(tempFolder)
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     private val waitingMutex = WaitingMutex(CoroutineScope(Dispatchers.IO + SupervisorJob()))
     private val freeSpaceReservationInMb: Long = 2048
     private val maxSizeOfFileCacheInMb: Long = 4096
@@ -86,7 +85,7 @@ object FileStreamCache: StreamCache {
             // So we need to sum files length
             val folderLength: Long = files.sumOf { it.length() }
 
-            val isNotEnoughSpace = tempFolder.freeSpace  < freeSpaceReservationInBytes
+            val isNotEnoughSpace = tempFolder.freeSpace < freeSpaceReservationInBytes
             val fileCacheMaxedOut = folderLength >= maxSizeOfFileCacheInBytes
 
             val excessReservedSpace = freeSpaceReservationInBytes - tempFolder.freeSpace
@@ -130,7 +129,7 @@ object FileStreamCache: StreamCache {
                 }
                 null
             }
-        }.groupBy({it.first}) {
+        }.groupBy({ it.first }) {
             it.second
         }
 
@@ -150,7 +149,7 @@ object FileStreamCache: StreamCache {
                 logger.info {
                     "Released space (${sizeToString(releasedSpace)}) is bigger than given (${sizeToString(bytes)}) size. Abort cleaning"
                 }
-                return;
+                return
             }
         }
 
@@ -168,7 +167,11 @@ object FileStreamCache: StreamCache {
             if (file.extension == "json") continue
 
             val deletedFilename = file.name
-            val canonical = try { file.canonicalFile } catch (e: Exception) { null }
+            val canonical = try {
+                file.canonicalFile
+            } catch (e: Exception) {
+                null
+            }
             val fileSizeInBytes = file.length()
 
             if (tryToDelete(file)) {
@@ -189,7 +192,7 @@ object FileStreamCache: StreamCache {
                 logger.info {
                     "Released space (${sizeToString(releasedSpace)}) is bigger than given (${sizeToString(bytes)}) size. Abort cleaning"
                 }
-                return;
+                return
             }
         }
     }

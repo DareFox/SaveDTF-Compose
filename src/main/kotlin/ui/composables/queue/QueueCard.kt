@@ -32,9 +32,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.animations.pulseColor
 import ui.i18n.Lang
-import viewmodel.queue.IQueueElementViewModel.QueueElementStatus
 import util.desktop.openFileInDefaultApp
 import viewmodel.queue.*
+import viewmodel.queue.IQueueElementViewModel.Status
 import java.io.File
 
 data class ActionBarElement(
@@ -61,7 +61,7 @@ fun SimpleCard(
     actionBar: List<ActionBarElement> = listOf(),
     title: String,
     author: String,
-    status: QueueElementStatus,
+    status: Status,
     website: Website?,
     error: String? = null,
     painter: Painter? = null,
@@ -73,9 +73,9 @@ fun SimpleCard(
     val pulse = when {
         // set pulse only if feature was on (pulseOnUse == true)
         pulseOnUse -> {
-            when(status) {
+            when (status) {
                 // on usage set start for pulse animation
-                QueueElementStatus.IN_USE, QueueElementStatus.INITIALIZING -> true
+                Status.IN_USE, Status.INITIALIZING -> true
                 else -> false
             }
         }
@@ -99,7 +99,7 @@ fun SimpleCard(
     /**
      * Color associated with website. Used when status of element is ready_to_use or in_use
      */
-    val websiteColor = when(website) {
+    val websiteColor = when (website) {
         Website.DTF -> MaterialTheme.colors.primary
         Website.TJ -> Color(0xFFffd260)
         Website.VC -> Color(0xFFe55c78)
@@ -112,10 +112,10 @@ fun SimpleCard(
     val mainColor by animateColorAsState(
         colorPulse.compositeOver(
             when (status) {
-                QueueElementStatus.ERROR -> Color(0xFFd53333)
-                QueueElementStatus.INITIALIZING -> Color(0xFF808080)
-                QueueElementStatus.READY_TO_USE, QueueElementStatus.IN_USE -> websiteColor
-                QueueElementStatus.SAVED -> Color(0xFF37ee9a)
+                Status.ERROR -> Color(0xFFd53333)
+                Status.INITIALIZING -> Color(0xFF808080)
+                Status.READY_TO_USE, Status.IN_USE -> websiteColor
+                Status.SAVED -> Color(0xFF37ee9a)
             }
         )
     )
@@ -126,8 +126,10 @@ fun SimpleCard(
      */
     val secondaryColor by animateColorAsState(
         colorPulse
-            .compositeOver(Color.Black.copy(0.15f)
-            .compositeOver(mainColor))
+            .compositeOver(
+                Color.Black.copy(0.15f)
+                    .compositeOver(mainColor)
+            )
     )
 
     /**
@@ -135,9 +137,10 @@ fun SimpleCard(
      */
     val onColor by animateColorAsState(
         when (status) {
-            QueueElementStatus.INITIALIZING -> Color.White
+            Status.INITIALIZING -> Color.White
             else -> Color.Black
-        })
+        }
+    )
 
     QueueCard(
         viewModel = viewModel,
@@ -159,19 +162,21 @@ fun QueueCard(
     actionBar: List<ActionBarElement> = listOf(),
     title: String,
     author: String,
-    status: QueueElementStatus,
+    status: Status,
     mainColor: Color,
     footerColor: Color,
     onColor: Color,
     error: String? = null,
     painter: Painter? = null,
-    ) {
+) {
 
     LaunchedEffect(Unit) {
-        if (viewModel.status.value == QueueElementStatus.INITIALIZING) {
-            viewModel.initialize()
+        if (viewModel.status.value == Status.INITIALIZING) {
+            viewModel.initializeAsync()
         }
     }
+
+    val path by viewModel.savedTo.collectAsState()
 
     Column(
         modifier = Modifier
@@ -282,31 +287,31 @@ fun QueueCard(
 
                                 // re-initialize to get original document
                                 // TODO: In abstract class, undo document changes on cancellation without reinitialization
-                                viewModel.initialize()
+                                viewModel.initializeAsync()
                             }
                         })
                     }
 
-                    if (status == QueueElementStatus.SAVED) {
+                    if (status == Status.SAVED && path != null) {
                         buttons.add(ActionBarElement(FeatherIcons.Folder, lang.queueCardOpen) {
-                            File(viewModel.pathToSave).openFileInDefaultApp()
+                            File(path!!).openFileInDefaultApp()
                         })
                     }
 
-                    if (status in listOf(QueueElementStatus.READY_TO_USE)) {
+                    if (status in listOf(Status.READY_TO_USE)) {
                         buttons += ActionBarElement(FeatherIcons.Download, lang.queueCardSave) {
                             scope.launch(CoroutineName("Save operation coroutine")) {
-                                if (status != QueueElementStatus.IN_USE) { // Double check
-                                    it.save()
+                                if (status != Status.IN_USE) { // Double check
+                                    it.saveAsync()
                                 }
                             }
                         }
                     }
 
-                    if (status != QueueElementStatus.INITIALIZING && job?.isActive != true) {
+                    if (status != Status.INITIALIZING && job?.isActive != true) {
                         buttons += ActionBarElement(FeatherIcons.RefreshCcw, lang.queueCardRefresh) {
                             scope.launch(CoroutineName("Init operation coroutine")) {
-                                it.initialize()
+                                it.initializeAsync()
                             }
                         }
                     }

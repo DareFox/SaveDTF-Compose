@@ -58,6 +58,7 @@ private suspend fun download(
 ): InputStream? {
     var attemptCounter = 0
     do {
+        attemptCounter++
         timeout?.join() // Wait if there is too many requests
         val caught = runCatching { // Catch exceptions with runCatching, try-catch don't work with coroutines
             val shouldUseTimeoutRestriction = timeoutInSeconds > 0
@@ -90,6 +91,7 @@ private suspend fun download(
         yield()
         val response = caught.getOrNull()
 
+        // Log error
         if (response == null) {
             logger.error { "Response is null" }
             logger.error { "Caught exception: ${caught.exceptionOrNull()} " }
@@ -104,6 +106,7 @@ private suspend fun download(
         }
         yield()
 
+        // On success, return content and break loop
         if (response?.status == HttpStatusCode.OK) {
             val type = response.contentType()
 
@@ -115,9 +118,9 @@ private suspend fun download(
             return response.content.toInputStream()
         }
 
-        // If retryAmount is bigger than 0, then try until reaching retryAmount
-        // On retryAmount = 0: repeat request infinitely until success
-        if (retryAmount != 0 && attemptCounter >= retryAmount) {
+        // If retryAmount is bigger than 0, then try until attemptCounter becomes equal to retryAmount
+        // If retryAmount is 0 or less, repeat request infinitely until success
+        if (retryAmount in 1..attemptCounter) {
             if (response == null) {
                 logger.error(caught.exceptionOrNull() ?: RuntimeException(Lang.value.ktorServerNoResponse))
             } else {
@@ -126,7 +129,6 @@ private suspend fun download(
 
             return replaceOnError?.binary?.inputStream()
         }
-
     } while (true)
 }
 

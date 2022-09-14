@@ -27,7 +27,7 @@ fun ProfileCard(viewModel: IProfileElementViewModel, actionBar: List<ActionBarEl
         title = title,
         author = viewModel.site.name,
         status = status,
-        error = if (status == IQueueElementViewModel.QueueElementStatus.ERROR) error else null,
+        error = if (status == IQueueElementViewModel.Status.ERROR) error else null,
         website = viewModel.site
     )
 }

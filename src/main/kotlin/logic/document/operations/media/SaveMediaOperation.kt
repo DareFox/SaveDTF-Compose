@@ -1,7 +1,10 @@
 package logic.document.operations.media
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import logic.document.AbstractProcessorOperation
 import logic.document.operations.media.modules.IDownloadModule
 import logic.ktor.Client
@@ -22,7 +25,7 @@ class SaveMediaOperation(
     val timeoutInSeconds: Int
 ) : AbstractProcessorOperation() {
     override val name: String = Lang.value.saveMediaOperation
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     override suspend fun process(document: Document): Document {
         for (moduleIgnorePair in downloaderModules) {
             val downloader = moduleIgnorePair.first
@@ -32,7 +35,8 @@ class SaveMediaOperation(
             val counter = MutableStateFlow(0)
 
             withContext(Dispatchers.IO) {
-                val counterJob = launch { counter.onEach {
+                val counterJob = launch {
+                    counter.onEach {
                         progress(
                             Lang.value.saveMediaDownloading.format(
                                 downloader.downloadingContentType,

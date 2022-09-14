@@ -3,8 +3,8 @@ package util
 import kmtt.models.enums.Website
 import me.darefox.saveDTF_compose.BuildConfig
 import mu.KotlinLogging
-import viewmodel.SettingsViewModel
 import util.logs.getCurrentLogFile
+import viewmodel.SettingsViewModel
 
 private val logger = KotlinLogging.logger { }
 fun getCrashLogReport(ex: Throwable): String {
@@ -68,7 +68,7 @@ fun getCrashLogReport(ex: Throwable): String {
             log.readLines().takeLast(linesNum).forEach {
                 stringBuilder.append(it + "\n")
             }
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             stringBuilder.append("Caught exception during log reading")
             stringBuilder.append("${ex.javaClass.name}: ${ex.message}\n${ex.stackTraceToString()}")
         }
