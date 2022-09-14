@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import mu.KotlinLogging
-import util.kmttapi.SharedRegex
-import util.kmttapi.UrlUtil
-import util.kmttapi.UrlUtil.getWebsiteType
+import util.kmttapi.KmttRegex
+import util.kmttapi.KmttUrl
+import util.kmttapi.KmttUrl.getWebsiteType
 import viewmodel.DebugQueueViewModel
 import viewmodel.SettingsViewModel
 
@@ -23,24 +23,24 @@ object QueueViewModel {
     val creationStateMap: StateFlow<Map<IQueueElementViewModel, MutableTransitionState<Boolean>>> = _creationStateMap
 
     private val urlChecks: List<UrlChecker> = listOf(
-        UrlChecker(UrlUtil::isPeriodSitemap) {
+        UrlChecker(KmttUrl::isPeriodSitemap) {
             add(PeriodEntriesViewModel(it, getWebsiteType(it)!!))
         },
-        UrlChecker(UrlUtil::isUserProfile) {
+        UrlChecker(KmttUrl::isUserProfile) {
             add(
                 ProfileElementViewModel(
                     getWebsiteType(it)!!,
-                    UrlUtil.getProfileID(it)
+                    KmttUrl.getProfileID(it)
                 )
             )
         },
-        UrlChecker(UrlUtil::isEntry) check@{
+        UrlChecker(KmttUrl::isEntry) check@{
             // url should start from https to get entry from API
             // todo: maybe don't call same regex twice?
-            val url = "https://" + (SharedRegex.entryUrlRegex.find(it)?.value ?: return@check)
+            val url = "https://" + (KmttRegex.entryUrlRegex.find(it)?.value ?: return@check)
             add(EntryQueueElementViewModel(url))
         },
-        UrlChecker(UrlUtil::isBookmarkLink) {
+        UrlChecker(KmttUrl::isBookmarkLink) {
             add(createBookmarks(getWebsiteType(it)!!)) // we do a little bit of trolling !!
         },
         UrlChecker({ it == "debug" }) {
@@ -48,10 +48,10 @@ object QueueViewModel {
                 add(it)
             }
         },
-        UrlChecker(UrlUtil::isSitemapAll) {
+        UrlChecker(KmttUrl::isSitemapAll) {
             add(AllEntriesViewModel(getWebsiteType(it)!!))
         },
-        UrlChecker(UrlUtil::isEmptyWebsite) {
+        UrlChecker(KmttUrl::isEmptyWebsite) {
             add(AllEntriesViewModel(getWebsiteType(it)!!))
         }
     )

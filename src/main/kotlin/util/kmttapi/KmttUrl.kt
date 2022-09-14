@@ -2,21 +2,24 @@ package util.kmttapi
 
 import kmtt.models.enums.Website
 
-object UrlUtil {
+/**
+ * Wrapper for [KmttRegex]
+ */
+object KmttUrl {
     fun isUserProfile(url: String): Boolean {
-        return SharedRegex.userProfileLinkRegex.find(url) != null
+        return KmttRegex.userProfileLinkRegex.find(url) != null
     }
 
     fun isEntry(url: String): Boolean {
-        return SharedRegex.entryUrlRegex.find(url) != null
+        return KmttRegex.entryUrlRegex.find(url) != null
     }
 
     fun isBookmarkLink(url: String): Boolean {
-        return SharedRegex.bookmarksRegex.find(url) != null
+        return KmttRegex.bookmarksRegex.find(url) != null
     }
 
     fun getWebsiteType(url: String): Website? {
-        return when (SharedRegex.websiteRegex.find(url)?.value) {
+        return when (KmttRegex.websiteRegex.find(url)?.value) {
             "dtf" -> Website.DTF
             "tjournal" -> Website.TJ
             "vc" -> Website.VC
@@ -37,13 +40,13 @@ object UrlUtil {
 
     private fun getIdOrNullSample() {
         val validURL = "https://leonardo.osnova.io/118ce574-1507-5a19-92a0-6b06da18fdf3/"
-        UrlUtil.getMediaIdOrNull(validURL) // 118ce574-1507-5a19-92a0-6b06da18fdf3
+        KmttUrl.getMediaIdOrNull(validURL) // 118ce574-1507-5a19-92a0-6b06da18fdf3
 
         val noSlashURL = "https://leonardo.osnova.io/118ce574-1507-5a19-92a0-6b06da18fdf3"
-        UrlUtil.getMediaIdOrNull(noSlashURL) // 118ce574-1507-5a19-92a0-6b06da18fdf3
+        KmttUrl.getMediaIdOrNull(noSlashURL) // 118ce574-1507-5a19-92a0-6b06da18fdf3
 
         val invalidURL = "https://osnova.io/118ce574-1507-5a19-92a0-6b06da18fdf3"
-        UrlUtil.getMediaIdOrNull(invalidURL) // null
+        KmttUrl.getMediaIdOrNull(invalidURL) // null
     }
 
     /**
@@ -63,18 +66,18 @@ object UrlUtil {
 
     private fun getIdSample() {
         val validURL = "https://leonardo.osnova.io/118ce574-1507-5a19-92a0-6b06da18fdf3/"
-        UrlUtil.getMediaId(validURL) // 118ce574-1507-5a19-92a0-6b06da18fdf3
+        KmttUrl.getMediaId(validURL) // 118ce574-1507-5a19-92a0-6b06da18fdf3
 
         val noSlashURL = "https://leonardo.osnova.io/118ce574-1507-5a19-92a0-6b06da18fdf3"
-        UrlUtil.getMediaId(noSlashURL) // 118ce574-1507-5a19-92a0-6b06da18fdf3
+        KmttUrl.getMediaId(noSlashURL) // 118ce574-1507-5a19-92a0-6b06da18fdf3
 
         val invalidURL = "https://osnova.io/118ce574-1507-5a19-92a0-6b06da18fdf3"
-        UrlUtil.getMediaId(invalidURL) // IllegalArgumentException
+        KmttUrl.getMediaId(invalidURL) // IllegalArgumentException
     }
 
 
     fun getProfileID(url: String): Long {
-        val id = SharedRegex.userIdRegex.find(url)
+        val id = KmttRegex.userIdRegex.find(url)
 
         requireNotNull(id) {
             "Got null instead of user id, from user profile url $url"
@@ -89,7 +92,7 @@ object UrlUtil {
      * "dtf|vc|tjournal.ru/sitemap"
      */
     fun isSitemapAll(url: String): Boolean {
-        return SharedRegex.sitemapAll.find(url) != null
+        return KmttRegex.sitemapAll.find(url) != null
     }
 
     /**
@@ -98,7 +101,7 @@ object UrlUtil {
      * dtf.ru/ for example
      */
     fun isEmptyWebsite(url: String): Boolean {
-        return SharedRegex.emptyWebsiteUrl.find(url) != null
+        return KmttRegex.emptyWebsiteUrl.find(url) != null
     }
 
     /**
@@ -107,7 +110,7 @@ object UrlUtil {
      * "dtf|vc|tjournal.ru/sitemap/year-xxxx-xx-xx"
      */
     fun isPeriodSitemap(url: String): Boolean {
-        return SharedRegex.sitemapPeriod.find(url) != null
+        return KmttRegex.sitemapPeriod.find(url) != null
     }
 
     /**
@@ -115,7 +118,7 @@ object UrlUtil {
      *
      * "dtf|vc|tjournal.ru/sitemap/year-xxxx-xx-xx" -> "year-xxxx-xx-xx"
      */
-    fun extractPeriod(url: String): String? = SharedRegex.sitemapExtractPeriod.find(url)?.value
+    fun extractPeriod(url: String): String? = KmttRegex.sitemapExtractPeriod.find(url)?.value
 
     fun extractPeriodAndFormat(url: String): String? {
         val period = extractPeriod(url) ?: return null

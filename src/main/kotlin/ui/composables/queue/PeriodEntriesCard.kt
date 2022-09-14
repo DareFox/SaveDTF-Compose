@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import ui.i18n.Lang
-import util.kmttapi.UrlUtil
+import util.kmttapi.KmttUrl
 import viewmodel.queue.IPeriodEntriesViewModel
 import viewmodel.queue.IQueueElementViewModel
 
@@ -15,7 +15,7 @@ fun PeriodEntriesCard(viewModel: IPeriodEntriesViewModel, actionBar: List<Action
     val url = viewModel.periodSitemapLink
     val lang by Lang.collectAsState()
 
-    val period = UrlUtil.extractPeriodAndFormat(url) ?: UrlUtil.extractPeriod(url) ?: url
+    val period = KmttUrl.extractPeriodAndFormat(url) ?: KmttUrl.extractPeriod(url) ?: url
 
     SimpleCard(
         viewModel = viewModel,

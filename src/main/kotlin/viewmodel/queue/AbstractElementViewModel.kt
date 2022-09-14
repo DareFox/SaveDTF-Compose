@@ -15,7 +15,7 @@ import org.jsoup.Jsoup
 import ui.i18n.Lang
 import ui.i18n.LanguageResource
 import util.filesystem.toDirectory
-import util.kmttapi.UrlUtil
+import util.kmttapi.KmttUrl
 import util.kmttapi.betterPublicKmtt
 import util.progress.redirectTo
 import viewmodel.SettingsViewModel
@@ -183,7 +183,7 @@ abstract class AbstractElementViewModel(
         val newCounter = currentCounter + 1
         val prefix = "${Lang.value.queueVmEntry} #${newCounter}"
 
-        val site = UrlUtil.getWebsiteType(url)
+        val site = KmttUrl.getWebsiteType(url)
         requireNotNull(site) {
             "Can't get website type from $url url"
         }

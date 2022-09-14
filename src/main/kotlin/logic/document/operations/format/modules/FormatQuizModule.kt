@@ -5,7 +5,7 @@ import kmtt.models.enums.Website
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import util.dom.getWebsite
-import util.kmttapi.SharedRegex
+import util.kmttapi.KmttRegex
 import util.kmttapi.betterPublicKmtt
 
 object FormatQuizModule : IHtmlFormatModule {
@@ -36,7 +36,7 @@ object FormatQuizModule : IHtmlFormatModule {
 
         quizItems.forEach { quizItem ->
             val itemId = quizItem.classNames().firstNotNullOfOrNull {
-                SharedRegex.quizItemHash.find(it)?.value
+                KmttRegex.quizItemHash.find(it)?.value
             }
 
             val votes = result?.items?.get(itemId)

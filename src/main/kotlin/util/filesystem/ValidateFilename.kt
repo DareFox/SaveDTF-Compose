@@ -1,12 +1,12 @@
 package util.filesystem
 
-import util.kmttapi.SharedRegex
+import util.kmttapi.KmttRegex
 import java.io.File
 import java.nio.file.InvalidPathException
 import java.nio.file.Paths
 
 fun convertToValidName(name: String, default: String = "null"): String {
-    val newName = SharedRegex.filenameValidationRegex.replace(name, "")
+    val newName = KmttRegex.filenameValidationRegex.replace(name, "")
     val file = File(newName)
 
     // Check if new name is valid, if not, return default

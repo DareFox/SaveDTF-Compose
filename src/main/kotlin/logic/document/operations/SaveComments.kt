@@ -21,7 +21,7 @@ import org.jsoup.nodes.Element
 import ui.i18n.Lang
 import util.dom.getWebsite
 import util.filesystem.readResource
-import util.kmttapi.SharedRegex
+import util.kmttapi.KmttRegex
 import util.kmttapi.betterPublicKmtt
 import util.random.RGB
 import util.random.offsetRandomColor
@@ -304,7 +304,7 @@ class SaveCommentsOperation(val entry: Entry) : AbstractProcessorOperation() {
 
     private fun makeElementTextLinkable(element: Element) {
         val text = element.text()
-        val newText = text.replace(SharedRegex.urlRegex) {
+        val newText = text.replace(KmttRegex.urlRegex) {
             "<a href=\"${it.value}\">${it.value}</a>"
         }
         element.html(newText)

@@ -1,6 +1,9 @@
 package util.kmttapi
 
-object SharedRegex {
+/**
+ * Regex for Kmtt urls
+ */
+object KmttRegex {
     // ${'$'} is needed to escape $ symbol in kotlin
     val entryUrlRegex =
         """(dtf|vc|tjournal)\.ru\/((u\/|).+?\/.+?|\d+.*)(?=\/|${'$'}|\s+)""".toRegex(RegexOption.IGNORE_CASE)

@@ -5,7 +5,7 @@ import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import util.kmttapi.UrlUtil
+import util.kmttapi.KmttUrl
 import util.kmttapi.betterPublicKmtt
 import java.io.File
 
@@ -30,7 +30,7 @@ data class EntryQueueElementViewModel(override val url: String) : AbstractElemen
         _website.value = null
         parentDir = null
 
-        val type = UrlUtil.getWebsiteType(url).errorOnNull("Can't get website type")
+        val type = KmttUrl.getWebsiteType(url).errorOnNull("Can't get website type")
         val client = betterPublicKmtt(type)
         parentDir = File("$type/entry")
 
