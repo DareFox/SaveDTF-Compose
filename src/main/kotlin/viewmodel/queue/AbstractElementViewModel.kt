@@ -143,7 +143,7 @@ abstract class AbstractElementViewModel(
             tryBlock()
             null
         } catch (ex: Throwable) {
-            setErrorMessage(ex)
+            setErrorMessageWithStatus(ex)
             ex
         }
     }
@@ -155,15 +155,12 @@ abstract class AbstractElementViewModel(
         _currentJob.value = job
 
         job.invokeOnCompletion { error ->
-            // TODO: setErrorMessage already handles cancellation
-            // Decide what to do with it
             if (error?.cause is CancellationException || error is CancellationException) {
-                setStatus(Status.READY_TO_USE)
                 removeProgress()
             }
 
             if (error != null) {
-                setErrorMessage(error)
+                setErrorMessageWithStatus(error)
             }
         }
     }
@@ -284,11 +281,19 @@ abstract class AbstractElementViewModel(
     }
 
     /**
-     * Set error message
+     * Set error message to argument and change status to [Status.ERROR]
+     */
+    protected fun setErrorMessageWithStatus(message: String) {
+        setErrorMessage(message)
+        setStatus(Status.ERROR)
+    }
+
+    /**
+     * Set error message to argument.
+     * Status will not change
      */
     protected fun setErrorMessage(message: String) {
         _lastErrorMessage.update { message }
-        setStatus(Status.ERROR)
     }
 
     /**
@@ -299,11 +304,9 @@ abstract class AbstractElementViewModel(
      * If error is [QueueElementException] and it's [message][Throwable.message] is not null, then only this message will be printed. Otherwise,
      * it will be print error as usual
      */
-    protected fun setErrorMessage(ex: Throwable) {
+    protected fun setErrorMessageWithStatus(ex: Throwable) {
         if (ex.cause is CancellationException || ex is CancellationException) {
-            setStatus(Status.READY_TO_USE)
-            resetPathAndMessages()
-            setProgress(lang.entryQueueElementVmOperationCancelled)
+            setErrorMessageWithStatus(lang.entryQueueElementVmOperationCancelled)
             return
         }
 
@@ -313,17 +316,17 @@ abstract class AbstractElementViewModel(
 
         if (ex is QueueElementException) {
             if (!message.isNullOrBlank()) {
-                setErrorMessage(message)
+                setErrorMessageWithStatus(message)
             } else {
-                setErrorMessage("Error! $errorName")
+                setErrorMessageWithStatus("Error! $errorName")
             }
             return
         }
 
         if (!message.isNullOrBlank()) {
-            setErrorMessage("Error! $errorName: $message")
+            setErrorMessageWithStatus("Error! $errorName: $message")
         } else {
-            setErrorMessage("Error! $errorName")
+            setErrorMessageWithStatus("Error! $errorName")
         }
     }
 
