@@ -155,6 +155,8 @@ abstract class AbstractElementViewModel(
         _currentJob.value = job
 
         job.invokeOnCompletion { error ->
+            _currentJob.value = null
+
             if (error?.cause is CancellationException || error is CancellationException) {
                 removeProgress()
             }
