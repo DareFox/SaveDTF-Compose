@@ -34,8 +34,15 @@
   width: 100%;
   padding: 0px 6px;
   box-sizing: border-box;
+  border-top: 2px solid #4643432e;
   overflow: auto;
 }
+
+/* Don't show border, if it's root comment */
+.comments-list > .comment-node > .comment-wrapper .comment {
+    border-top: none;
+}
+
 
 .comment .header {
   padding-top: 5px;
