@@ -7,5 +7,5 @@ pluginManagement {
 
 }
 rootProject.name = "saveDTF-compose"
-
+include("shared")
 include("compose-gui")
