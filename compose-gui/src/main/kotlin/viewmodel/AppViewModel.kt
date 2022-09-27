@@ -8,7 +8,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import logic.Version
 import logic.ktor.Client
 import logic.ktor.rateRequest
-import me.darefox.saveDTF_compose.BuildConfig
+import me.darefox.compose_gui.BuildConfig
 import util.string.toVersionOrNull
 
 object AppViewModel {

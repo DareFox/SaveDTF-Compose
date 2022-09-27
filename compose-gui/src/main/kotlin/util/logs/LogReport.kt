@@ -1,7 +1,7 @@
 package util
 
 import kmtt.models.enums.Website
-import me.darefox.saveDTF_compose.BuildConfig
+import me.darefox.compose_gui.BuildConfig
 import mu.KotlinLogging
 import util.logs.getCurrentLogFile
 import viewmodel.SettingsViewModel

@@ -8,3 +8,4 @@ pluginManagement {
 }
 rootProject.name = "saveDTF-compose"
 
+include("compose-gui")

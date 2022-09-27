@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import me.darefox.saveDTF_compose.BuildConfig
+import me.darefox.compose_gui.BuildConfig
 import ui.SaveDtfTheme
 import ui.i18n.Lang
 import util.string.repeatOrEmpty
