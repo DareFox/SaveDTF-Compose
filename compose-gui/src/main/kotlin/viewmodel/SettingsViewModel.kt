@@ -6,7 +6,7 @@ import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import logic.cache.buildCache
+import cache.buildCache
 import org.slf4j.LoggerFactory
 import ui.i18n.AvailableLanguages
 import ui.i18n.DefaultLanguageResource

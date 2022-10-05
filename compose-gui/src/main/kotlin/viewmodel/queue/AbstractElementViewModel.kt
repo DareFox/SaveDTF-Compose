@@ -1,5 +1,6 @@
 package viewmodel.queue
 
+import SettingsBasedDocumentProcessor
 import exception.OperationTimeoutException
 import exception.QueueElementException
 import exception.errorOnNull
@@ -9,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
-import import shared.documentdocument.SettingsBasedDocumentProcessor
 import mu.KotlinLogging
 import org.jsoup.Jsoup
 import ui.i18n.Lang
