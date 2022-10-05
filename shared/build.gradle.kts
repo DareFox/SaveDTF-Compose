@@ -6,7 +6,7 @@ plugins {
     id("java")
 }
 
-group = "me.darefox.shared"
+group = "me.darefox"
 version = "2.0.0"
 
 repositories {
