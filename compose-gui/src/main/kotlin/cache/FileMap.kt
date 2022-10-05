@@ -1,4 +1,4 @@
-package shared.cache
+package cache
 
 import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString

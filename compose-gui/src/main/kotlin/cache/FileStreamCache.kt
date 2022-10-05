@@ -1,4 +1,4 @@
-package shared.cache
+package cache
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -8,6 +8,7 @@ import shared.io.WaitingMutex
 import shared.io.asCounter
 import shared.io.asMultiStream
 import mu.KotlinLogging
+import shared.cache.StreamCache
 import shared.util.filesystem.getTempCacheFolder
 import shared.util.filesystem.recursiveFileList
 import shared.util.filesystem.sizeToString
