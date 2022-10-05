@@ -9,15 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
-import logic.document.SettingsBasedDocumentProcessor
+import import shared.documentdocument.SettingsBasedDocumentProcessor
 import mu.KotlinLogging
 import org.jsoup.Jsoup
 import ui.i18n.Lang
 import ui.i18n.LanguageResource
-import util.filesystem.toDirectory
-import util.kmttapi.KmttUrl
-import util.kmttapi.betterPublicKmtt
-import util.progress.redirectTo
+import shared.util.filesystem.toDirectory
+import shared.util.kmttapi.KmttUrl
+import shared.util.kmttapi.betterPublicKmtt
+import shared.util.progress.redirectTo
 import viewmodel.SettingsViewModel
 import viewmodel.queue.IQueueElementViewModel.Status
 import java.io.File

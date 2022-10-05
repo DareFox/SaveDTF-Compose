@@ -55,6 +55,9 @@ val ktorVersion = "1.6.8"
 dependencies {
     implementation(compose.desktop.currentOs)
 
+    // Shared package
+    implementation(project(":shared"))
+
     // ICONS
     implementation("br.com.devsrsouza.compose.icons.jetbrains:feather:1.0.0")
 

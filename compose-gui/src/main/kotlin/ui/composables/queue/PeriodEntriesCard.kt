@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import ui.i18n.Lang
-import util.kmttapi.KmttUrl
+import shared.util.kmttapi.KmttUrl
 import viewmodel.queue.IPeriodEntriesViewModel
 import viewmodel.queue.IQueueElementViewModel
 

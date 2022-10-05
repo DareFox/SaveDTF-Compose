@@ -5,8 +5,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kmtt.models.enums.Website
 import kotlinx.coroutines.runBlocking
-import logic.ktor.Client
-import logic.ktor.rateRequest
+import shared.ktor.Client
+import shared.ktor.rateRequest
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ui.i18n.Lang

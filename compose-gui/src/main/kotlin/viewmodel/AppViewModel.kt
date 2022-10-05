@@ -5,11 +5,11 @@ import io.ktor.http.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import logic.Version
-import logic.ktor.Client
-import logic.ktor.rateRequest
+import shared.Version
+import shared.ktor.Client
+import shared.ktor.rateRequest
 import me.darefox.compose_gui.BuildConfig
-import util.string.toVersionOrNull
+import shared.util.string.toVersionOrNull
 
 object AppViewModel {
     const val VERSION = BuildConfig.APP_SEMANTIC_VERSION

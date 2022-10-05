@@ -35,8 +35,8 @@ import ui.composables.directoryDialog
 import ui.i18n.AvailableLanguages
 import ui.i18n.Lang
 import ui.theme.CustomPallet
-import util.desktop.openUrl
-import util.logs.openLogsFolder
+import shared.util.desktop.openUrl
+import shared.util.logs.openLogsFolder
 import viewmodel.SettingsViewModel
 
 @Composable

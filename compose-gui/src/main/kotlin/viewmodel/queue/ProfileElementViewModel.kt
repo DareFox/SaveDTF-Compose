@@ -7,7 +7,7 @@ import kmtt.models.subsite.Subsite
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ui.i18n.Lang
-import util.kmttapi.betterPublicKmtt
+import shared.util.kmttapi.betterPublicKmtt
 
 interface IProfileElementViewModel : IQueueElementViewModel {
     val site: Website

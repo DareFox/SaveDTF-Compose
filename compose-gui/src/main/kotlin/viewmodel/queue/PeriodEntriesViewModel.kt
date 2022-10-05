@@ -4,10 +4,10 @@ import exception.errorOnNull
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kmtt.models.enums.Website
-import logic.ktor.Client
-import logic.ktor.rateRequest
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import shared.ktor.Client
+import shared.ktor.rateRequest
 import ui.i18n.Lang
 
 interface IPeriodEntriesViewModel : IQueueElementViewModel {

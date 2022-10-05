@@ -3,6 +3,7 @@ package util.range
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import shared.util.range.size
 
 internal class SizeKtTest {
     @Test

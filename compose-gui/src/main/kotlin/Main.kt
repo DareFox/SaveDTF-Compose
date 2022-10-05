@@ -14,7 +14,7 @@ import ui.composables.CheckVersion
 import ui.composables.InfoPopupColumn
 import ui.i18n.Lang
 import ui.menus.NotificationsUI
-import util.desktop.openUrl
+import shared.util.desktop.openUrl
 import util.getCrashLogReport
 import java.awt.Toolkit
 import java.awt.Window

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import me.darefox.compose_gui.BuildConfig
 import ui.SaveDtfTheme
 import ui.i18n.Lang
-import util.string.repeatOrEmpty
+import shared.util.string.repeatOrEmpty
 import viewmodel.AppViewModel
 
 @Composable

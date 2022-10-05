@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import logic.Version
+import shared.Version
 import mu.KotlinLogging
 import ui.i18n.Lang
 import viewmodel.AppViewModel

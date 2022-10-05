@@ -5,8 +5,8 @@ import kmtt.models.entry.Entry
 import kmtt.models.enums.Website
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import util.kmttapi.KmttUrl
-import util.kmttapi.betterPublicKmtt
+import shared.util.kmttapi.KmttUrl
+import shared.util.kmttapi.betterPublicKmtt
 import java.io.File
 
 interface IEntryQueueElementViewModel : IQueueElementViewModel {

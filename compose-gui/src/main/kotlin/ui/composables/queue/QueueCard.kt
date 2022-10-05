@@ -32,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ui.animations.pulseColor
 import ui.i18n.Lang
-import util.desktop.openFileInDefaultApp
+import shared.util.desktop.openFileInDefaultApp
 import viewmodel.queue.*
 import viewmodel.queue.IQueueElementViewModel.Status
 import java.io.File

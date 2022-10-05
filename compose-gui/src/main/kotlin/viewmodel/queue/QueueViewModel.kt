@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import mu.KotlinLogging
-import util.kmttapi.KmttRegex
-import util.kmttapi.KmttUrl
-import util.kmttapi.KmttUrl.getWebsiteType
+import shared.util.kmttapi.KmttRegex
+import shared.util.kmttapi.KmttUrl
+import shared.util.kmttapi.KmttUrl.getWebsiteType
 import viewmodel.DebugQueueViewModel
 import viewmodel.SettingsViewModel
 
