@@ -1,4 +1,4 @@
-package logic.shared
+package shared
 
 /**
  * Class that represents [semantic versioning](https://semver.org)
