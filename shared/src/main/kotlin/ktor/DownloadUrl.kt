@@ -10,7 +10,7 @@ import kotlinx.coroutines.*
 import logic.cache.buildCache
 import logic.document.operations.media.BinaryMedia
 import mu.KotlinLogging
-import ui.i18n.Lang
+import i18n.Lang
 import util.string.sha256
 import java.io.File
 import java.io.InputStream
@@ -122,9 +122,9 @@ private suspend fun download(
         // If retryAmount is 0 or less, repeat request infinitely until success
         if (retryAmount in 1..attemptCounter) {
             if (response == null) {
-                logger.error(caught.exceptionOrNull() ?: RuntimeException(Lang.value.ktorServerNoResponse))
+                logger.error(caught.exceptionOrNull() ?: RuntimeException(Lang.ktorServerNoResponse))
             } else {
-                logger.error(IllegalArgumentException(Lang.value.ktorErrorResponseStatus.format(response.status)))
+                logger.error(IllegalArgumentException(Lang.ktorErrorResponseStatus.format(response.status)))
             }
 
             return replaceOnError?.binary?.inputStream()
