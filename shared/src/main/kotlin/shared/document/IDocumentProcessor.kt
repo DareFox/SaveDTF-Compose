@@ -21,7 +21,7 @@ interface IDocumentProcessor : IProgress {
      *  @see clearOperationsQueue
      *  @see replaceQueueWith
      */
-    val operationsQueue: List<IProcessorOperation>
+    val operationsQueue: Set<IProcessorOperation>
 
     /**
      *  Process/transform document by [operations queue][operationsQueue]
@@ -57,5 +57,5 @@ interface IDocumentProcessor : IProgress {
     /**
      * Remove all previous operations and replace it with new given operations queue
      */
-    fun replaceQueueWith(operations: List<IProcessorOperation>)
+    fun replaceQueueWith(operations: Set<IProcessorOperation>)
 }

@@ -1,5 +1,6 @@
 package shared.document
 
+import kmtt.models.entry.Entry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.yield
@@ -14,22 +15,15 @@ import java.io.File
  * Process document by using [operations queue][operationsQueue]
  */
 class DocumentProcessor(
-    document: Document,
+    override val document: Document,
     override val saveFolder: File,
-    operations: List<IProcessorOperation> = listOf(),
+    operations: Set<IProcessorOperation> = setOf(),
 ) : AbstractProgress(), IDocumentProcessor {
     private val scope = CoroutineScope(Dispatchers.Default)
     private val logger = KotlinLogging.logger { }
 
-    private var _document: Document = document
-
-    // read-only for public usage
-    override val document: Document
-        get() = _document
-
-
     // private mutable queue
-    private var _operationsQueue: MutableList<IProcessorOperation> = operations.toMutableList()
+    private var _operationsQueue: MutableSet<IProcessorOperation> = operations.toMutableSet()
 
     /**
      *  Collection of [operations][IProcessorOperation] that used as queue for [transforming. processing][process] document.
@@ -42,7 +36,7 @@ class DocumentProcessor(
      *  @see clearOperationsQueue
      *  @see replaceQueueWith
      */
-    override val operationsQueue: List<IProcessorOperation>
+    override val operationsQueue: Set<IProcessorOperation>
         get() = _operationsQueue
 
     /**
@@ -58,7 +52,6 @@ class DocumentProcessor(
             logger.debug { "Processing document with ${operation::class.simpleName}" }
             val progressJob = operation.redirectTo(mutableProgress)
             progressJob.cancelOnSuspendEnd {
-                document = operation.process(document)
             }
         }
 
@@ -111,8 +104,8 @@ class DocumentProcessor(
     /**
      * Remove all previous operations and replace it with new given operations queue
      */
-    override fun replaceQueueWith(operations: List<IProcessorOperation>) {
+    override fun replaceQueueWith(operations: Set<IProcessorOperation>) {
         clearOperationsQueue()
-        _operationsQueue = operations.toMutableList()
+        _operationsQueue = operations.toMutableSet()
     }
 }
