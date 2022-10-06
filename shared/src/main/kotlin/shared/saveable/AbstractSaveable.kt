@@ -106,7 +106,7 @@ abstract class AbstractSaveable(
      * Implementation of [initializeAsync]. This method will have exception handling,
      * meaning exception will be caught, printed to [lastErrorMessage] and operation will be cancelled
      */
-    abstract suspend fun initializeImpl()
+    protected abstract suspend fun initializeImpl()
 
     override fun saveAsync(): Deferred<Throwable?>? {
         return when {
@@ -133,7 +133,7 @@ abstract class AbstractSaveable(
      * Implementation of [saveAsync]. This method will have exception handling,
      * meaning exception will be caught, printed to [lastErrorMessage] and operation will be cancelled
      */
-    abstract suspend fun saveImpl()
+    protected abstract suspend fun saveImpl()
 
     /**
      * Run suspending block and catch exceptions.
