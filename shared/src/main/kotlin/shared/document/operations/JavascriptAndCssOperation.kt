@@ -1,5 +1,6 @@
 package shared.document.operations
 
+import kmtt.models.entry.Entry
 import shared.document.AbstractProcessorOperation
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -10,7 +11,7 @@ object JavascriptAndCssOperation : AbstractProcessorOperation() {
     override val name: String
         get() = "JS & CSS"
 
-    override suspend fun process(document: Document): Document {
+    override suspend fun process(document: Document, entry: Entry?): Document {
         val wrapper = document
             .getElementsByClass("savedtf-insert-here")
             .first()

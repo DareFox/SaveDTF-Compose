@@ -17,13 +17,17 @@ import shared.util.kmttapi.betterPublicKmtt
 import java.io.File
 import java.io.IOException
 
-class SaveMetadata(val entry: Entry, val folder: File) : AbstractProcessorOperation() {
+class SaveMetadata(val folder: File) : AbstractProcessorOperation() {
     private val logger = KotlinLogging.logger { }
     private var cachedComments: List<Comment>? = null
     override val name: String
         get() = Lang.saveMetadataOperation
     private val cacheListeners = mutableListOf<(List<Comment>) -> Unit>()
-    override suspend fun process(document: Document): Document {
+    override suspend fun process(document: Document, entry: Entry?): Document {
+        if (entry == null) {
+            return document
+        }
+
         val website = document.getWebsite()
         val id = entry.id
 

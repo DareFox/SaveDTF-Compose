@@ -27,7 +27,7 @@ import shared.util.random.RGB
 import shared.util.random.offsetRandomColor
 import shared.util.random.randomColor
 
-class SaveCommentsOperation(val entry: Entry) : AbstractProcessorOperation() {
+class SaveCommentsOperation : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.saveCommentsOperation
     private val colorRange = 50..255
@@ -36,7 +36,11 @@ class SaveCommentsOperation(val entry: Entry) : AbstractProcessorOperation() {
     private val maxLayerHideOffset = 10
     private val cacheListeners = mutableListOf<(List<Comment>) -> Unit>()
     private var cachedComments: List<Comment>? = null
-    override suspend fun process(document: Document): Document {
+    override suspend fun process(document: Document, entry: Entry?): Document {
+        if (entry == null) {
+            return document;
+        }
+
         val layerLevel = MutableStateFlow(0)
         val website = document.getWebsite() ?: return document
 

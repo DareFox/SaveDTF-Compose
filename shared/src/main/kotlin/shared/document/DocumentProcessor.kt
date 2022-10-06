@@ -16,6 +16,7 @@ import java.io.File
  */
 class DocumentProcessor(
     override val document: Document,
+    val entry: Entry?,
     override val saveFolder: File,
     operations: Set<IProcessorOperation> = setOf(),
 ) : AbstractProgress(), IDocumentProcessor {
@@ -52,6 +53,7 @@ class DocumentProcessor(
             logger.debug { "Processing document with ${operation::class.simpleName}" }
             val progressJob = operation.redirectTo(mutableProgress)
             progressJob.cancelOnSuspendEnd {
+                document = operation.process(document, entry)
             }
         }
 

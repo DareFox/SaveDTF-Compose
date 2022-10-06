@@ -10,11 +10,11 @@ import shared.i18n.Lang
 /**
  * Change title to SaveDTF
  */
-class ChangeTitleOperation(val entry: Entry? = null) : AbstractProcessorOperation() {
+class ChangeTitleOperation() : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.titleOperation
 
-    override suspend fun process(document: Document): Document {
+    override suspend fun process(document: Document, entry: Entry?): Document {
         withProgress(Lang.titleOperationProgress) {
             document.head().getElementsByTag("title").first()?.text("SaveDTF")
             // If title is not null, then use entry title as html title,

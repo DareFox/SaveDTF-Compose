@@ -1,5 +1,6 @@
 package shared.document
 
+import kmtt.models.entry.Entry
 import kotlinx.coroutines.flow.StateFlow
 import shared.abstracts.AbstractProgress
 import shared.abstracts.IProgress
@@ -25,7 +26,7 @@ sealed interface IProcessorOperation : IProgress {
     /**
      *  Process given document and output a new one
      */
-    suspend fun process(document: Document): Document
+    suspend fun process(document: Document, entry: Entry?): Document
 }
 
 /**
