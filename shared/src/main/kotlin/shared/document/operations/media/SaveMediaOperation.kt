@@ -11,6 +11,7 @@ import shared.ktor.Client
 import shared.ktor.downloadUrl
 import mu.KotlinLogging
 import org.jsoup.nodes.Document
+import shared.document.operations.OperationArguments
 import shared.i18n.Lang
 import java.io.File
 
@@ -26,7 +27,10 @@ class SaveMediaOperation(
 ) : AbstractProcessorOperation() {
     override val name: String = Lang.saveMediaOperation
     private val logger = KotlinLogging.logger { }
-    override suspend fun process(document: Document): Document {
+    override suspend fun process(arguments: OperationArguments): Document {
+        val entry = arguments.entry
+        val document = arguments.document
+
         for (moduleIgnorePair in downloaderModules) {
             val downloader = moduleIgnorePair.first
             val doNotDownloadURL = !moduleIgnorePair.second

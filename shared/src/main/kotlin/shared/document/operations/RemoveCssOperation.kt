@@ -12,7 +12,10 @@ object RemoveCssOperation : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.cssRemoveOperation
 
-    override suspend fun process(document: Document, entry: Entry?): Document {
+    override suspend fun process(arguments: OperationArguments): Document {
+        val entry = arguments.entry
+        val document = arguments.document
+
         document.getElementsByTag("style").forEachIndexed { index, cssElement ->
             withProgress(Lang.removedStyleTag.format(index)) {
                 cssElement.remove()

@@ -14,7 +14,10 @@ class ChangeTitleOperation() : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.titleOperation
 
-    override suspend fun process(document: Document, entry: Entry?): Document {
+    override suspend fun process(arguments: OperationArguments): Document {
+        val entry = arguments.entry
+        val document = arguments.document
+
         withProgress(Lang.titleOperationProgress) {
             document.head().getElementsByTag("title").first()?.text("SaveDTF")
             // If title is not null, then use entry title as html title,

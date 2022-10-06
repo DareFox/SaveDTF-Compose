@@ -36,7 +36,10 @@ class SaveCommentsOperation : AbstractProcessorOperation() {
     private val maxLayerHideOffset = 10
     private val cacheListeners = mutableListOf<(List<Comment>) -> Unit>()
     private var cachedComments: List<Comment>? = null
-    override suspend fun process(document: Document, entry: Entry?): Document {
+    override suspend fun process(arguments: OperationArguments): Document {
+        val entry = arguments.entry
+        val document = arguments.document
+
         if (entry == null) {
             return document;
         }

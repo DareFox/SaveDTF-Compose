@@ -11,7 +11,10 @@ object JavascriptAndCssOperation : AbstractProcessorOperation() {
     override val name: String
         get() = "JS & CSS"
 
-    override suspend fun process(document: Document, entry: Entry?): Document {
+    override suspend fun process(arguments: OperationArguments): Document {
+        val entry = arguments.entry
+        val document = arguments.document
+
         val wrapper = document
             .getElementsByClass("savedtf-insert-here")
             .first()

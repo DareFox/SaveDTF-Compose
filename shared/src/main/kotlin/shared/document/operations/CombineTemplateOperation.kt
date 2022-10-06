@@ -11,7 +11,10 @@ object CombineTemplateOperation : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.templateHtmlOperation
 
-    override suspend fun process(document: Document, entry: Entry?): Document {
+    override suspend fun process(arguments: OperationArguments): Document {
+        val entry = arguments.entry
+        val document = arguments.document
+
         val template = withProgressSuspend(Lang.readingHtmlTemplate) {
             readResource("templates/entry.html").readText()
         }

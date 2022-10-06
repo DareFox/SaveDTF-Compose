@@ -26,7 +26,7 @@ sealed interface IProcessorOperation : IProgress {
     /**
      *  Process given document and output a new one
      */
-    suspend fun process(document: Document, entry: Entry?): Document
+    suspend fun process(arguments: OperationArguments): Document
 }
 
 /**

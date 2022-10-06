@@ -1,9 +1,9 @@
 package shared.document.operations.format
 
-import kmtt.models.entry.Entry
 import shared.document.AbstractProcessorOperation
 import shared.document.operations.format.modules.*
 import org.jsoup.nodes.Document
+import shared.document.operations.OperationArguments
 import shared.i18n.Lang
 
 /**
@@ -13,8 +13,8 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.htmlFormatOperation
 
-    override suspend fun process(document: Document, entry: Entry?): Document {
-        var result = document
+    override suspend fun process(arguments: OperationArguments): Document {
+        var document = arguments.document
 
         val operations = listOf<IHtmlFormatModule>(
             FormatSeparatorModule,
@@ -27,10 +27,10 @@ object FormatHtmlOperation : AbstractProcessorOperation() {
         )
 
         operations.forEach {
-            result = it.process(result)
+            document = it.process(document)
         }
 
-        return result
+        return document
     }
 }
 

@@ -7,6 +7,7 @@ import kotlinx.coroutines.yield
 import shared.abstracts.AbstractProgress
 import mu.KotlinLogging
 import org.jsoup.nodes.Document
+import shared.document.operations.OperationArguments
 import shared.util.coroutine.cancelOnSuspendEnd
 import shared.util.progress.redirectTo
 import java.io.File
@@ -53,7 +54,7 @@ class DocumentProcessor(
             logger.debug { "Processing document with ${operation::class.simpleName}" }
             val progressJob = operation.redirectTo(mutableProgress)
             progressJob.cancelOnSuspendEnd {
-                document = operation.process(document, entry)
+                document = operation.process(OperationArguments(document, entry, saveFolder))
             }
         }
 
