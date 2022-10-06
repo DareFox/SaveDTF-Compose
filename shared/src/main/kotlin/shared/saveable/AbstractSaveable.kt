@@ -47,12 +47,6 @@ abstract class AbstractSaveable(
 ) : ISaveable {
     private val internalLogger = KotlinLogging.logger { }
     protected val logger = KotlinLogging.logger(emptyLambda)
-
-    /**
-     * Get current [SettingsViewModel.folderToSave].
-     *
-     * @throws QueueElementException if [SettingsViewModel.folderToSave] is null
-     * */
     protected val baseSaveFolder: File = folderToSave
 
     protected val lang: LanguageResource
