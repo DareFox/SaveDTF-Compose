@@ -10,7 +10,7 @@ import shared.i18n.Lang
 /**
  * Change title to SaveDTF
  */
-class ChangeTitleOperation() : AbstractProcessorOperation() {
+object ChangeTitleOperation : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.titleOperation
 

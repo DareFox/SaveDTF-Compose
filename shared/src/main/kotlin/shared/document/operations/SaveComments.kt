@@ -27,7 +27,7 @@ import shared.util.random.RGB
 import shared.util.random.offsetRandomColor
 import shared.util.random.randomColor
 
-class SaveCommentsOperation : AbstractProcessorOperation() {
+object SaveCommentsOperation : AbstractProcessorOperation() {
     override val name: String
         get() = Lang.saveCommentsOperation
     private val colorRange = 50..255

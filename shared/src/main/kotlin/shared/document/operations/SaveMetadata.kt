@@ -17,7 +17,7 @@ import shared.util.kmttapi.betterPublicKmtt
 import java.io.File
 import java.io.IOException
 
-class SaveMetadata() : AbstractProcessorOperation() {
+object SaveMetadata : AbstractProcessorOperation() {
     private val logger = KotlinLogging.logger { }
     private var cachedComments: List<Comment>? = null
     override val name: String
