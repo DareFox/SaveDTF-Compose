@@ -5,11 +5,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import shared.saveable.IProfileSaveable
 import shared.saveable.ISaveable
-import ui.i18n.Lang
+import shared.i18n.Lang
 
 @Composable
 fun ProfileCard(viewModel: IProfileSaveable, actionBar: List<ActionBarElement> = listOf()) {
-    val lang by Lang.collectAsState()
+    val lang by shared.i18n.LangState.collectAsState()
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
     val author by viewModel.user.collectAsState()

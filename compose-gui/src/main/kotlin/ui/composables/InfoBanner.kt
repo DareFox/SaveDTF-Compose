@@ -20,7 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import me.darefox.compose_gui.BuildConfig
 import ui.SaveDtfTheme
-import ui.i18n.Lang
+import shared.i18n.Lang
 import shared.util.string.repeatOrEmpty
 import viewmodel.AppViewModel
 
@@ -38,7 +38,7 @@ fun InfoBanner() {
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colors.background
     ) {
-        val langState by Lang.collectAsState()
+        val langState by shared.i18n.LangState.collectAsState()
         Row(
             modifier = Modifier.padding(20.dp, 23.dp),
             verticalAlignment = Alignment.CenterVertically

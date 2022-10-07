@@ -5,12 +5,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import shared.saveable.IAllEntriesSaveable
 import shared.saveable.ISaveable
-import ui.i18n.Lang
+import shared.i18n.Lang
 @Composable
 fun AllWebsiteCard(viewModel: IAllEntriesSaveable, actionBar: List<ActionBarElement> = listOf()) {
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
-    val lang by Lang.collectAsState()
+    val lang by shared.i18n.LangState
 
     SimpleCard(
         viewModel = viewModel,

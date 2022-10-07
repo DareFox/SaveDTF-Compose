@@ -5,7 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import shared.saveable.IPeriodEntriesSaveable
 import shared.saveable.ISaveable
-import ui.i18n.Lang
+import shared.i18n.Lang
 import shared.util.kmttapi.KmttUrl
 
 @Composable
@@ -13,7 +13,7 @@ fun PeriodEntriesCard(viewModel: IPeriodEntriesSaveable, actionBar: List<ActionB
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
     val url = viewModel.periodSitemapLink
-    val lang by Lang.collectAsState()
+    val lang by shared.i18n.LangState.collectAsState()
 
     val period = KmttUrl.extractPeriodAndFormat(url) ?: KmttUrl.extractPeriod(url) ?: url
 

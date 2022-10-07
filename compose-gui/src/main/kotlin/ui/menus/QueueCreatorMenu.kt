@@ -22,7 +22,7 @@ import ui.SaveDtfTheme
 import ui.composables.FancyButton
 import ui.composables.FancyInputField
 import ui.composables.queue.QueueList
-import ui.i18n.Lang
+import shared.i18n.Lang
 import viewmodel.NotificationData
 import viewmodel.NotificationType
 import viewmodel.NotificationsViewModel
@@ -50,7 +50,7 @@ fun QueueCreatorMenu() {
 
             val hasFolder by SettingsViewModel.folderToSave.collectAsState()
             val supported = queueVM.canCreateQueueElement(input)
-            val lang by Lang.collectAsState()
+            val lang by shared.i18n.LangState.collectAsState()
             val errorMessage = when {
                 hasFolder == null -> lang.queueCreatorFolderError
                 input.isNotEmpty() && !supported -> lang.queueCreatorInvalidURL

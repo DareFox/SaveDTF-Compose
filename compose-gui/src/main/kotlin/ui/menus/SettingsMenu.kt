@@ -32,17 +32,17 @@ import compose.icons.feathericons.EyeOff
 import ui.composables.CheckVersion
 import ui.composables.FancyButton
 import ui.composables.directoryDialog
-import ui.i18n.AvailableLanguages
-import ui.i18n.Lang
+import shared.i18n.LangState
+import shared.i18n.langs.AvailableLanguages
 import ui.theme.CustomPallet
 import shared.util.desktop.openUrl
-import shared.util.logs.openLogsFolder
+import util.logs.openLogsFolder
 import viewmodel.SettingsViewModel
 
 @Composable
 fun SettingsMenu() {
     val categories = mutableListOf<@Composable () -> Unit>()
-    val lang by Lang.collectAsState()
+    val lang by LangState.collectAsState()
 
     categories += {
         SettingsCategory(lang.settingsCategoryApp) {
@@ -440,7 +440,7 @@ fun SettingsTextField(
                 VisualTransformation.None
             }
 
-            val lang by Lang.collectAsState()
+            val lang by shared.i18n.LangState.collectAsState()
 
             OutlinedTextField(
                 enabled = onFieldClick == null,

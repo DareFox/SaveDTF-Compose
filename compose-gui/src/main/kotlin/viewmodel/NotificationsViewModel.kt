@@ -35,8 +35,6 @@ object NotificationsViewModel {
                 it
             }
         }
-
-
     }
 
     fun remove(notification: NotificationData) {
@@ -97,3 +95,4 @@ data class NotificationData(val text: String, val type: NotificationType, val on
 enum class NotificationType {
     ERROR, INFO, SUCCESS
 }
+

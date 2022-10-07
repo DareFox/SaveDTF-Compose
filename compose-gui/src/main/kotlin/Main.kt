@@ -12,7 +12,7 @@ import ui.AppUI
 import ui.SaveDtfTheme
 import ui.composables.CheckVersion
 import ui.composables.InfoPopupColumn
-import ui.i18n.Lang
+import shared.i18n.Lang
 import ui.menus.NotificationsUI
 import shared.util.desktop.openUrl
 import util.getCrashLogReport
@@ -84,18 +84,18 @@ private fun ComposeCrashMenu(ex: Throwable) {
     }
 
     val actions = mutableListOf<Pair<String, () -> Unit>>().also {
-        it.add(Lang.value.crashReportCopyLogsAndReport to {
+        it.add(Lang.crashReportCopyLogsAndReport to {
             copyLogToClipboard()
-            openUrl(Lang.value.crashReportURL)
+            openUrl(Lang.crashReportURL)
         })
 
-        it.add(Lang.value.crashReportCopyLogs to ::copyLogToClipboard)
+        it.add(Lang.crashReportCopyLogs to ::copyLogToClipboard)
     }
 
     application {
         SaveDtfTheme(true) {
             if (show) {
-                InfoPopupColumn(Lang.value.crashReportTitle, Lang.value.crashReportDescription, {
+                InfoPopupColumn(Lang.crashReportTitle, Lang.crashReportDescription, {
                     show = false
                 }, actions)
             }

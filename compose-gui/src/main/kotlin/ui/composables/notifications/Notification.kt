@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.X
-import ui.i18n.Lang
+import shared.i18n.Lang
 import ui.theme.CustomPallet
 import viewmodel.NotificationData
 import viewmodel.NotificationType
@@ -52,7 +52,7 @@ fun Notification(
     onClose: () -> Unit,
     composable: @Composable () -> Unit,
 ) {
-    val lang by Lang.collectAsState()
+    val lang by shared.i18n.LangState.collectAsState()
     val shape = RoundedCornerShape(30)
 
     Surface(

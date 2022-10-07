@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import ui.i18n.Lang
+import shared.i18n.Lang
 
 @Composable
 fun EmptyQueueList() {
@@ -22,7 +22,7 @@ fun EmptyQueueList() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxHeight()
     ) {
-        val lang by Lang.collectAsState()
+        val lang by shared.i18n.LangState.collectAsState()
 
         Text(
             text = lang.emptyQueueList,

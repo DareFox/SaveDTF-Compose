@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import shared.saveable.*
 import shared.saveable.ISaveable.Status
 import ui.animations.pulseColor
-import ui.i18n.Lang
+import shared.i18n.Lang
 import shared.util.desktop.openFileInDefaultApp
 import java.io.File
 
@@ -277,7 +277,7 @@ fun QueueCard(
                     }
 
                     val buttons = actionBar.toMutableList()
-                    val lang by Lang.collectAsState()
+                    val lang by shared.i18n.LangState.collectAsState()
                     val job by viewModel.currentJob.collectAsState()
 
                     if (job?.isActive == true) {

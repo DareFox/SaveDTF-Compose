@@ -10,7 +10,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import shared.Version
 import mu.KotlinLogging
-import ui.i18n.Lang
+import shared.i18n.Lang
 import viewmodel.AppViewModel
 import viewmodel.SettingsViewModel
 import java.awt.Desktop
@@ -20,7 +20,7 @@ private val logger = KotlinLogging.logger { }
 
 @Composable
 fun CheckVersion(forced: Boolean = false) {
-    val lang by Lang.collectAsState()
+    val lang by shared.i18n.LangState.collectAsState()
     var showPopup by remember { mutableStateOf(false) }
     var lastVersion: Version? by remember { mutableStateOf(null) }
     val ignoreUpdates by SettingsViewModel.ignoreUpdate.collectAsState()

@@ -10,14 +10,14 @@ import androidx.compose.ui.Modifier
 import ui.composables.InfoBanner
 import ui.composables.TextBarElement
 import ui.composables.TextNavBar
-import ui.i18n.Lang
+import shared.i18n.Lang
 import ui.menus.QueueCreatorMenu
 import ui.menus.SettingsMenu
 
 @Composable
 fun AppUI() {
     Surface(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
-        val lang by Lang.collectAsState()
+        val lang by shared.i18n.LangState.collectAsState()
         var navbarElement by remember { mutableStateOf(NavBar.DOWNLOAD_MENU) }
         var navbarIndex by remember { mutableStateOf(0) }
 
