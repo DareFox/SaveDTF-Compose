@@ -1,4 +1,4 @@
-package shared.util.logs
+package util.logs
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.core.FileAppender

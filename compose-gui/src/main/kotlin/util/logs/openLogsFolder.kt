@@ -1,4 +1,4 @@
-package shared.util.logs
+package util.logs
 
 import shared.util.desktop.openFileInDefaultApp
 

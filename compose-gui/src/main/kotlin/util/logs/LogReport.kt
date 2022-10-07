@@ -3,7 +3,7 @@ package util
 import kmtt.models.enums.Website
 import me.darefox.compose_gui.BuildConfig
 import mu.KotlinLogging
-import shared.util.logs.getCurrentLogFile
+import util.logs.getCurrentLogFile
 import viewmodel.SettingsViewModel
 
 private val logger = KotlinLogging.logger { }
