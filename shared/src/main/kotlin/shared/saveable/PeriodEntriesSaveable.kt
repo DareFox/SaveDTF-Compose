@@ -6,14 +6,13 @@ import io.ktor.client.statement.*
 import kmtt.models.enums.Website
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import shared.document.IDocumentProcessor
 import shared.document.IProcessorOperation
 import shared.ktor.Client
 import shared.ktor.rateRequest
 import shared.i18n.Lang
 import java.io.File
 
-interface IPeriodEntriesViewModel : ISaveable {
+interface IPeriodEntriesSaveable : ISaveable {
     val periodSitemapLink: String
     val site: Website
 }
@@ -25,7 +24,7 @@ class PeriodEntriesSaveable(
     entryTimeoutInSeconds: Int,
     operations: Set<IProcessorOperation>,
     folderToSave: File,
-) : AllEntriesSaveable(site, apiTimeoutInSeconds, entryTimeoutInSeconds, operations, folderToSave), IPeriodEntriesViewModel {
+) : AllEntriesSaveable(site, apiTimeoutInSeconds, entryTimeoutInSeconds, operations, folderToSave), IPeriodEntriesSaveable {
     private var sitemapPeriodDoc: Document? = null
 
     override suspend fun initializeImpl() {

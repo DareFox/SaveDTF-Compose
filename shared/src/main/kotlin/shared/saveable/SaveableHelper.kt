@@ -23,7 +23,7 @@ class SaveableHelper(
     /**
      * Operations to be applied when creating [ISaveable] objects
      */
-    val operations: MutableSet<IProcessorOperation> = operations.toMutableSet();
+    var operations: MutableSet<IProcessorOperation> = operations.toMutableSet();
 
     /**
      * Create [AllEntriesSaveable] with predefined [SaveableHelper] arguments

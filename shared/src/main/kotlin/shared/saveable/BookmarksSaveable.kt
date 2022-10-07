@@ -3,12 +3,11 @@ package shared.saveable
 import exception.QueueElementException
 import kmtt.impl.authKmtt
 import kmtt.models.enums.Website
-import shared.document.IDocumentProcessor
 import shared.document.IProcessorOperation
 import shared.i18n.Lang
 import java.io.File
 
-interface IBookmarksElementViewModel : ISaveable {
+interface IBookmarksSaveable : ISaveable {
     val site: Website
 }
 
@@ -25,7 +24,7 @@ class BookmarksSaveable(
     entryTimeoutInSeconds = entryTimeoutInSeconds,
     operations = operations,
     folderToSave = folderToSave
-), IBookmarksElementViewModel {
+), IBookmarksSaveable {
     private var client = authKmtt(site, token)
     override suspend fun initializeImpl() {
         // if token updates we should recreate api client

@@ -6,13 +6,12 @@ import kmtt.models.enums.Website
 import kmtt.models.subsite.Subsite
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import shared.document.IDocumentProcessor
 import shared.document.IProcessorOperation
 import shared.i18n.Lang
 import shared.util.kmttapi.betterPublicKmtt
 import java.io.File
 
-interface IProfileElementViewModel : ISaveable {
+interface IProfileSaveable : ISaveable {
     val site: Website
     val user: StateFlow<Subsite?>
     val id: Long
@@ -31,7 +30,7 @@ class ProfileSaveable(
     entryTimeoutInSeconds = entryTimeoutInSeconds,
     operations = operations,
     folderToSave = folderToSave
-), IProfileElementViewModel {
+), IProfileSaveable {
     private val _user = MutableStateFlow<Subsite?>(null)
     override val user: StateFlow<Subsite?> = _user
     override suspend fun initializeImpl() {
