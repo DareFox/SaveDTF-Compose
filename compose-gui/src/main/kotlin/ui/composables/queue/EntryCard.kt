@@ -3,12 +3,12 @@ package ui.composables.queue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import shared.saveable.IEntrySaveable
+import shared.saveable.ISaveable
 import ui.i18n.Lang
-import viewmodel.queue.IEntryQueueElementViewModel
-import viewmodel.queue.IQueueElementViewModel
 
 @Composable
-fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
+fun EntryCard(viewModel: IEntrySaveable, actionBar: List<ActionBarElement> = listOf()) {
     val entry by viewModel.entry.collectAsState()
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
@@ -32,7 +32,7 @@ fun EntryCard(viewModel: IEntryQueueElementViewModel, actionBar: List<ActionBarE
         title = title,
         author = author,
         status = status,
-        error = if (status == IQueueElementViewModel.Status.ERROR) error else null,
+        error = if (status == ISaveable.Status.ERROR) error else null,
         website = website
     )
 }

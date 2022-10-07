@@ -30,34 +30,34 @@ import kmtt.models.enums.Website
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import shared.saveable.*
+import shared.saveable.ISaveable.Status
 import ui.animations.pulseColor
 import ui.i18n.Lang
 import shared.util.desktop.openFileInDefaultApp
-import viewmodel.queue.*
-import viewmodel.queue.IQueueElementViewModel.Status
 import java.io.File
 
 data class ActionBarElement(
     val icon: ImageVector,
     val description: String,
-    val onClickCallback: (IQueueElementViewModel) -> Unit,
+    val onClickCallback: (ISaveable) -> Unit,
 )
 
 @Composable
-fun QueueCard(viewModel: IQueueElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
+fun QueueCard(viewModel: ISaveable, actionBar: List<ActionBarElement> = listOf()) {
     when (viewModel) {
-        is IBookmarksElementViewModel -> BookmarksCard(viewModel, actionBar)
-        is IEntryQueueElementViewModel -> EntryCard(viewModel, actionBar)
-        is IProfileElementViewModel -> ProfileCard(viewModel, actionBar)
-        is IPeriodEntriesViewModel -> PeriodEntriesCard(viewModel, actionBar)
-        is IAllEntriesViewModel -> AllWebsiteCard(viewModel, actionBar)
+        is IBookmarksSaveable -> BookmarksCard(viewModel, actionBar)
+        is IEntrySaveable -> EntryCard(viewModel, actionBar)
+        is IProfileSaveable -> ProfileCard(viewModel, actionBar)
+        is IPeriodEntriesSaveable -> PeriodEntriesCard(viewModel, actionBar)
+        is IAllEntriesSaveable -> AllWebsiteCard(viewModel, actionBar)
         else -> {}
     }
 }
 
 @Composable
 fun SimpleCard(
-    viewModel: IQueueElementViewModel,
+    viewModel: ISaveable,
     actionBar: List<ActionBarElement> = listOf(),
     title: String,
     author: String,
@@ -158,7 +158,7 @@ fun SimpleCard(
 
 @Composable
 fun QueueCard(
-    viewModel: IQueueElementViewModel,
+    viewModel: ISaveable,
     actionBar: List<ActionBarElement> = listOf(),
     title: String,
     author: String,

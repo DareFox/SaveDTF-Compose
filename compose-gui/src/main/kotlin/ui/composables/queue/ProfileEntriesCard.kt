@@ -3,12 +3,12 @@ package ui.composables.queue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import shared.saveable.IProfileSaveable
+import shared.saveable.ISaveable
 import ui.i18n.Lang
-import viewmodel.queue.IProfileElementViewModel
-import viewmodel.queue.IQueueElementViewModel
 
 @Composable
-fun ProfileCard(viewModel: IProfileElementViewModel, actionBar: List<ActionBarElement> = listOf()) {
+fun ProfileCard(viewModel: IProfileSaveable, actionBar: List<ActionBarElement> = listOf()) {
     val lang by Lang.collectAsState()
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
@@ -27,7 +27,7 @@ fun ProfileCard(viewModel: IProfileElementViewModel, actionBar: List<ActionBarEl
         title = title,
         author = viewModel.site.name,
         status = status,
-        error = if (status == IQueueElementViewModel.Status.ERROR) error else null,
+        error = if (status == ISaveable.Status.ERROR) error else null,
         website = viewModel.site
     )
 }

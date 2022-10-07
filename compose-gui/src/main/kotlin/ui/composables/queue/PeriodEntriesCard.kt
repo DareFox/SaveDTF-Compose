@@ -3,13 +3,13 @@ package ui.composables.queue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import shared.saveable.IPeriodEntriesSaveable
+import shared.saveable.ISaveable
 import ui.i18n.Lang
 import shared.util.kmttapi.KmttUrl
-import viewmodel.queue.IPeriodEntriesViewModel
-import viewmodel.queue.IQueueElementViewModel
 
 @Composable
-fun PeriodEntriesCard(viewModel: IPeriodEntriesViewModel, actionBar: List<ActionBarElement> = listOf()) {
+fun PeriodEntriesCard(viewModel: IPeriodEntriesSaveable, actionBar: List<ActionBarElement> = listOf()) {
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
     val url = viewModel.periodSitemapLink
@@ -23,7 +23,7 @@ fun PeriodEntriesCard(viewModel: IPeriodEntriesViewModel, actionBar: List<Action
         title = lang.periodEntriesVmCardTitle.format(period),
         author = viewModel.site.name,
         status = status,
-        error = if (status == IQueueElementViewModel.Status.ERROR) error else null,
+        error = if (status == ISaveable.Status.ERROR) error else null,
         website = viewModel.site
     )
 }

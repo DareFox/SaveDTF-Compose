@@ -3,12 +3,11 @@ package ui.composables.queue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import shared.saveable.IAllEntriesSaveable
+import shared.saveable.ISaveable
 import ui.i18n.Lang
-import viewmodel.queue.IAllEntriesViewModel
-import viewmodel.queue.IQueueElementViewModel
-
 @Composable
-fun AllWebsiteCard(viewModel: IAllEntriesViewModel, actionBar: List<ActionBarElement> = listOf()) {
+fun AllWebsiteCard(viewModel: IAllEntriesSaveable, actionBar: List<ActionBarElement> = listOf()) {
     val status by viewModel.status.collectAsState()
     val error by viewModel.lastErrorMessage.collectAsState()
     val lang by Lang.collectAsState()
@@ -19,7 +18,7 @@ fun AllWebsiteCard(viewModel: IAllEntriesViewModel, actionBar: List<ActionBarEle
         title = lang.allEntriesVmCardTitle,
         author = viewModel.site.name,
         status = status,
-        error = if (status == IQueueElementViewModel.Status.ERROR) error else null,
+        error = if (status == ISaveable.Status.ERROR) error else null,
         website = viewModel.site
     )
 }
