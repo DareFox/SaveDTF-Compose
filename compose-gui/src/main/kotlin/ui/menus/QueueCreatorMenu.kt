@@ -1,5 +1,6 @@
 package ui.menus
 
+import Downloader
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.*
 import kmtt.models.enums.Website
 import kotlinx.coroutines.launch
+import shared.saveable.ISaveable.Status
 import ui.SaveDtfTheme
 import ui.composables.FancyButton
 import ui.composables.FancyInputField
@@ -25,8 +27,6 @@ import viewmodel.NotificationData
 import viewmodel.NotificationType
 import viewmodel.NotificationsViewModel
 import viewmodel.SettingsViewModel
-import viewmodel.queue.AllEntriesViewModel
-import viewmodel.queue.IQueueElementViewModel.Status
 import viewmodel.queue.QueueViewModel
 
 @Composable
@@ -99,11 +99,11 @@ fun QueueCreatorMenu() {
                 }
 
                 if (showArchiveMenu) {
-                    /* create bookmark element with associated website */
+                    /* create archive element with associated website */
                     Website.values().forEach { website ->
                         Surface(modifier = Modifier.padding(start = 10.dp).width(50.dp)) {
                             FancyButton(true, onClick = {
-                                QueueViewModel.add(AllEntriesViewModel(website))
+                                QueueViewModel.add(Downloader.allEntries(website))
                             }) {
                                 Image(getPainterByWebsite(website), null)
                             }
@@ -131,6 +131,7 @@ fun QueueCreatorMenu() {
 
                         Surface(modifier = Modifier.padding(start = 10.dp).width(50.dp)) {
                             FancyButton(canCreateBookmark, onClick = {
+                                // TODO: What if no token between check and creation?
                                 QueueViewModel.createBookmarks(website).let { QueueViewModel.add(it) }
                             }, onDisabledClick = {
                                 NotificationsViewModel.add(
