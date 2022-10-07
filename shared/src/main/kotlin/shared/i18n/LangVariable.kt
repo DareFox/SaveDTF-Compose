@@ -1,12 +1,13 @@
 package shared.i18n
 
-import i18n.langs.LanguageResource
-import i18n.langs.ProxyLanguageResource
-import i18n.langs.en_USLanguageResource
+import shared.i18n.langs.LanguageResource
+import shared.i18n.langs.ProxyLanguageResource
+import shared.i18n.langs.en_USLanguageResource
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 private var _LangState: MutableStateFlow<LanguageResource> = MutableStateFlow(ProxyLanguageResource(en_USLanguageResource, en_USLanguageResource))
-val LangState = _LangState
+val LangState: StateFlow<LanguageResource> = _LangState
 val Lang
     get() = LangState.value
 

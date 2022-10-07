@@ -78,7 +78,7 @@ val defaultLangProperties = allLanguages.firstOrNull() {
 } ?: throw IllegalArgumentException("No default language was detected with $tagField $defaultLang")
 
 // Package to save all generated classes
-val classPackage = "i18n.langs"
+val classPackage = "shared.i18n.langs"
 
 // Create build/generated folder
 // Also remove previous generated files

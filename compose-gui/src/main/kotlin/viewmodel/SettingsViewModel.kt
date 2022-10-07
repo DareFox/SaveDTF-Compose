@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import cache.buildCache
+import shared.i18n.langs.LanguageResource
 import org.slf4j.LoggerFactory
-import ui.i18n.AvailableLanguages
-import ui.i18n.DefaultLanguageResource
-import ui.i18n.LanguageResource
-import ui.i18n.ProxyLanguageResource
+import shared.i18n.langs.AvailableLanguages
+import shared.i18n.langs.DefaultLanguageResource
+import shared.i18n.langs.ProxyLanguageResource
 import java.util.prefs.Preferences
 
 object SettingsViewModel {
