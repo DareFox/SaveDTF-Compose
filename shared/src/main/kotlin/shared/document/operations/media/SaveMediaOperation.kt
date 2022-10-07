@@ -22,7 +22,6 @@ class SaveMediaOperation(
     val downloaderModules: List<Pair<IDownloadModule, Boolean>>,
     val retryAmount: Int,
     val replaceErrorMedia: Boolean,
-    val saveFolder: File,
     val timeoutInSeconds: Int
 ) : AbstractProcessorOperation() {
     override val name: String = Lang.saveMediaOperation
@@ -30,6 +29,7 @@ class SaveMediaOperation(
     override suspend fun process(arguments: OperationArguments): Document {
         val entry = arguments.entry
         val document = arguments.document
+        val saveFolder = arguments.saveFolder
 
         for (moduleIgnorePair in downloaderModules) {
             val downloader = moduleIgnorePair.first
