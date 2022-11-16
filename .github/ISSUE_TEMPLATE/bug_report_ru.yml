@@ -18,7 +18,7 @@ body:
     label: Описание ошибки
     description: Четкое и краткое описание ошибки.
     placeholder: |
-      При нажатие на эту кнопку появляется ошибка NullPointerReference.
+      При нажатие на X кнопку программа вылетает.
     render: markdown
   validations:
     required: true
@@ -36,15 +36,6 @@ body:
   validations:
     required: true
 - type: textarea
-  id: expectation
-  attributes:
-    label: Ожидаемое поведение
-    description: |
-      Четкое и краткое описание того, что вы ожидали, что произойдет.
-    render: text
-  validations:
-    required: true
-- type: textarea
   id: screenshots
   attributes:
     label: Скриншоты
@@ -54,9 +45,9 @@ body:
 - type: textarea
   id: deviceinfo
   attributes:
-    label: Сведения об устройстве
-    placeholder: |
-      ОС: [например, Windows 10 21H2] 
+    label: Логи
+    description: Их можно получить в окне вылета программы или можно открыть папку в настройках и скопировать логи оттуда
+    render: markdown
   validations:
     required: false
 - type: textarea
@@ -64,6 +55,5 @@ body:
   attributes:
     label: Дополнительный контекст
     description: Добавьте сюда любые другие сведения о проблеме.
-    render: markdown
   validations:
     required: false

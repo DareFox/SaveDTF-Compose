@@ -6,6 +6,8 @@
 by [Jetpack Compose for Desktop](https://www.jetbrains.com/ru-ru/lp/compose-mpp/ "Jetpack Compose for Desktop"). It can
 save pages from [DTF](https://dtf.ru "DTF"), [VC](https://vc.ru "VC") and [TJournal](https://tjournal.ru "TJournal")**
 
+## [BETA 2.0.0](https://github.com/DareFox/SaveDTF-Compose/releases/tag/pre3--2.0.0)
+
 **[Инструкция на русском языке](https://github.com/DareFox/SaveDTF-Compose/blob/main/README_RU.md)**
 
 ## Features ✨
@@ -16,10 +18,10 @@ save pages from [DTF](https://dtf.ru "DTF"), [VC](https://vc.ru "VC") and [TJour
 
 ## Work in progress 🚧
 
-- Download article with comments
-- Download articles from bookmarks
-- Download all articles from user profile
-- Make downloaded articles more fancier ✨
+- Download article with comments [[Done in 2.0.0 beta](https://github.com/DareFox/SaveDTF-Compose/releases/tag/pre3--2.0.0)]
+- Download articles from bookmarks [[Done in 2.0.0 beta](https://github.com/DareFox/SaveDTF-Compose/releases/tag/pre3--2.0.0)]
+- Download all articles from user profile [[Done in 2.0.0 beta](https://github.com/DareFox/SaveDTF-Compose/releases/tag/pre3--2.0.0)]
+- Make downloaded articles more fancier ✨ [[Done in 2.0.0 beta](https://github.com/DareFox/SaveDTF-Compose/releases/tag/pre3--2.0.0)]
 
 ## Installation ⚙️
 

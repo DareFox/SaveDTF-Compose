@@ -1,0 +1,121 @@
+name: Create native distributions
+
+on:  
+  release:
+    types: [published]
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  buildDeb:
+    # Only if pre-release version
+    if: "github.event.release.prerelease"
+  
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    name: Build Debian package
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+      
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build package
+        run: ./gradlew packageDeb
+      
+      - name: Find and save package path
+        run: |
+          echo "FILEPATH=$(find . -name "*.deb")" >> $GITHUB_ENV
+        
+      - name: Upload package to Github release page
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.FILEPATH }}
+          tag: ${{ github.ref }}
+          overwrite: true
+        
+  buildExe: 
+    # Only if pre-release version
+    if: "github.event.release.prerelease"
+  
+    runs-on: windows-latest
+    
+    name: Build Windows installer
+    
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
+      
+      - name: Build package
+        run: ./gradlew.bat packageExe
+      
+      - name: Find and save package path
+        run: |
+          echo "FILEPATH=$(find . -iname "savedtf*.exe")" >> $GITHUB_ENV
+        shell: bash
+        
+      - name: Upload package to Github release page
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.FILEPATH }}
+          tag: ${{ github.ref }}
+          overwrite: true
+
+  buildDmg:
+    # Only if pre-release version
+    if: "github.event.release.prerelease"
+  
+    # The type of runner that the job will run on
+    runs-on: macos-latest
+
+    name: Build MacOS .dmg package
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+      
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build package
+        run: ./gradlew packageDmg
+      
+      - name: Find and save package path
+        run: |
+          echo "FILEPATH=$(find . -name "*.dmg")" >> $GITHUB_ENV
+        
+      - name: Upload package to Github release page
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.FILEPATH }}
+          tag: ${{ github.ref }}
+          overwrite: true
+      
