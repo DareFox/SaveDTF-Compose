@@ -32,10 +32,6 @@ dependencies {
     // HTML Parser
     implementation("org.jsoup:jsoup:1.14.3")
 
-    // Function rate limiter
-    implementation("io.github.resilience4j:resilience4j-ratelimiter:1.7.1")
-    implementation("io.github.resilience4j:resilience4j-kotlin:1.7.1")
-
     // Logger
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     implementation("org.slf4j:slf4j-api:1.7.36")
