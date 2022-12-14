@@ -18,7 +18,6 @@ class MultiOutputStream(private val streams: Collection<OutputStream>) : OutputS
     override fun write(b: Int) {
         streams.forEach {
             it.write(b)
-
         }
     }
 

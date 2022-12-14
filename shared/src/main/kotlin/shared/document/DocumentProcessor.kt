@@ -27,25 +27,9 @@ class DocumentProcessor(
     // private mutable queue
     private var _operationsQueue: MutableSet<IProcessorOperation> = operations.toMutableSet()
 
-    /**
-     *  Collection of [operations][IProcessorOperation] that used as queue for [transforming. processing][process] document.
-     *
-     *  [Processor][DocumentProcessor] uses queue from first to last
-     *
-     *  @see addOperation
-     *  @see removeOperation
-     *  @see removeAllOperations
-     *  @see clearOperationsQueue
-     *  @see replaceQueueWith
-     */
     override val operationsQueue: Set<IProcessorOperation>
         get() = _operationsQueue
 
-    /**
-     *  Process/transform document by [operations queue][operationsQueue]
-     *
-     *  @return transformed document by queue
-     */
     override suspend fun process(): Document {
         var document = document
 
@@ -62,20 +46,12 @@ class DocumentProcessor(
         return document
     }
 
-    /**
-     * Adds the specified operations to the end of the operation queue
-     */
     override fun addOperation(vararg operations: IProcessorOperation) {
         for (operation in operations) {
             _operationsQueue.add(operation)
         }
     }
 
-    /**
-     * Removes a single instance of the specified operations from operation queue, if it is present.
-     *
-     * @return true if any of the specified elements was removed from the queue, false if the queue was not modified
-     */
     override fun removeOperation(vararg operations: IProcessorOperation): Boolean {
         var result = false
 
@@ -88,25 +64,14 @@ class DocumentProcessor(
         return result
     }
 
-    /**
-     * Removes all operations from operations queue that are also contained in the given operations collection
-     *
-     * @return true if any of the specified elements was removed from the queue, false if the queue was not modified
-     */
     override fun removeAllOperations(vararg operations: IProcessorOperation): Boolean {
-        return _operationsQueue.removeAll(operations)
+        return _operationsQueue.removeAll(operations.toSet())
     }
 
-    /**
-     * Remove all operation queue elements.
-     */
     override fun clearOperationsQueue() {
         _operationsQueue.clear()
     }
 
-    /**
-     * Remove all previous operations and replace it with new given operations queue
-     */
     override fun replaceQueueWith(operations: Set<IProcessorOperation>) {
         clearOperationsQueue()
         _operationsQueue = operations.toMutableSet()
