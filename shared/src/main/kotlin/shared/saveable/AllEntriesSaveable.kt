@@ -5,11 +5,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kmtt.models.enums.Website
 import kotlinx.coroutines.runBlocking
-import shared.ktor.Client
+import shared.ktor.HttpClient
 import shared.ktor.rateRequest
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import shared.document.IDocumentProcessor
 import shared.document.IProcessorOperation
 import shared.i18n.Lang
 import java.io.File
@@ -40,7 +39,7 @@ open class AllEntriesSaveable(
         setProgress(Lang.allEntriesVmFetchingSitemap)
 
         val sitemap = "https://${site.baseURL}/sitemap"
-        val response = Client.rateRequest<HttpResponse> {
+        val response = HttpClient.rateRequest<HttpResponse> {
             url(sitemap)
         }
 
@@ -102,7 +101,7 @@ open class AllEntriesSaveable(
 
                 try {
                     val response = runBlocking {
-                        Client.rateRequest<HttpResponse> {
+                        HttpClient.rateRequest<HttpResponse> {
                             url(it)
                         }
                     }

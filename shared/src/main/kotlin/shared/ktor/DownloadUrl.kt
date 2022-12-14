@@ -7,7 +7,6 @@ import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
-import shared.cache.buildCache
 import shared.document.operations.media.BinaryMedia
 import mu.KotlinLogging
 import shared.i18n.Lang
@@ -16,11 +15,10 @@ import java.io.File
 import java.io.InputStream
 
 private val logger = KotlinLogging.logger { }
-private val cache = buildCache()
 private var timeout: Job? = null
 private val scope = CoroutineScope(Dispatchers.IO)
 
-suspend fun Client.downloadUrl(
+suspend fun HttpClient.downloadUrl(
     url: String,
     retryAmount: Int,
     replaceOnError: BinaryMedia? = null,
@@ -50,7 +48,7 @@ suspend fun Client.downloadUrl(
     return file
 }
 
-private suspend fun download(
+private suspend fun HttpClient.download(
     url: String,
     retryAmount: Int,
     replaceOnError: BinaryMedia?,
@@ -64,7 +62,7 @@ private suspend fun download(
             val shouldUseTimeoutRestriction = timeoutInSeconds > 0
             val downloadJob: suspend () -> HttpResponse = {
                 yield()
-                Client.rateRequest<HttpResponse> {
+                this.rateRequest<HttpResponse> {
                     logger.debug {
                         "Sending rate request to $url"
                     }

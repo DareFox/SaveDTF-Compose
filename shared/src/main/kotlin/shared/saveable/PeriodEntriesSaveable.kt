@@ -7,7 +7,7 @@ import kmtt.models.enums.Website
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import shared.document.IProcessorOperation
-import shared.ktor.Client
+import shared.ktor.HttpClient
 import shared.ktor.rateRequest
 import shared.i18n.Lang
 import java.io.File
@@ -34,7 +34,7 @@ class PeriodEntriesSaveable(
 
         setProgress(Lang.allEntriesVmFetchingSitemap)
 
-        val response = Client.rateRequest<HttpResponse> {
+        val response = HttpClient.rateRequest<HttpResponse> {
             url(periodSitemapLink)
         }
 

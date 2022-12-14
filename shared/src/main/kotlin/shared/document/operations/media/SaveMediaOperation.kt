@@ -7,13 +7,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import shared.document.AbstractProcessorOperation
 import shared.document.operations.media.modules.IDownloadModule
-import shared.ktor.Client
+import shared.ktor.HttpClient
 import shared.ktor.downloadUrl
 import mu.KotlinLogging
 import org.jsoup.nodes.Document
 import shared.document.operations.OperationArguments
 import shared.i18n.Lang
-import java.io.File
 
 class SaveMediaOperation(
     /**
@@ -68,7 +67,7 @@ class SaveMediaOperation(
                                 saveFolder.resolve(downloaderFolder)
                             }
 
-                            val media = Client.downloadUrl(
+                            val media = HttpClient.downloadUrl(
                                 url = url.second,
                                 retryAmount = retryAmount,
                                 replaceOnError = errMedia,

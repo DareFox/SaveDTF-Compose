@@ -7,7 +7,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.darefox.compose_gui.BuildConfig
 import shared.Version
-import shared.ktor.Client
+import shared.ktor.HttpClient
 import shared.ktor.rateRequest
 import shared.util.string.toVersionOrNull
 
@@ -21,7 +21,7 @@ object AppViewModel {
 
     suspend fun getLastVersionOrNull(): Version? {
         return try {
-            val json = Client.rateRequest<JsonElement> {
+            val json = HttpClient.rateRequest<JsonElement> {
                 method = HttpMethod.Get
                 url(latestVersionAPI)
             }.jsonObject
