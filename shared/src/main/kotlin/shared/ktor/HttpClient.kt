@@ -11,7 +11,7 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.withPermit
 import mu.KotlinLogging
-import shared.cache.StreamCache
+import shared.abstracts.StreamCache
 import shared.document.operations.media.BinaryMedia
 import shared.i18n.Lang
 import shared.io.RateLimitSemaphore

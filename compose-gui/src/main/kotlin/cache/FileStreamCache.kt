@@ -8,7 +8,7 @@ import shared.io.WaitingMutex
 import shared.io.asCounter
 import shared.io.asMultiStream
 import mu.KotlinLogging
-import shared.cache.StreamCache
+import shared.abstracts.StreamCache
 import shared.util.filesystem.getTempCacheFolder
 import shared.util.filesystem.recursiveFileList
 import shared.util.filesystem.sizeToString

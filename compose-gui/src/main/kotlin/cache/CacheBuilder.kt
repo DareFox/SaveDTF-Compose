@@ -1,6 +1,6 @@
 package cache
 
-import shared.cache.StreamCache
+import shared.abstracts.StreamCache
 
 fun buildCache(): StreamCache {
     return FileStreamCache
