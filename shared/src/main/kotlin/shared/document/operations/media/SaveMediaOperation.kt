@@ -19,6 +19,7 @@ class SaveMediaOperation(
      * List of download modules pairs. On true, will download media from (given by downloader) URLs, on false - won't
      */
     val downloaderModules: List<Pair<IDownloadModule, Boolean>>,
+    val client: HttpClient,
     val retryAmount: Int,
     val replaceErrorMedia: Boolean,
     val timeoutInSeconds: Int
@@ -67,7 +68,7 @@ class SaveMediaOperation(
                                 saveFolder.resolve(downloaderFolder)
                             }
 
-                            val media = HttpClient.downloadUrl(
+                            val media = client.downloadUrl(
                                 url = url.second,
                                 retryAmount = retryAmount,
                                 replaceOnError = errMedia,
