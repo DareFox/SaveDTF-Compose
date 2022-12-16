@@ -6,7 +6,6 @@ import io.ktor.client.statement.*
 import kmtt.models.enums.Website
 import kotlinx.coroutines.runBlocking
 import shared.ktor.HttpClient
-import shared.ktor.rateRequest
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import shared.document.IProcessorOperation
@@ -25,12 +24,14 @@ open class AllEntriesSaveable(
     entryTimeoutInSeconds: Int,
     operations: Set<IProcessorOperation>,
     folderToSave: File,
+    httpClient: HttpClient
 ) : AbstractSaveable(
     emptyLambda = {},
     apiTimeoutInSeconds = apiTimeoutInSeconds,
     entryTimeoutInSeconds = entryTimeoutInSeconds,
     operations = operations,
-    folderToSave = folderToSave
+    folderToSave = folderToSave,
+    httpClient = httpClient
 ), IAllEntriesSaveable {
     private var sitemapDoc: Document? = null
     protected val yearRegex = "/year-\\d{4}-\\d{2}-\\d{2}".toRegex(RegexOption.IGNORE_CASE)
@@ -39,7 +40,7 @@ open class AllEntriesSaveable(
         setProgress(Lang.allEntriesVmFetchingSitemap)
 
         val sitemap = "https://${site.baseURL}/sitemap"
-        val response = HttpClient.rateRequest<HttpResponse> {
+        val response = httpClient.rateRequest<HttpResponse> {
             url(sitemap)
         }
 
@@ -101,7 +102,7 @@ open class AllEntriesSaveable(
 
                 try {
                     val response = runBlocking {
-                        HttpClient.rateRequest<HttpResponse> {
+                        httpClient.rateRequest<HttpResponse> {
                             url(it)
                         }
                     }

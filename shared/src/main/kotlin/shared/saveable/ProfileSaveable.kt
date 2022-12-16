@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import shared.document.IProcessorOperation
 import shared.i18n.Lang
+import shared.ktor.HttpClient
 import shared.util.kmttapi.betterPublicKmtt
 import java.io.File
 
@@ -24,12 +25,14 @@ class ProfileSaveable(
     entryTimeoutInSeconds: Int,
     operations: Set<IProcessorOperation>,
     folderToSave: File,
+    httpClient: HttpClient
 ) : AbstractSaveable(
     emptyLambda = {},
     apiTimeoutInSeconds = apiTimeoutInSeconds,
     entryTimeoutInSeconds = entryTimeoutInSeconds,
     operations = operations,
-    folderToSave = folderToSave
+    folderToSave = folderToSave,
+    httpClient = httpClient
 ), IProfileSaveable {
     private val _user = MutableStateFlow<Subsite?>(null)
     override val user: StateFlow<Subsite?> = _user

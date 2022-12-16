@@ -8,7 +8,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import shared.document.IProcessorOperation
 import shared.ktor.HttpClient
-import shared.ktor.rateRequest
 import shared.i18n.Lang
 import java.io.File
 
@@ -24,7 +23,15 @@ class PeriodEntriesSaveable(
     entryTimeoutInSeconds: Int,
     operations: Set<IProcessorOperation>,
     folderToSave: File,
-) : AllEntriesSaveable(site, apiTimeoutInSeconds, entryTimeoutInSeconds, operations, folderToSave), IPeriodEntriesSaveable {
+    httpClient: HttpClient
+) : AllEntriesSaveable(
+    site = site,
+    apiTimeoutInSeconds = apiTimeoutInSeconds,
+    entryTimeoutInSeconds = entryTimeoutInSeconds,
+    operations = operations,
+    folderToSave = folderToSave,
+    httpClient = httpClient
+), IPeriodEntriesSaveable {
     private var sitemapPeriodDoc: Document? = null
 
     override suspend fun initializeImpl() {
@@ -34,7 +41,7 @@ class PeriodEntriesSaveable(
 
         setProgress(Lang.allEntriesVmFetchingSitemap)
 
-        val response = HttpClient.rateRequest<HttpResponse> {
+        val response = httpClient.rateRequest<HttpResponse> {
             url(periodSitemapLink)
         }
 

@@ -52,7 +52,7 @@ class HttpClient(
     /**
      * Send request with rate limit of 3 usages in 1 second and thread limit of 3 coroutines/threads
      */
-    suspend inline fun <reified T> HttpClient.rateRequest(crossinline block: HttpRequestBuilder.() -> Unit): T {
+    suspend inline fun <reified T> rateRequest(crossinline block: HttpRequestBuilder.() -> Unit): T {
         return withRatePermit {
             ktor.request(block)
         }

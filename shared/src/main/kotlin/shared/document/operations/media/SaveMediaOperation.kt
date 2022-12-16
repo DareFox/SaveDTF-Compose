@@ -8,11 +8,12 @@ import kotlinx.coroutines.flow.update
 import shared.document.AbstractProcessorOperation
 import shared.document.operations.media.modules.IDownloadModule
 import shared.ktor.HttpClient
-import shared.ktor.downloadUrl
 import mu.KotlinLogging
 import org.jsoup.nodes.Document
 import shared.document.operations.OperationArguments
 import shared.i18n.Lang
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class SaveMediaOperation(
     /**
@@ -68,12 +69,12 @@ class SaveMediaOperation(
                                 saveFolder.resolve(downloaderFolder)
                             }
 
-                            val media = client.downloadUrl(
+                            val media = client.downloadUrlToFile(
                                 url = url.second,
                                 retryAmount = retryAmount,
                                 replaceOnError = errMedia,
-                                timeoutInSeconds = timeoutInSeconds,
-                                directory = folder
+                                directory = folder,
+                                timeoutDuration = timeoutInSeconds.toDuration(DurationUnit.SECONDS),
                             ) ?: return@async
 
                             media.relativeTo(saveFolder).path

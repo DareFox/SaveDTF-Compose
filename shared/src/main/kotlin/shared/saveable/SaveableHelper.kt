@@ -1,8 +1,8 @@
 package shared.saveable
 
 import kmtt.models.enums.Website
-import shared.document.DocumentProcessor
 import shared.document.IProcessorOperation
+import shared.ktor.HttpClient
 import java.io.File
 
 /**
@@ -19,6 +19,7 @@ class SaveableHelper(
     var entryTimeoutInSeconds: Int,
     operations: Set<IProcessorOperation>,
     var folderToSave: File,
+    val httpClient: HttpClient
 ) {
     /**
      * Operations to be applied when creating [ISaveable] objects
@@ -33,7 +34,8 @@ class SaveableHelper(
         apiTimeoutInSeconds = apiTimeoutInSeconds,
         entryTimeoutInSeconds = entryTimeoutInSeconds,
         operations = operations,
-        folderToSave = folderToSave
+        folderToSave = folderToSave,
+        httpClient = httpClient
     )
 
     /**
@@ -45,7 +47,8 @@ class SaveableHelper(
         apiTimeoutInSeconds = apiTimeoutInSeconds,
         entryTimeoutInSeconds = entryTimeoutInSeconds,
         operations = operations,
-        folderToSave = folderToSave
+        folderToSave = folderToSave,
+        httpClient = httpClient
     )
 
     /**
@@ -56,7 +59,8 @@ class SaveableHelper(
         apiTimeoutInSeconds = apiTimeoutInSeconds,
         entryTimeoutInSeconds = entryTimeoutInSeconds,
         operations = operations,
-        folderToSave = folderToSave
+        folderToSave = folderToSave,
+        httpClient = httpClient
     )
 
     /**
@@ -68,7 +72,8 @@ class SaveableHelper(
         apiTimeoutInSeconds = apiTimeoutInSeconds,
         entryTimeoutInSeconds = entryTimeoutInSeconds,
         operations = operations,
-        folderToSave = folderToSave
+        folderToSave = folderToSave,
+        httpClient = httpClient
     )
 
     /**
@@ -80,6 +85,7 @@ class SaveableHelper(
         apiTimeoutInSeconds = apiTimeoutInSeconds,
         entryTimeoutInSeconds = entryTimeoutInSeconds,
         operations = operations,
-        folderToSave = folderToSave
+        folderToSave = folderToSave,
+        httpClient = httpClient
     )
 }

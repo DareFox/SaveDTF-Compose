@@ -3,7 +3,7 @@ package shared.saveable
 import exception.OperationTimeoutException
 import exception.QueueElementException
 import exception.errorOnNull
-import i18n.langs.LanguageResource
+import shared.i18n.langs.LanguageResource
 import kmtt.models.entry.Entry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,9 +13,9 @@ import kotlinx.coroutines.sync.Mutex
 import mu.KotlinLogging
 import org.jsoup.Jsoup
 import shared.document.DocumentProcessor
-import shared.document.IDocumentProcessor
 import shared.document.IProcessorOperation
 import shared.i18n.Lang
+import shared.ktor.HttpClient
 import shared.saveable.ISaveable.*
 import shared.util.filesystem.toDirectory
 import shared.util.kmttapi.KmttUrl
@@ -44,6 +44,7 @@ abstract class AbstractSaveable(
     protected val entryTimeoutInSeconds: Int,
     folderToSave: File,
     protected val operations: Set<IProcessorOperation>,
+    protected val httpClient: HttpClient
 ) : ISaveable {
     private val internalLogger = KotlinLogging.logger { }
     protected val logger = KotlinLogging.logger(emptyLambda)

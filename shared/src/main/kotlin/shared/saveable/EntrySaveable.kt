@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import shared.document.IDocumentProcessor
 import shared.document.IProcessorOperation
+import shared.ktor.HttpClient
 import shared.util.kmttapi.KmttUrl
 import shared.util.kmttapi.betterPublicKmtt
 import java.io.File
@@ -23,12 +24,14 @@ class EntrySaveable(
     entryTimeoutInSeconds: Int,
     operations: Set<IProcessorOperation>,
     folderToSave: File,
+    httpClient: HttpClient
 ) : AbstractSaveable(
     emptyLambda = {},
     apiTimeoutInSeconds = apiTimeoutInSeconds,
     entryTimeoutInSeconds = entryTimeoutInSeconds,
     operations = operations,
-    folderToSave = folderToSave
+    httpClient = httpClient,
+    folderToSave = folderToSave,
 ),
     IEntrySaveable {
 

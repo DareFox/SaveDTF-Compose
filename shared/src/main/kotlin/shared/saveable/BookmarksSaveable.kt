@@ -5,6 +5,7 @@ import kmtt.impl.authKmtt
 import kmtt.models.enums.Website
 import shared.document.IProcessorOperation
 import shared.i18n.Lang
+import shared.ktor.HttpClient
 import java.io.File
 
 interface IBookmarksSaveable : ISaveable {
@@ -18,21 +19,23 @@ class BookmarksSaveable(
     entryTimeoutInSeconds: Int,
     operations: Set<IProcessorOperation>,
     folderToSave: File,
+    httpClient: HttpClient
 ) : AbstractSaveable(
     emptyLambda = {},
     apiTimeoutInSeconds = apiTimeoutInSeconds,
     entryTimeoutInSeconds = entryTimeoutInSeconds,
     operations = operations,
-    folderToSave = folderToSave
+    httpClient = httpClient,
+    folderToSave = folderToSave,
 ), IBookmarksSaveable {
-    private var client = authKmtt(site, token)
+    private var kmttClient = authKmtt(site, token)
     override suspend fun initializeImpl() {
         // if token updates we should recreate api client
-        client = authKmtt(site, token)
+        kmttClient = authKmtt(site, token)
         setProgress(Lang.bookmarksElementVmRequestingProfile)
 
         try {
-            client.user.getMe()
+            kmttClient.user.getMe()
         } catch (e: Exception) {
             throw QueueElementException(Lang.bookmarksElementVmProfileError)
         }
@@ -44,7 +47,7 @@ class BookmarksSaveable(
         val errorList = mutableListOf<String>()
 
         setProgress(Lang.bookmarksElementVmAllEntriesMessage)
-        client.user.getAllMyFavoriteEntries {
+        kmttClient.user.getAllMyFavoriteEntries {
             it.forEach { entry ->
                 if (!tryProcessEntry(entry, parentDirFile, counter)) {
                     errorList += "${site.baseURL}/${entry.id} (author=${entry.author?.name})"
