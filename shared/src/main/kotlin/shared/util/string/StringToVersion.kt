@@ -1,6 +1,6 @@
 package shared.util.string
 
-import Version
+import shared.Version
 
 fun String.toVersionOrNull(): Version? {
     val regex = """\d+\.\d+\.\d+""".toRegex()
