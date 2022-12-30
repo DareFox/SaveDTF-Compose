@@ -5,8 +5,10 @@ import org.jsoup.nodes.Document
 import util.kmttapi.UrlUtil
 
 fun Document.getWebsite(): Website? {
-    val header = getElementsByClass("content-header-author").first() ?: return null
-    val url = header.attr("href")
+    val header = getElementsByClass("content-header-author__name")
+    val url = header.firstNotNullOfOrNull {
+        it.attr("href").ifEmpty { null }
+    } ?: return null
 
     return UrlUtil.getWebsiteType(url)
 }
