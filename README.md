@@ -1,3 +1,7 @@
+
+> [!CAUTION]
+> Archived due to API access removal and other often breaking changes on the DTF/VC/TJ site
+
 # SaveDTF
 
 ![DTF_logo_low_res](https://user-images.githubusercontent.com/47672780/164269052-5ad8858d-c8cb-4152-951e-873316b7562c.png)
