@@ -1,6 +1,8 @@
 
 > [!CAUTION]
 > Archived due to API access removal and other often breaking changes on the DTF/VC/TJ site
+> 
+> Software is no longer supported and will no longer receive updates
 
 # SaveDTF
 
